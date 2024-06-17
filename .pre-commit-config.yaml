@@ -1,0 +1,22 @@
+repos:
+  # Versioning: Commit Messages & Changelog
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v2.27.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # Autoformat: Python code
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        args: [--target-version=py311]
+
+  # Lint / autoformat: Python code
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: "v0.0.264"
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
