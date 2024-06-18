@@ -50,7 +50,7 @@ def main():
     Download and write files hosted at URLs to S3 bucket or local machine.
     """
     args = parse_arguments()
-    websnap.write_urls(**(vars(args)))
+    websnap.websnap(**(vars(args)))
 
 
 if __name__ == "__main__":
