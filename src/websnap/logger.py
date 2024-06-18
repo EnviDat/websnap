@@ -28,7 +28,8 @@ def get_console_handler() -> logging.StreamHandler:
 
 def get_file_handler(filename: str) -> logging.handlers.TimedRotatingFileHandler:
     """
-    Return formatted file handler for logs. Repeat interval, backup count and formatter
+    Return formatted rotational file handler for logs.
+    Repeat interval, backup count and formatter
     are set with constants at beginning of module.
 
     Args:

@@ -4,57 +4,26 @@ local machine.
 
 TODO finish WIP
 TODO write comments including example commands
+TODO test using as a function from a package
 
 Example command from websnap/src/websnap:
     python websnap.py
 """
 
-import argparse
-
-from logger import get_logger
+from src.websnap.logger import get_logger
 
 
-def parse_arguments() -> argparse.Namespace | None:
-    """
-    Parses command line arguments and return arguments as argparse.Namespace object.
-    If parsing fails then return None.
-    """
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "-l",
-        "--loglevel",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        default="INFO",
-        help="Level to use for logging. Default value is'INFO'.",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--repeat",
-        type=int,
-        help="Run websnap continuously every <repeat> minutes.",
-    )
-
-    try:
-        return parser.parse_args()
-    except (argparse.ArgumentTypeError, Exception) as e:
-        print(f"Exception: {e} ")
-        return None
-
-
-def websnap():
+def write_urls(loglevel: str = "INFO", repeat: int | None = None):
     """
     Download and write files hosted at URLs to S3 bucket or local machine.
     """
-    args = parse_arguments()
 
-    log = get_logger(websnap.__name__, args.loglevel)
-    log.info("*** Start transfer...")
+    # TODO remove print statements
+    print(f"loglevel:  {loglevel}")
+    print(f"repeat:   {repeat}")
 
     # TODO start dev here: read config file
 
-
-if __name__ == "__main__":
-    websnap()
+    # TODO refactor logger to use config (with default) values
+    log = get_logger("websnap", loglevel)
+    log.info("*** Start transfer...")

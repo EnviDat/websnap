@@ -17,3 +17,6 @@ license = {text = "MIT"}
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[tool.pdm.scripts]
+websnap-cli = {call = "websnap.websnap_cli:main"}

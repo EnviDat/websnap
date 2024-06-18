@@ -1,3 +1,28 @@
+# Project
+*.log
+*.log.*
+/src/websnap/confg.ini
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PEP 582
+__pypackages__/
+
+# PDM
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# PyCharm
+.idea/
+
+
+
+# TODO review PDM generated block below
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -153,10 +178,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-.idea/

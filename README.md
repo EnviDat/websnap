@@ -2,6 +2,13 @@
 
 Download and write files hosted at URLs to S3 bucket or local machine.
 
+TODO document PDM setup and install
+
+TODO document usage uncluding pdm commands 
+
+TODO document config citing example.ini files
+
+
 ## Pre-commit hooks
 
 - To run the pre-commit hooks manually open app in terminal and execute: `pre-commit run --all-files`
