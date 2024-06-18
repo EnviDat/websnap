@@ -9,6 +9,7 @@ dependencies = [
     "argparse>=1.4.0",
     "pre-commit>=3.7.1",
     "black>=24.4.2",
+    "pydantic>=2.7.4",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

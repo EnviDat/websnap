@@ -20,7 +20,14 @@ def parse_arguments() -> argparse.Namespace | None:
     If parsing fails then return None.
     """
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Websnap CLI")
+
+    parser.add_argument(
+        "-c",
+        "--config",
+        default="./src/websnap/config/config.ini",
+        help="Path to 'config.ini' file. Default value is './config/config.ini'.",
+    )
 
     parser.add_argument(
         "-l",
@@ -49,8 +56,8 @@ def main():
     Main entry point for websnap-cli.
     Download and write files hosted at URLs to S3 bucket or local machine.
     """
-    args = parse_arguments()
-    websnap.websnap(**(vars(args)))
+    kwargs = parse_arguments()
+    websnap.websnap(**(vars(kwargs)))
 
 
 if __name__ == "__main__":

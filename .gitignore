@@ -1,7 +1,7 @@
 # Project
 *.log
 *.log.*
-/src/websnap/config.ini
+*config.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
