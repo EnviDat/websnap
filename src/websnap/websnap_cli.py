@@ -26,7 +26,8 @@ def parse_arguments() -> argparse.Namespace | None:
         "-c",
         "--config",
         default="./src/websnap/config/config.ini",
-        help="Path to 'config.ini' file. Default value is './config/config.ini'.",
+        help="Path to 'config.ini' file. "
+        "Default value is './src/websnap/config/config.ini'.",
     )
 
     parser.add_argument(

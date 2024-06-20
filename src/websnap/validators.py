@@ -2,6 +2,8 @@
 
 import configparser
 from pathlib import Path
+
+from black import Enum
 from pydantic import BaseModel, ValidationError
 
 
@@ -45,17 +47,31 @@ class LogConfigModel(BaseModel):
     """
 
     log_when: str
+    log_interval: int
     log_backup_count: int
 
 
-def get_log_config(
+class LogRotation(Enum):
+    """Class with default values used by rotating logs."""
+
+    WHEN = "h"
+    INTERVAL = 1
+    BACKUP_COUNT = 0
+
+
+def validate_log_config(
     config_parser: configparser.ConfigParser,
 ) -> LogConfigModel | Exception:
     try:
         log = {
-            "log_when": config_parser.get("DEFAULT", "log_when", fallback="midnight"),
+            "log_when": config_parser.get(
+                "DEFAULT", "log_when", fallback=LogRotation.WHEN.value
+            ),
+            "log_interval": config_parser.get(
+                "DEFAULT", "log_interval", fallback=LogRotation.INTERVAL.value
+            ),
             "log_backup_count": config_parser.getint(
-                "DEFAULT", "log_backup_count", fallback=7
+                "DEFAULT", "log_backup_count", fallback=LogRotation.BACKUP_COUNT.value
             ),
         }
         return LogConfigModel(**log)
