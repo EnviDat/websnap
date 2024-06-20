@@ -26,7 +26,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-c",
         "--config",
         default="./src/websnap/config/config.ini",
-        help="Path to 'config.ini' file. "
+        help="Path to 'config.ini' file."
         "Default value is './src/websnap/config/config.ini'.",
     )
 
@@ -36,6 +36,10 @@ def parse_arguments() -> argparse.Namespace | None:
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
         help="Level to use for logging. Default value is'INFO'.",
+    )
+
+    parser.add_argument(
+        "-f", "--file_logs", action="store_true", help="Enable rotating file logs."
     )
 
     parser.add_argument(
@@ -57,8 +61,13 @@ def main():
     Main entry point for websnap-cli.
     Download and write files hosted at URLs to S3 bucket or local machine.
     """
-    kwargs = parse_arguments()
-    websnap.websnap(**(vars(kwargs)))
+    kwargs = vars(parse_arguments())
+
+    websnap.websnap(
+        config=kwargs["config"],
+        log_level=kwargs["loglevel"],
+        has_file_logs=kwargs["file_logs"],
+    )
 
 
 if __name__ == "__main__":

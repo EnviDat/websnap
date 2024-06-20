@@ -2,15 +2,15 @@
 
 import configparser
 from pathlib import Path
+from pydantic import BaseModel, ValidationError, field_validator
 
-from black import Enum
-from pydantic import BaseModel, ValidationError
+from src.websnap.constants import LogRotation
 
 
-def get_config_parser(config_path: str) -> configparser.ConfigParser | None:
+def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception:
     """
-    Return ConfigParser object. If ConfigParser object does not have any sections or
-    raises and exception then returns None.
+    Return ConfigParser object.
+    Returns Exception if fails.
 
     Args:
         config_path (str): path to config .ini file
@@ -18,27 +18,20 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | None:
     try:
         config_file = Path(config_path)
         config = configparser.ConfigParser()
-        config.read(config_file)
+        conf = config.read(config_file)
 
-        if not config:
-            return None
+        if not conf:
+            raise Exception(f"File {config_path} not found")
 
         if len(config.sections()) < 1:
-            print(
-                f"ERROR: File '{config_path}' not valid config, "
-                f"does not have any sections"
+            raise Exception(
+                f"File '{config_path}' not valid config, does not have any sections"
             )
-            return None
 
         return config
 
-    except FileNotFoundError:
-        print(f"ERROR: Config file '{config_path}' not found")
-        return None
-
     except Exception as e:
-        print(f"ERROR: {e}")
-        return None
+        raise Exception(f"{e}")
 
 
 class LogConfigModel(BaseModel):
@@ -50,18 +43,23 @@ class LogConfigModel(BaseModel):
     log_interval: int
     log_backup_count: int
 
-
-class LogRotation(Enum):
-    """Class with default values used by rotating logs."""
-
-    WHEN = "h"
-    INTERVAL = 1
-    BACKUP_COUNT = 0
+    @field_validator("log_interval", "log_backup_count")
+    def backup_count_is_non_negative(cls, value: int):
+        if value < 0:
+            raise ValueError("Config value must be greater than 0.")
+        return value
 
 
 def validate_log_config(
     config_parser: configparser.ConfigParser,
 ) -> LogConfigModel | Exception:
+    """
+    Return ConfigParser object.
+    Returns Exception if parsing fails.
+
+    Args:
+        config_parser (configparser.ConfigParser): ConfigParser object
+    """
     try:
         log = {
             "log_when": config_parser.get(
@@ -78,6 +76,6 @@ def validate_log_config(
     except ValidationError as e:
         raise Exception(f"Failed to validate config, error(s): {e}")
     except ValueError as e:
-        raise Exception(f"Incorrect value used in config, error(s): {e}")
+        raise Exception(f"Incorrect log related value in config, error(s): {e}")
     except Exception as e:
-        raise Exception(f"ERROR: {e}")
+        raise Exception(f"{e}")

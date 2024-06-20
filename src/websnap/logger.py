@@ -1,46 +1,24 @@
 """
-Supports rotational logging.
+Logging utilities, console handlers, and rotational file handlers.
 """
 
 import logging
 import sys
-from enum import Enum
 from logging.handlers import TimedRotatingFileHandler
 
-WHEN_INTERVAL = "midnight"
-# TODO revert
-# WHEN_INTERVAL = "W6"
-BACKUP_COUNT = 7
+from src.websnap.validators import LogConfigModel
+from src.websnap.constants import LogFormatter, LogLevel
 
 
-class LogFormatter(Enum):
-    """Class with values used to format logs."""
-
-    FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
-    DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-    @classmethod
-    def formatter(cls):
-        return logging.Formatter(fmt=cls.FORMAT.value, datefmt=cls.DATE_FORMAT.value)
-
-
-class LogLevel(Enum):
-    """Class with supported log levels."""
-
-    DEBUG = "DEBUG"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    CRITICAL = "CRITICAL"
-    INFO = "INFO"
-
-
-def get_log_level(log_level: str = "INFO"):
+def get_log_level(log_level: str = "INFO") -> int:
     """
     Return logging level for logger. Default log level: logging.INFO
 
     Args:
-        log_level(str): logging level represented as upper case string, default log
-                    level is 'INFO'
+        log_level: logging level represented as upper case string
+
+    Returns:
+        Integer that corresponds to logging level.
     """
     match log_level:
         case LogLevel.DEBUG.value:
@@ -66,42 +44,64 @@ def get_console_handler() -> logging.StreamHandler:
     return console_handler
 
 
-def get_file_handler(filename: str) -> logging.handlers.TimedRotatingFileHandler:
+def get_file_handler(
+    filename: str, when: str, interval: int, backup_count: int
+) -> logging.handlers.TimedRotatingFileHandler:
     """
     Return formatted rotational file handler for logs.
-    Repeat interval, backup count and formatter
-    are set with constants at beginning of module.
+    To learn more about logging TimedRotating FileHandler and the values acceptable for
+     'when' and how to use interval and backupCount see:
+    https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler
 
     Args:
-        filename (str): name of logger file
+        filename: Name of log file.
+        when: Value used to assign when logs rotate.
+        interval: How frequently to rotate logs.
+        backup_count: If more than 0 then at most <backup_count> files will be kept.
     """
     file_handler = TimedRotatingFileHandler(
-        filename, when=WHEN_INTERVAL, backupCount=BACKUP_COUNT
+        filename=filename, when=when, interval=interval, backupCount=backup_count
     )
     file_handler.setFormatter(LogFormatter.formatter())
     return file_handler
 
 
-def get_logger(logger_name: str, loglevel: str = "INFO") -> logging.getLogger:
+def get_logger(
+    name: str,
+    level: str = "INFO",
+    has_file_logs: bool = False,
+    config: LogConfigModel | None = None,
+) -> logging.getLogger:
     """
     Return logger with console and file handlers added. Default logging level is
     'INFO'.
 
     Args:
-        logger_name (str): name of logger
-        loglevel(str): logging level represented as upper case string, default log
-                    level is 'INFO'
+        name: Name of logger.
+        level: Logging level represented as string.
+        has_file_logs: If True then implements rotating file logs.
+        config: Validated log config.
     """
-    # TODO test
     try:
-        _loglevel = loglevel.upper()
+        _loglevel = level.upper()
     except AttributeError:
         raise Exception("Argument loglevel must be a string")
 
-    logger = logging.getLogger(logger_name)
+    logger = logging.getLogger(name)
     logger.setLevel(get_log_level(_loglevel))
     logger.addHandler(get_console_handler())
-    logger.addHandler(get_file_handler(f"{logger_name}.log"))
-    logger.propagate = False  # TODO review
+
+    if has_file_logs:
+        logger.addHandler(
+            get_file_handler(
+                filename=f"{name}.log",
+                when=config.log_when,
+                interval=config.log_interval,
+                backup_count=config.log_backup_count,
+            )
+        )
+
+    # TODO review
+    logger.propagate = False
 
     return logger
