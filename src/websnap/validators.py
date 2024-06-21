@@ -13,7 +13,7 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception
     Returns Exception if fails.
 
     Args:
-        config_path (str): path to config .ini file
+        config_path (str): Path to config.ini file.
     """
     try:
         config_file = Path(config_path)
@@ -54,7 +54,7 @@ def validate_log_config(
     config_parser: configparser.ConfigParser,
 ) -> LogConfigModel | Exception:
     """
-    Return ConfigParser object.
+    Return LogConfigModel object.
     Returns Exception if parsing fails.
 
     Args:

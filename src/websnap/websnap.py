@@ -1,8 +1,6 @@
 """
-Function websnap is used to download and write files hosted at URLs to
-S3 bucket or local machine.
-Supports customized file rotational logging.
-Optionally repeats.
+Supports downloading files hosted at URLs in config and then uploading
+them to S3 bucket or local machine.
 
 TODO finish WIP
 TODO test using as a function from a package
@@ -19,28 +17,33 @@ __all__ = ["websnap"]
 LOGGER_NAME = "websnap"
 
 
-# TODO add validation for section config and add secrets.ini config and
-#  validation for bucket values
+# TODO add validation for section config and add s3_config.ini config
+# TODO add argument to CLI:  has_s3_writer: bool = False
+# TODO test with different paths to config and s3_config
 def websnap(
     config: str = "./config/config.ini",
     log_level: str = "INFO",
     has_file_logs: bool = False,
+    has_s3_uploader: bool = False,
+    s3_config: str = "./config/s3_config.ini",
     repeat_interval: int | None = None,
 ):
     """
-    Download and write files hosted at URLs to S3 bucket or local machine.
+    Download files hosted at URLs in config and then uploads them
+    to S3 bucket or local machine.
     Optionally customize rotating logs.
     Optionally repeat websnap file processing iteration.
 
     Args:
-        config: Path to 'config.ini' file.
+        config: Path to ini config file.
         log_level: Level to use for logging.
         has_file_logs: If True then implements rotating file logs.
-        repeat_interval: run websnap continuously every <repeat> minutes, if omitted
+        has_s3_uploader: If True then uploads files to S3 bucket.
+        s3_config: Path to ini file used for S3 config.
+        repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
             then default value is None and websnap will not repeat.
     """
-
-    # Parse config and setup log
+    # Validate log config and setup logging
     try:
         conf = get_config_parser(config)
         log_conf = validate_log_config(conf)
@@ -54,7 +57,15 @@ def websnap(
         print(f"ERROR: {e}")
         return
 
-    # File processing repeat loop
+    # Validate S3 config
+    if has_s3_uploader:
+        try:
+            get_config_parser(s3_config)
+            # TODO WIP start dev here, add validator for conf_s3
+        except Exception as e:
+            log.error({e})
+
+    # Download and write URLs
     is_repeat = True
     while is_repeat:
 
@@ -62,18 +73,16 @@ def websnap(
         is_repeat = repeat_interval is not None
 
         start_time = time.time()
-        log.info("Start websnap iteration")
+        log.info("Started websnap iteration")
 
         # TODO remove
-        time.sleep(2)
+        time.sleep(1)
 
-        # TODO add log validation and file processing here
+        # TODO URLs processing here, call logic.process_urls()
 
         log.info("Finished websnap iteration")
         exec_time = int(time.time() - start_time)
 
-        # If is_repeat is True wait during time left in repeat_interval
-        # before next iteration
         if is_repeat:
             interval_seconds = int(repeat_interval) * 60
             if interval_seconds > exec_time:

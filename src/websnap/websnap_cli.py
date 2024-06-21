@@ -1,6 +1,6 @@
 """
-Script that is used to download and write files hosted at URLs to S3 bucket or
-local machine.
+CLI that supports downloading files hosted at URLs in config and then uploading
+them to S3 bucket or local machine.
 
 TODO write comments including example commands
 TODO investigate running as single-line script with dependencies or building an
@@ -28,7 +28,10 @@ def parse_arguments() -> argparse.Namespace | None:
     If parsing fails then return None.
     """
 
-    parser = argparse.ArgumentParser(description="Websnap CLI")
+    parser = argparse.ArgumentParser(
+        description="Websnap CLI: Utility to download files hosted at URLs in config "
+        "and then upload them to S3 bucket or local machine."
+    )
 
     parser.add_argument(
         "-c",
@@ -68,7 +71,6 @@ def parse_arguments() -> argparse.Namespace | None:
 def main():
     """
     Main entry point for websnap-cli.
-    Download and write files hosted at URLs to S3 bucket or local machine.
     """
     kwargs = vars(parse_arguments())
 
