@@ -66,15 +66,15 @@ def get_file_handler(
     return file_handler
 
 
-def get_logger(
+def get_custom_logger(
     name: str,
     level: str = "INFO",
     has_file_logs: bool = False,
     config: LogConfigModel | None = None,
 ) -> logging.getLogger:
     """
-    Return logger with console and file handlers added. Default logging level is
-    'INFO'.
+    Return logger with console handler and optional file handler.
+    Default logging level is 'INFO'.
 
     Args:
         name: Name of logger.

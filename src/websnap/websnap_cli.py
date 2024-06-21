@@ -1,13 +1,21 @@
 """
-Scripts that is used to download and write files hosted at URLs to S3 bucket or
+Script that is used to download and write files hosted at URLs to S3 bucket or
 local machine.
 
 TODO write comments including example commands
-TODO investigate running as sing-glie script with dependencies or bulding an exectuable
-    script
+TODO investigate running as single-line script with dependencies or building an
+    exectuable script
 
-Example command:
+Example pdm command without flags (uses default argument values):
     pdm run websnap-cli
+
+TODO add flags
+Example pdm command with flags:
+    pdm run websnap-cli
+
+Example command to run command directly with python
+from project root directory without flags:
+    python -m src.websnap.websnap_cli
 """
 
 import argparse
@@ -46,7 +54,8 @@ def parse_arguments() -> argparse.Namespace | None:
         "-r",
         "--repeat",
         type=int,
-        help="Run websnap continuously every <repeat> minutes.",
+        help="Run websnap continuously every <repeat> minutes. "
+        "If omitted then websnap does not repeat.",
     )
 
     try:
@@ -63,10 +72,13 @@ def main():
     """
     kwargs = vars(parse_arguments())
 
+    r_interval = kwargs["repeat"] if kwargs["repeat"] else None
+
     websnap.websnap(
         config=kwargs["config"],
         log_level=kwargs["loglevel"],
         has_file_logs=kwargs["file_logs"],
+        repeat_interval=r_interval,
     )
 
 
