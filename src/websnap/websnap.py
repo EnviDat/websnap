@@ -61,9 +61,10 @@ def websnap(
     if has_s3_uploader:
         try:
             parser_s3 = get_config_parser(s3_config)
-            # TODO WIP start dev here, add validator for conf_s3
+            # TODO WIP start dev here, add validator for parser_s3
         except Exception as e:
             log.error({e})
+            return
 
     # Download and write URLs
     is_repeat = True
@@ -91,11 +92,3 @@ def websnap(
                 time.sleep(wait_time)
 
     return
-
-
-# # TODO finish function in another module
-# def write_urls(self):
-#     """
-#     Download and write files hosted at URLs to S3 bucket or local machine.
-#     """
-#     log.info("*** Start transfer...")
