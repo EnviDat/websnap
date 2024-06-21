@@ -29,8 +29,8 @@ def parse_arguments() -> argparse.Namespace | None:
     """
 
     parser = argparse.ArgumentParser(
-        description="Websnap CLI: Utility to download files hosted at URLs in config "
-        "and then upload them to S3 bucket or local machine."
+        description="Websnap CLI: Supports downloading files hosted at URLs in config "
+        "and then uploading them to S3 bucket or local machine."
     )
 
     parser.add_argument(

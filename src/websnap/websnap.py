@@ -45,8 +45,8 @@ def websnap(
     """
     # Validate log config and setup logging
     try:
-        conf = get_config_parser(config)
-        log_conf = validate_log_config(conf)
+        parser = get_config_parser(config)
+        log_conf = validate_log_config(parser)
         log = get_custom_logger(
             name=LOGGER_NAME,
             level=log_level,
@@ -60,7 +60,7 @@ def websnap(
     # Validate S3 config
     if has_s3_uploader:
         try:
-            get_config_parser(s3_config)
+            parser_s3 = get_config_parser(s3_config)
             # TODO WIP start dev here, add validator for conf_s3
         except Exception as e:
             log.error({e})
