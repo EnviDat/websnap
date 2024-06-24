@@ -3,6 +3,7 @@
 *.log.*
 *config.ini
 *s3_config.ini
+*testdata/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

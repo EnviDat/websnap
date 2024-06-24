@@ -3,8 +3,8 @@ Logging utilities, console handlers, and rotational file handlers.
 """
 
 import logging
-import sys
 from logging.handlers import TimedRotatingFileHandler
+import sys
 
 from src.websnap.validators import LogConfigModel
 from src.websnap.constants import LogFormatter, LogLevel

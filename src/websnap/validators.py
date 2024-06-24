@@ -2,9 +2,9 @@
 
 import configparser
 from pathlib import Path
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, ValidationError, PositiveInt, AnyHttpUrl, AnyUrl
 
-from src.websnap.constants import LogRotation
+from src.websnap.constants import LogRotation, MIN_SIZE_KB
 
 
 def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception:
@@ -21,17 +21,17 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception
         conf = config.read(config_file)
 
         if not conf:
-            raise Exception(f"File {config_path} not found")
+            return Exception(f"File {config_path} not found")
 
         if len(config.sections()) < 1:
-            raise Exception(
+            return Exception(
                 f"File '{config_path}' not valid config, does not have any sections"
             )
 
         return config
 
     except Exception as e:
-        raise Exception(f"{e}")
+        return Exception(f"{e}")
 
 
 class LogConfigModel(BaseModel):
@@ -40,14 +40,8 @@ class LogConfigModel(BaseModel):
     """
 
     log_when: str
-    log_interval: int
-    log_backup_count: int
-
-    @field_validator("log_interval", "log_backup_count")
-    def backup_count_is_non_negative(cls, value: int):
-        if value < 0:
-            raise ValueError("Config value must be greater than 0.")
-        return value
+    log_interval: PositiveInt
+    log_backup_count: PositiveInt
 
 
 def validate_log_config(
@@ -74,8 +68,103 @@ def validate_log_config(
         }
         return LogConfigModel(**log)
     except ValidationError as e:
-        raise Exception(f"Failed to validate config, error(s): {e}")
+        return Exception(f"Failed to validate config, error(s): {e}")
     except ValueError as e:
-        raise Exception(f"Incorrect log related value in config, error(s): {e}")
+        return Exception(f"Incorrect log related value in config, error(s): {e}")
     except Exception as e:
-        raise Exception(f"{e}")
+        return Exception(f"{e}")
+
+
+def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exception:
+    """
+    Return min_size_kb from config as integer.
+    Returns Exception if validation fails.
+
+    Args:
+        config_parser: ConfigParser object
+    """
+    try:
+        return config_parser.getint("DEFAULT", "min_size_kb", fallback=MIN_SIZE_KB)
+    except ValidationError as e:
+        return Exception(f"Failed to validate value 'min_size_kb, error(s): {e}")
+    except ValueError as e:
+        return Exception(f"Incorrect value for 'min_size_kb', error(s): {e}")
+    except Exception as e:
+        return Exception(f"{e}")
+
+
+class ConfigSectionModel(BaseModel):
+    """
+    Class with required config section values (for writing to local machine).
+    """
+
+    url: AnyHttpUrl
+    directory: str
+    file_name: str
+
+
+def validate_config_section(
+    config_parser: configparser.ConfigParser, section: str
+) -> ConfigSectionModel | Exception:
+    """
+    Return ConfigSectionModel object.
+    Returns Exception if parsing fails.
+
+    Args:
+        config_parser: ConfigParser object
+        section: Name of section being validated
+    """
+    try:
+        conf_section = {
+            "url": config_parser.get(section, "url"),
+            "directory": config_parser.get(section, "directory"),
+            "file_name": config_parser.get(section, "file_name"),
+        }
+        return ConfigSectionModel(**conf_section)
+    except ValidationError as e:
+        return Exception(
+            f"Failed to validate config section '{section}', error(s): {e}"
+        )
+    except ValueError as e:
+        return Exception(
+            f"Incorrect value in config section '{section}', error(s): {e}"
+        )
+    except Exception as e:
+        return Exception(f"{e}")
+
+
+class S3ConfigModel(BaseModel):
+    """
+    Class with requried S3 config values and their types.
+    """
+
+    endpoint_url: AnyUrl
+    aws_access_key_id: str
+    aws_secret_access_key: str
+
+
+def validate_s3_config(
+    config_parser: configparser.ConfigParser,
+) -> S3ConfigModel | Exception:
+    """
+    Return S3ConfigModel object.
+    Returns Exception if parsing fails.
+
+    Args:
+        config_parser (configparser.ConfigParser): ConfigParser object
+    """
+    try:
+        s3_conf = {
+            "endpoint_url": config_parser.get("DEFAULT", "endpoint_url"),
+            "aws_access_key_id": config_parser.get("DEFAULT", "aws_access_key_id"),
+            "aws_secret_access_key": config_parser.get(
+                "DEFAULT", "aws_secret_access_key"
+            ),
+        }
+        return S3ConfigModel(**s3_conf)
+    except ValidationError as e:
+        return Exception(f"Failed to validate S3 config, error(s): {e}")
+    except ValueError as e:
+        return Exception(f"Incorrect value in S3 config, error(s): {e}")
+    except Exception as e:
+        return Exception(f"{e}")

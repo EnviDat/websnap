@@ -5,12 +5,19 @@ them to S3 bucket or local machine.
 TODO finish WIP
 TODO test using as a function from a package
 TODO test passing logger and setting up default loggers
+TODO write one with date and one with generic name, delete the old ones
 """
 
 import time
 
-from src.websnap.validators import get_config_parser, validate_log_config
+from src.websnap.validators import (
+    get_config_parser,
+    validate_log_config,
+    validate_s3_config,
+    validate_min_size_kb,
+)
 from src.websnap.logger import get_custom_logger
+from src.websnap.logic import write_urls_locally
 
 __all__ = ["websnap"]
 
@@ -18,14 +25,13 @@ LOGGER_NAME = "websnap"
 
 
 # TODO add validation for section config and add s3_config.ini config
-# TODO add argument to CLI:  has_s3_writer: bool = False
-# TODO test with different paths to config and s3_config
+# TODO add argument to CLI:  has_s3_uploader: bool = False
+# TODO test with different paths to config
 def websnap(
     config: str = "./config/config.ini",
     log_level: str = "INFO",
     has_file_logs: bool = False,
     has_s3_uploader: bool = False,
-    s3_config: str = "./config/s3_config.ini",
     repeat_interval: int | None = None,
 ):
     """
@@ -39,14 +45,13 @@ def websnap(
         log_level: Level to use for logging.
         has_file_logs: If True then implements rotating file logs.
         has_s3_uploader: If True then uploads files to S3 bucket.
-        s3_config: Path to ini file used for S3 config.
         repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
             then default value is None and websnap will not repeat.
     """
     # Validate log config and setup logging
     try:
-        parser = get_config_parser(config)
-        log_conf = validate_log_config(parser)
+        conf_parser = get_config_parser(config)
+        log_conf = validate_log_config(conf_parser)
         log = get_custom_logger(
             name=LOGGER_NAME,
             level=log_level,
@@ -57,11 +62,17 @@ def websnap(
         print(f"ERROR: {e}")
         return
 
+    # Validate min_size_kb
+    try:
+        min_size_kb = validate_min_size_kb(conf_parser)
+    except Exception as e:
+        log.error({e})
+        return
+
     # Validate S3 config
     if has_s3_uploader:
         try:
-            parser_s3 = get_config_parser(s3_config)
-            # TODO WIP start dev here, add validator for parser_s3
+            validate_s3_config(conf_parser)
         except Exception as e:
             log.error({e})
             return
@@ -74,12 +85,19 @@ def websnap(
         is_repeat = repeat_interval is not None
 
         start_time = time.time()
-        log.info("Started websnap iteration")
 
-        # TODO remove
-        time.sleep(1)
+        log.info("******* STARTED WEBSNAP ITERATION *******")
+        log.info(
+            f"Read config file: {config}, it has sections: {conf_parser.sections()}"
+        )
 
-        # TODO URLs processing here, call logic.process_urls()
+        if has_s3_uploader:
+            # TODO WIP start dev here
+            # TODO write log.write_urls_s3()
+            pass
+        else:
+            write_urls_locally(conf_parser, log, min_size_kb)
+            pass
 
         log.info("Finished websnap iteration")
         exec_time = int(time.time() - start_time)

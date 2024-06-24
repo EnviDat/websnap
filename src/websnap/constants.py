@@ -3,6 +3,8 @@
 import logging
 from enum import Enum
 
+MIN_SIZE_KB: int = 1
+
 
 class LogFormatter(Enum):
     """Class with values used to format logs."""
