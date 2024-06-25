@@ -170,4 +170,41 @@ def validate_s3_config(
         return Exception(e)
 
 
-# TODO write validator for s3 config section
+class S3ConfigSectionModel(BaseModel):
+    """
+    Class with required config section values (for writing to S3 bucket).
+    """
+
+    url: AnyHttpUrl
+    bucket: str
+    key: str
+
+
+def validate_s3_config_section(
+    config_parser: configparser.ConfigParser, section: str
+) -> S3ConfigSectionModel | Exception:
+    """
+    Return S3ConfigSectionModel object.
+    Returns Exception if parsing fails.
+
+    Args:
+        config_parser: ConfigParser object
+        section: Name of section being validated
+    """
+    try:
+        conf_section = {
+            "url": config_parser.get(section, "url"),
+            "bucket": config_parser.get(section, "bucket"),
+            "key": config_parser.get(section, "key"),
+        }
+        return S3ConfigSectionModel(**conf_section)
+    except ValidationError as e:
+        return Exception(
+            f"Failed to validate config section '{section}', error(s): {e}"
+        )
+    except ValueError as e:
+        return Exception(
+            f"Incorrect value in config section '{section}', error(s): {e}"
+        )
+    except Exception as e:
+        return Exception(f"{e}")

@@ -9,7 +9,13 @@ import os
 import requests
 import boto3
 
-from src.websnap.validators import validate_config_section, S3ConfigModel
+from src.websnap.validators import (
+    validate_config_section,
+    S3ConfigModel,
+    validate_s3_config_section,
+    ConfigSectionModel,
+    S3ConfigSectionModel,
+)
 
 
 # TODO test with CLI
@@ -29,6 +35,9 @@ def write_urls_locally(
 
         try:
             conf = validate_config_section(conf_parser, section)
+            if not isinstance(conf, ConfigSectionModel):
+                log.error(f"Config section '{section}': {conf}")
+                continue
 
             if not os.path.isdir(conf.directory):
                 log.error(
@@ -75,6 +84,8 @@ def write_urls_locally(
 
 
 # TODO finish WIP, start dev here
+# TODO test with slash before config key values, may need to add additional validation
+# TODO implement backup_s3_count argument
 # TODO test with CLI
 # TODO review function
 def write_urls_to_s3(
@@ -98,10 +109,55 @@ def write_urls_to_s3(
         aws_secret_access_key=conf_s3.aws_secret_access_key,
     )
 
-    session.client(service_name="s3", endpoint_url=str(conf_s3.endpoint_url))
+    client = session.client(service_name="s3", endpoint_url=str(conf_s3.endpoint_url))
 
     for section in conf_parser.sections():
 
-        pass
+        try:
+            conf = validate_s3_config_section(conf_parser, section)
+            if not isinstance(conf, S3ConfigSectionModel):
+                log.error(f"Config section '{section}': {conf}")
+                continue
+
+            url = str(conf.url)
+            response = requests.get(url)
+
+            if not response.ok:
+                log.error(
+                    f"Config section '{section}': "
+                    f"URL returned unsuccessful HTTP response "
+                    f"status code {response.status_code}"
+                )
+                continue
+
+            data = response.content
+
+            # TODO test
+            data_kb = data.__sizeof__() / 1024
+            if data_kb < min_size_kb:
+                log.error(
+                    f"Config section '{section}': "
+                    f"URL response content in config section {section} is less than "
+                    f"config value 'min_size_kb' {min_size_kb}"
+                )
+                continue
+
+            response_s3 = client.put_object(Body=data, Bucket=conf.bucket, Key=conf.key)
+
+            status_code = response_s3.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+            if status_code == 200:
+                log.info(
+                    f"Successfully downloaded URL content and uploaded file to S3 "
+                    f"bucket in config section: {section}"
+                )
+            else:
+                log.error(
+                    f"Config section '{section}': S3 returned unexpected "
+                    f"HTTP response {status_code}"
+                )
+
+        except Exception as e:
+            log.error(f"Config section '{section}', error(s): {e}")
 
     return
