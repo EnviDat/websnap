@@ -27,6 +27,7 @@ LOGGER_NAME = "websnap"
 # TODO add validation for section config and add s3_config.ini config
 # TODO add argument to CLI:  has_s3_uploader: bool = False
 # TODO test with different paths to config
+# TODO add argument: backup_s3_count: int | None = None (and add to CLI)
 def websnap(
     config: str = "./config/config.ini",
     log_level: str = "INFO",
@@ -93,7 +94,7 @@ def websnap(
 
         if has_s3_uploader:
             # TODO WIP start dev here
-            # TODO write log.write_urls_s3()
+            # TODO write log.write_urls_s3(), include backup_s3_count argument
             pass
         else:
             write_urls_locally(conf_parser, log, min_size_kb)

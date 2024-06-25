@@ -3,7 +3,7 @@
 import logging
 from enum import Enum
 
-MIN_SIZE_KB: int = 1
+MIN_SIZE_KB: int = 0
 
 
 class LogFormatter(Enum):
