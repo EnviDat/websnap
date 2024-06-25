@@ -32,8 +32,7 @@ def write_urls_locally(
 
             if not os.path.isdir(conf.directory):
                 log.error(
-                    f"Failed to write file in section '{section}': "
-                    f"Config section '{section}' directory '{conf.directory}' "
+                    f"Config section '{section}': directory '{conf.directory}' "
                     f"does not exist"
                 )
                 continue
@@ -43,35 +42,34 @@ def write_urls_locally(
 
             if not response.ok:
                 log.error(
-                    f"Failed to write file in section '{section}': "
+                    f"Config section '{section}': "
                     f"URL returned unsuccessful HTTP response "
                     f"status code {response.status_code}"
                 )
                 continue
 
             data = response.content
-            data_kb = data.__sizeof__() / 1024
 
-            if data_kb >= min_size_kb:
-                # TODO test with extra slashes in directory and file_name
-                # TODO test with absolute path
-                file_path = f"{conf.directory}/{conf.file_name}"
-                with open(file_path, "wb") as f:
-                    f.write(data)
-                    log.info(
-                        f"Successfully downloaded URL content and wrote file in "
-                        f"config section: {section}"
-                    )
-            else:
-                # TODO test
+            # TODO test
+            data_kb = data.__sizeof__() / 1024
+            if data_kb < min_size_kb:
                 log.error(
-                    f"Failed to write file in section '{section}': "
-                    f"URL content in config section {section} is less than "
+                    f"Config section '{section}': "
+                    f"URL response content in config section {section} is less than "
                     f"config value 'min_size_kb' {min_size_kb}"
+                )
+                continue
+
+            file_path = f"{conf.directory}/{conf.file_name}"
+            with open(file_path, "wb") as f:
+                f.write(data)
+                log.info(
+                    f"Successfully downloaded URL content and wrote file in "
+                    f"config section: {section}"
                 )
 
         except Exception as e:
-            log.error(f"Failed to write file in section '{section}', error(s): {e}")
+            log.error(f"Config section '{section}', error(s): {e}")
 
     return
 
@@ -100,6 +98,10 @@ def write_urls_to_s3(
         aws_secret_access_key=conf_s3.aws_secret_access_key,
     )
 
-    session.client(service_name="s3", endpoint_url=conf_s3.endpoint_url)
+    session.client(service_name="s3", endpoint_url=str(conf_s3.endpoint_url))
+
+    for section in conf_parser.sections():
+
+        pass
 
     return

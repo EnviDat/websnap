@@ -15,9 +15,10 @@ from src.websnap.validators import (
     validate_log_config,
     validate_s3_config,
     validate_min_size_kb,
+    S3ConfigModel,
 )
 from src.websnap.logger import get_custom_logger
-from src.websnap.logic import write_urls_locally
+from src.websnap.logic import write_urls_locally, write_urls_to_s3
 
 __all__ = ["websnap"]
 
@@ -49,7 +50,7 @@ def websnap(
         repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
             then default value is None and websnap will not repeat.
     """
-    # Validate log config and setup logging
+    # Validate log settings in config
     try:
         conf_parser = get_config_parser(config)
         conf_log = validate_log_config(conf_parser)
@@ -63,22 +64,16 @@ def websnap(
         print(f"ERROR: {e}")
         return
 
-    # Validate min_size_kb
+    # Validate min_size_kb in config
     try:
         min_size_kb = validate_min_size_kb(conf_parser)
+        if not isinstance(min_size_kb, int):
+            raise Exception(min_size_kb)
     except Exception as e:
-        log.error({e})
+        log.error(e)
         return
 
-    # Validate S3 config
-    if has_s3_uploader:
-        try:
-            validate_s3_config(conf_parser)
-        except Exception as e:
-            log.error({e})
-            return
-
-    # Download and write URLs
+    # Download and write URL files
     is_repeat = True
     while is_repeat:
 
@@ -92,13 +87,19 @@ def websnap(
             f"Read config file: {config}, it has sections: {conf_parser.sections()}"
         )
 
+        # TODO WIP start dev here
+        # TODO write log.write_urls_s3(), include backup_s3_count argument
         if has_s3_uploader:
-            # TODO WIP start dev here
-            # TODO write log.write_urls_s3(), include backup_s3_count argument
-            pass
+            try:
+                conf_s3 = validate_s3_config(conf_parser)
+                if not isinstance(conf_s3, S3ConfigModel):
+                    raise Exception(conf_s3)
+                write_urls_to_s3(conf_parser, conf_s3, log, min_size_kb)
+            except Exception as e:
+                log.error(e)
+                return
         else:
             write_urls_locally(conf_parser, log, min_size_kb)
-            pass
 
         log.info("Finished websnap iteration")
         exec_time = int(time.time() - start_time)
