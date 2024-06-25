@@ -6,14 +6,13 @@ at URLs to S3 bucket or local machine.
 import configparser
 import logging
 import os
-
 import requests
+import boto3
 
-from src.websnap.validators import validate_config_section
+from src.websnap.validators import validate_config_section, S3ConfigModel
 
 
 # TODO test with CLI
-# TODO review function
 def write_urls_locally(
     conf_parser: configparser.ConfigParser, log: logging.getLogger, min_size_kb: int
 ) -> None | Exception:
@@ -73,5 +72,34 @@ def write_urls_locally(
 
         except Exception as e:
             log.error(f"Failed to write file in section '{section}', error(s): {e}")
+
+    return
+
+
+# TODO finish WIP, start dev here
+# TODO test with CLI
+# TODO review function
+def write_urls_to_s3(
+    conf_parser: configparser.ConfigParser,
+    conf_s3: S3ConfigModel,
+    log: logging.getLogger,
+    min_size_kb: int,
+) -> None | Exception:
+    """
+    Download files hosted at URLS in config and then upload them to S3 bucket.
+
+    Args:
+        conf_parser: ConfigParser object created from parsing configuration file.
+        conf_s3: S3ConfigModel object created from validated configuration file.
+        log: Logger object created with customized configuration file.
+        min_size_kb: Minimum threshold in kilobytes that URL response content must be to
+            upload file to S3 bucket.
+    """
+    session = boto3.Session(
+        aws_access_key_id=conf_s3.aws_access_key_id,
+        aws_secret_access_key=conf_s3.aws_secret_access_key,
+    )
+
+    session.client(service_name="s3", endpoint_url=conf_s3.endpoint_url)
 
     return

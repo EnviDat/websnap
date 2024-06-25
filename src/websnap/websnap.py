@@ -52,12 +52,12 @@ def websnap(
     # Validate log config and setup logging
     try:
         conf_parser = get_config_parser(config)
-        log_conf = validate_log_config(conf_parser)
+        conf_log = validate_log_config(conf_parser)
         log = get_custom_logger(
             name=LOGGER_NAME,
             level=log_level,
             has_file_logs=has_file_logs,
-            config=log_conf,
+            config=conf_log,
         )
     except Exception as e:
         print(f"ERROR: {e}")

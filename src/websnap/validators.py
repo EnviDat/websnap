@@ -168,3 +168,6 @@ def validate_s3_config(
         return Exception(f"Incorrect value in S3 config, error(s): {e}")
     except Exception as e:
         return Exception(f"{e}")
+
+
+# TODO write validator for s3 config section
