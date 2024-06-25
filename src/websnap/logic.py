@@ -8,6 +8,7 @@ import logging
 import os
 import requests
 import boto3
+from botocore.exceptions import ClientError
 
 from src.websnap.validators import (
     validate_config_section,
@@ -142,6 +143,10 @@ def write_urls_to_s3(
                 )
                 continue
 
+            # TODO WIP
+            # TODO add condition backup_s3_count for function
+            # backup_s3_objects(client, section, conf, data, log)
+
             response_s3 = client.put_object(Body=data, Bucket=conf.bucket, Key=conf.key)
 
             status_code = response_s3.get("ResponseMetadata", {}).get("HTTPStatusCode")
@@ -161,3 +166,61 @@ def write_urls_to_s3(
             log.error(f"Config section '{section}', error(s): {e}")
 
     return
+
+
+# TODO move function up
+# TODO WIP finish
+# TODO remove print statements
+# TODO remove unused arguments
+def backup_s3_objects(
+    client: boto3.Session.client,
+    section: str,
+    conf: S3ConfigSectionModel,
+    data: bytes,
+    log: logging.getLogger,
+):
+    """
+    Backup up and delete old copies of an object in the same bucket subdirectory.
+
+    Args:
+        client : boto3.Session.client object created using configuration file values.
+        section: Name of current config section being processed.
+        conf: S3ConfigSctionModel object created from validated
+            section of configuration file.
+        data: URL (from config) HTTP response content in bytes.
+        log: Logger object created with customized configuration file.
+    """
+
+    prefix = conf.key.rpartition("/")[0]
+    prefix = f"{prefix}/"
+
+    try:
+        # Get object with configured key
+        obj = client.head_object(Bucket=conf.bucket, Key=conf.key)
+        # print(obj)  # TODO remove
+
+        last_modified = obj.get("LastModified")
+        # print(last_modified)
+        # print(type(last_modified))
+
+        format_date = "%Y-%m-%d_%H-%M-%S"
+        datetime_str = last_modified.strftime(format_date)
+        # print(datetime_str)
+
+        key_split = conf.key.rpartition(".")
+        key_copy = f"{key_split[0]}_{datetime_str}{key_split[1]}{key_split[2]}"
+        print(key_copy)
+
+        # TODO debug
+        # Copy object
+        # obj_copy = client.copy_object(
+        #     Bucket=conf.bucket,
+        #     CopySource=conf.key,
+        #     Key=key_copy,
+        # )
+        #
+        # # TODO handle response
+        # print(obj_copy)
+
+    except ClientError as e:
+        log.warning(e)
