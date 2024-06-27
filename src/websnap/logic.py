@@ -84,6 +84,57 @@ def write_urls_locally(
     return
 
 
+# TODO WIP finish
+# TODO test
+def copy_s3_object(
+    client: boto3.Session.client,
+    conf: S3ConfigSectionModel,
+    log: logging.getLogger,
+    section: str,
+):
+    """
+    Copy an object in the same bucket subdirectory using values in config.
+
+    Copied object's name is constructed using the 'LastModified' timestamp of original
+    object.
+
+    Args:
+        client : boto3.Session.client object created using configuration file values.
+        conf: S3ConfigSctionModel object created from validated
+            section of configuration file.
+        log: Logger object created with customized configuration file.
+        section: Name of config section being processed.
+    """
+
+    try:
+        obj = client.head_object(Bucket=conf.bucket, Key=conf.key)
+
+        last_modified = obj.get("LastModified")
+        format_date = "%Y-%m-%d_%H-%M-%S"
+        datetime_str = last_modified.strftime(format_date)
+        key_split = conf.key.rpartition(".")
+        key_copy = f"{key_split[0]}_{datetime_str}{key_split[1]}{key_split[2]}"
+
+        response_copy = client.copy_object(
+            CopySource={"Bucket": conf.bucket, "Key": conf.key},
+            Bucket=conf.bucket,
+            Key=key_copy,
+        )
+
+        status_code = response_copy.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+        if status_code == 200:
+            log.info(f"Copied and backed up object in config section: {section}")
+        else:
+            log.error(
+                f"Config section '{section}': Object backup attempt returned "
+                f"unexpected HTTP response {status_code}"
+            )
+
+    except ClientError as e:
+        log.warning(e)
+
+
 # TODO finish WIP, start dev here
 # TODO test with slash before config key values, may need to add additional validation
 # TODO implement backup_s3_count argument
@@ -94,6 +145,7 @@ def write_urls_to_s3(
     conf_s3: S3ConfigModel,
     log: logging.getLogger,
     min_size_kb: int,
+    backup_s3_count: int | None = None,
 ) -> None | Exception:
     """
     Download files hosted at URLS in config and then upload them to S3 bucket.
@@ -104,7 +156,12 @@ def write_urls_to_s3(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             upload file to S3 bucket.
+        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
+            remove object with the oldest last modified timestamp.
+            If omitted then default value is None and objects are not copied.
     """
+    # print(f"backup_s3_count:  {backup_s3_count}   {type(backup_s3_count)}")
+
     session = boto3.Session(
         aws_access_key_id=conf_s3.aws_access_key_id,
         aws_secret_access_key=conf_s3.aws_secret_access_key,
@@ -143,9 +200,9 @@ def write_urls_to_s3(
                 )
                 continue
 
-            # TODO WIP
-            # TODO add condition backup_s3_count for function
-            # backup_s3_objects(client, section, conf, data, log)
+            if backup_s3_count:
+                copy_s3_object(client, conf, log, section)
+                # TODO WIP start dev here: write remove_s3_object()
 
             response_s3 = client.put_object(Body=data, Bucket=conf.bucket, Key=conf.key)
 
@@ -166,61 +223,3 @@ def write_urls_to_s3(
             log.error(f"Config section '{section}', error(s): {e}")
 
     return
-
-
-# TODO move function up
-# TODO WIP finish
-# TODO remove print statements
-# TODO remove unused arguments
-def backup_s3_objects(
-    client: boto3.Session.client,
-    section: str,
-    conf: S3ConfigSectionModel,
-    data: bytes,
-    log: logging.getLogger,
-):
-    """
-    Backup up and delete old copies of an object in the same bucket subdirectory.
-
-    Args:
-        client : boto3.Session.client object created using configuration file values.
-        section: Name of current config section being processed.
-        conf: S3ConfigSctionModel object created from validated
-            section of configuration file.
-        data: URL (from config) HTTP response content in bytes.
-        log: Logger object created with customized configuration file.
-    """
-
-    prefix = conf.key.rpartition("/")[0]
-    prefix = f"{prefix}/"
-
-    try:
-        # Get object with configured key
-        obj = client.head_object(Bucket=conf.bucket, Key=conf.key)
-        # print(obj)  # TODO remove
-
-        last_modified = obj.get("LastModified")
-        # print(last_modified)
-        # print(type(last_modified))
-
-        format_date = "%Y-%m-%d_%H-%M-%S"
-        datetime_str = last_modified.strftime(format_date)
-        # print(datetime_str)
-
-        key_split = conf.key.rpartition(".")
-        key_copy = f"{key_split[0]}_{datetime_str}{key_split[1]}{key_split[2]}"
-        print(key_copy)
-
-        # TODO debug
-        # Copy object
-        # obj_copy = client.copy_object(
-        #     Bucket=conf.bucket,
-        #     CopySource=conf.key,
-        #     Key=key_copy,
-        # )
-        #
-        # # TODO handle response
-        # print(obj_copy)
-
-    except ClientError as e:
-        log.warning(e)

@@ -35,6 +35,7 @@ def websnap(
     has_file_logs: bool = False,
     has_s3_uploader: bool = False,
     repeat_interval: int | None = None,
+    backup_s3_count: int | None = None,
 ):
     """
     Download files hosted at URLs in config and then uploads them
@@ -49,6 +50,9 @@ def websnap(
         has_s3_uploader: If True then uploads files to S3 bucket.
         repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
             then default value is None and websnap will not repeat.
+        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
+            remove object with the oldest last modified timestamp.
+            If omitted then default value is None and objects are not copied.
     """
     # Validate log settings in config
     try:
@@ -94,7 +98,9 @@ def websnap(
                 conf_s3 = validate_s3_config(conf_parser)
                 if not isinstance(conf_s3, S3ConfigModel):
                     raise Exception(conf_s3)
-                write_urls_to_s3(conf_parser, conf_s3, log, min_size_kb)
+                write_urls_to_s3(
+                    conf_parser, conf_s3, log, min_size_kb, backup_s3_count
+                )
             except Exception as e:
                 log.error(e)
                 return
