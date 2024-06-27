@@ -84,8 +84,7 @@ def write_urls_locally(
     return
 
 
-# TODO WIP finish
-# TODO test
+# TODO review function
 def copy_s3_object(
     client: boto3.Session.client,
     conf: S3ConfigSectionModel,
@@ -93,14 +92,14 @@ def copy_s3_object(
     section: str,
 ):
     """
-    Copy an object in the same bucket subdirectory using values in config.
+    Copy an object using S3 object config.
 
-    Copied object's name is constructed using the 'LastModified' timestamp of original
+    New object's name is constructed using the 'LastModified' timestamp of original
     object.
 
     Args:
         client : boto3.Session.client object created using configuration file values.
-        conf: S3ConfigSctionModel object created from validated
+        conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
         section: Name of config section being processed.
@@ -115,27 +114,112 @@ def copy_s3_object(
         key_split = conf.key.rpartition(".")
         key_copy = f"{key_split[0]}_{datetime_str}{key_split[1]}{key_split[2]}"
 
-        response_copy = client.copy_object(
+        response = client.copy_object(
             CopySource={"Bucket": conf.bucket, "Key": conf.key},
             Bucket=conf.bucket,
             Key=key_copy,
         )
 
-        status_code = response_copy.get("ResponseMetadata", {}).get("HTTPStatusCode")
+        status_code = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
         if status_code == 200:
-            log.info(f"Copied and backed up object in config section: {section}")
+            log.info(
+                f"S3 config section '{section}': Created new backup file '{key_copy}'"
+            )
         else:
             log.error(
-                f"Config section '{section}': Object backup attempt returned "
+                f"S3 config section '{section}': Object backup attempt returned "
                 f"unexpected HTTP response {status_code}"
             )
 
     except ClientError as e:
-        log.warning(e)
+        log.error(e)
 
 
-# TODO finish WIP, start dev here
+# TODO test with no file (ex: no projects.json)
+# TODO review function
+def delete_s3_backup_object(
+    client: boto3.Session.client,
+    conf: S3ConfigSectionModel,
+    log: logging.getLogger,
+    section: str,
+    backup_s3_count: int,
+):
+    """
+    Delete a S3 backup object using S3 object config.
+    Only deletes object if backup objects exceed backup_s3_count.
+
+    Only deletes object that corresponds to the file name in the configured key,
+    allows for a timestamp in key created using copy_s3_object().
+
+    Args:
+        client : boto3.Session.client object created using configuration file values.
+        conf: S3ConfigSectionModel object created from validated
+            section of configuration file.
+        log: Logger object created with customized configuration file.
+        section: Name of config section being processed.
+        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
+            remove object with the oldest last modified timestamp.
+    """
+
+    try:
+        key_split = conf.key.rpartition("/")
+
+        if not key_split[0]:
+            response = client.list_objects_v2(
+                Bucket=conf.bucket,
+            )
+        else:
+            response = client.list_objects_v2(
+                Bucket=conf.bucket, Prefix=f"{key_split[0]}{key_split[1]}"
+            )
+
+        file_split = key_split[2].rpartition(".")
+        file_start = f"{file_split[0]}_"
+        file_end = f"{file_split[1]}{file_split[2]}"
+
+        objs = [obj for obj in response.get("Contents")]
+        match_objs = []
+
+        for obj in objs:
+            ky = obj.get("Key")
+            ky_split = ky.rpartition("/")
+            ky_file = ky_split[2]
+            if ky_file.startswith(file_start) and ky_file.endswith(file_end):
+                match_objs.append(obj)
+
+        sorted_objs = sorted(match_objs, key=lambda x: x["LastModified"])
+
+        if len(sorted_objs) > backup_s3_count:
+
+            obj_oldest = sorted_objs[0]
+            delete_key = obj_oldest.get("Key")
+
+            resp = client.delete_object(Bucket=conf.bucket, Key=delete_key)
+
+            status_code = resp.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+            if status_code == 204:
+                log.info(
+                    f"S3 config section '{section}': "
+                    f"Deleted backup file '{delete_key}'"
+                )
+            else:
+                log.error(
+                    f"S3 config section '{section}': Backup file delete attempt "
+                    f"returned unexpected HTTP response {status_code}"
+                )
+
+        else:
+            log.info(
+                f"S3 config section '{section}': Current number of backup files "
+                f"does not exceed backup S3 count {backup_s3_count}"
+            )
+
+    except ClientError as e:
+        log.error(e)
+
+
 # TODO test with slash before config key values, may need to add additional validation
 # TODO implement backup_s3_count argument
 # TODO test with CLI
@@ -160,8 +244,6 @@ def write_urls_to_s3(
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied.
     """
-    # print(f"backup_s3_count:  {backup_s3_count}   {type(backup_s3_count)}")
-
     session = boto3.Session(
         aws_access_key_id=conf_s3.aws_access_key_id,
         aws_secret_access_key=conf_s3.aws_secret_access_key,
@@ -182,7 +264,7 @@ def write_urls_to_s3(
 
             if not response.ok:
                 log.error(
-                    f"Config section '{section}': "
+                    f"S3 config section '{section}': "
                     f"URL returned unsuccessful HTTP response "
                     f"status code {response.status_code}"
                 )
@@ -194,7 +276,7 @@ def write_urls_to_s3(
             data_kb = data.__sizeof__() / 1024
             if data_kb < min_size_kb:
                 log.error(
-                    f"Config section '{section}': "
+                    f"S3 config section '{section}': "
                     f"URL response content in config section {section} is less than "
                     f"config value 'min_size_kb' {min_size_kb}"
                 )
@@ -202,20 +284,19 @@ def write_urls_to_s3(
 
             if backup_s3_count:
                 copy_s3_object(client, conf, log, section)
-                # TODO WIP start dev here: write remove_s3_object()
+                delete_s3_backup_object(client, conf, log, section, backup_s3_count)
 
             response_s3 = client.put_object(Body=data, Bucket=conf.bucket, Key=conf.key)
-
             status_code = response_s3.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
             if status_code == 200:
                 log.info(
-                    f"Successfully downloaded URL content and uploaded file to S3 "
-                    f"bucket in config section: {section}"
+                    f"S3 config section '{section}': Successfully downloaded URL "
+                    f"content and uploaded file '{conf.key}'"
                 )
             else:
                 log.error(
-                    f"Config section '{section}': S3 returned unexpected "
+                    f"S3 config section '{section}': S3 returned unexpected "
                     f"HTTP response {status_code}"
                 )
 

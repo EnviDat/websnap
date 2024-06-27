@@ -4,8 +4,6 @@ them to S3 bucket or local machine.
 
 TODO finish WIP
 TODO test using as a function from a package
-TODO test passing logger and setting up default loggers
-TODO write one with date and one with generic name, delete the old ones
 """
 
 import time
@@ -25,7 +23,6 @@ __all__ = ["websnap"]
 LOGGER_NAME = "websnap"
 
 
-# TODO add validation for section config and add s3_config.ini config
 # TODO add argument to CLI:  has_s3_uploader: bool = False
 # TODO test with different paths to config
 # TODO add argument: backup_s3_count: int | None = None (and add to CLI)
@@ -88,11 +85,10 @@ def websnap(
 
         log.info("******* STARTED WEBSNAP ITERATION *******")
         log.info(
-            f"Read config file: {config}, it has sections: {conf_parser.sections()}"
+            f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
         )
 
         # TODO WIP start dev here
-        # TODO write log.write_urls_s3(), include backup_s3_count argument
         if has_s3_uploader:
             try:
                 conf_s3 = validate_s3_config(conf_parser)

@@ -170,6 +170,7 @@ def validate_s3_config(
         return Exception(e)
 
 
+# TODO add field validator that ensures that key includes file extension!
 class S3ConfigSectionModel(BaseModel):
     """
     Class with required config section values (for writing to S3 bucket).
