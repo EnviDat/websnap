@@ -2,7 +2,14 @@
 
 import configparser
 from pathlib import Path
-from pydantic import BaseModel, ValidationError, PositiveInt, AnyHttpUrl, AnyUrl
+from pydantic import (
+    BaseModel,
+    ValidationError,
+    PositiveInt,
+    AnyHttpUrl,
+    AnyUrl,
+    field_validator,
+)
 
 from src.websnap.constants import LogRotation, MIN_SIZE_KB
 
@@ -170,7 +177,6 @@ def validate_s3_config(
         return Exception(e)
 
 
-# TODO add field validator that ensures that key includes file extension!
 class S3ConfigSectionModel(BaseModel):
     """
     Class with required config section values (for writing to S3 bucket).
@@ -179,6 +185,14 @@ class S3ConfigSectionModel(BaseModel):
     url: AnyHttpUrl
     bucket: str
     key: str
+
+    @field_validator("key")
+    @classmethod
+    def key_must_contain_period(cls, v: str) -> str:
+        key_split = v.rpartition(".")
+        if not key_split[1]:
+            raise ValueError("Config section key requires a file extension")
+        return v
 
 
 def validate_s3_config_section(

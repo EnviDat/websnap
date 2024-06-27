@@ -2,10 +2,10 @@
 Supports downloading files hosted at URLs in config and then uploading
 them to S3 bucket or local machine.
 
-TODO finish WIP
 TODO test using as a function from a package
 """
 
+from math import ceil
 import time
 
 from src.websnap.validators import (
@@ -23,16 +23,13 @@ __all__ = ["websnap"]
 LOGGER_NAME = "websnap"
 
 
-# TODO add argument to CLI:  has_s3_uploader: bool = False
-# TODO test with different paths to config
-# TODO add argument: backup_s3_count: int | None = None (and add to CLI)
 def websnap(
     config: str = "./config/config.ini",
     log_level: str = "INFO",
     has_file_logs: bool = False,
-    has_s3_uploader: bool = False,
-    repeat_interval: int | None = None,
+    is_s3_uploader: bool = False,
     backup_s3_count: int | None = None,
+    repeat_interval: int | None = None,
 ):
     """
     Download files hosted at URLs in config and then uploads them
@@ -44,12 +41,13 @@ def websnap(
         config: Path to ini config file.
         log_level: Level to use for logging.
         has_file_logs: If True then implements rotating file logs.
-        has_s3_uploader: If True then uploads files to S3 bucket.
-        repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
-            then default value is None and websnap will not repeat.
-        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
+        is_s3_uploader: If True then uploads files to S3 bucket.
+        backup_s3_count: Copy and backup S3 objects in each config section
+            <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied.
+        repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
+            then default value is None and websnap will not repeat.
     """
     # Validate log settings in config
     try:
@@ -88,8 +86,7 @@ def websnap(
             f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
         )
 
-        # TODO WIP start dev here
-        if has_s3_uploader:
+        if is_s3_uploader:
             try:
                 conf_s3 = validate_s3_config(conf_parser)
                 if not isinstance(conf_s3, S3ConfigModel):
@@ -109,8 +106,12 @@ def websnap(
         if is_repeat:
             interval_seconds = int(repeat_interval) * 60
             if interval_seconds > exec_time:
-                wait_time = interval_seconds - exec_time
-                log.info(f"Sleeping {wait_time} seconds before next iteration...")
-                time.sleep(wait_time)
+                wait_seconds = interval_seconds - exec_time
+                wait_minutes = wait_seconds / 60
+                log.info(
+                    f"Sleeping {wait_seconds} seconds (about {ceil(wait_minutes)} "
+                    f"minutes) before next iteration..."
+                )
+                time.sleep(wait_seconds)
 
     return

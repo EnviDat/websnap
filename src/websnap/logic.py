@@ -19,7 +19,6 @@ from src.websnap.validators import (
 )
 
 
-# TODO test with CLI
 def write_urls_locally(
     conf_parser: configparser.ConfigParser, log: logging.getLogger, min_size_kb: int
 ) -> None | Exception:
@@ -136,7 +135,6 @@ def copy_s3_object(
         log.error(e)
 
 
-# TODO test with no file (ex: no projects.json)
 # TODO review function
 def delete_s3_backup_object(
     client: boto3.Session.client,
@@ -221,8 +219,6 @@ def delete_s3_backup_object(
 
 
 # TODO test with slash before config key values, may need to add additional validation
-# TODO implement backup_s3_count argument
-# TODO test with CLI
 # TODO review function
 def write_urls_to_s3(
     conf_parser: configparser.ConfigParser,
@@ -240,7 +236,8 @@ def write_urls_to_s3(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             upload file to S3 bucket.
-        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
+        backup_s3_count: Copy and backup S3 objects in each config section
+            <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied.
     """

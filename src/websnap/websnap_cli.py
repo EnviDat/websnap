@@ -2,16 +2,18 @@
 CLI that supports downloading files hosted at URLs in config and then uploading
 them to S3 bucket or local machine.
 
-TODO write comments including example commands
 TODO investigate running as single-line script with dependencies or building an
     exectuable script
 
 Example pdm command without flags (uses default argument values):
     pdm run websnap-cli
 
-TODO add flags
-Example pdm command with flags:
-    pdm run websnap-cli
+Example pdm command, writes files locally and repeats every 60 minutes (1 hour):
+pdm run websnap-cli --file_logs --repeat 60
+
+Example pdm command, uploads files to a S3 bucket and
+repeats every 1440 minutes (24 hours):
+    pdm run websnap-cli --file_logs --s3_uploader --backup_s3_count 3 --repeat 1440
 
 Example command to run command directly with python
 from project root directory without flags:
@@ -54,6 +56,20 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
+        "-s", "--s3_uploader", action="store_true", help="Enable S3 uploader."
+    )
+
+    parser.add_argument(
+        "-b",
+        "--backup_s3_count",
+        type=int,
+        help="Copy and backup S3 objects in each config section"
+        "<backup_s3_count> times,"
+        "remove object with the oldest last modified timestamp."
+        "If omitted then objects are not copied or removed.",
+    )
+
+    parser.add_argument(
         "-r",
         "--repeat",
         type=int,
@@ -74,13 +90,16 @@ def main():
     """
     kwargs = vars(parse_arguments())
 
-    r_interval = kwargs["repeat"] if kwargs["repeat"] else None
+    backup_s3_count = kwargs["backup_s3_count"] if kwargs["backup_s3_count"] else None
+    repeat_interval = kwargs["repeat"] if kwargs["repeat"] else None
 
     websnap.websnap(
         config=kwargs["config"],
         log_level=kwargs["loglevel"],
         has_file_logs=kwargs["file_logs"],
-        repeat_interval=r_interval,
+        is_s3_uploader=kwargs["s3_uploader"],
+        backup_s3_count=backup_s3_count,
+        repeat_interval=repeat_interval,
     )
 
 
