@@ -4,9 +4,8 @@ stages:
   - deploy
 
 before_script:
-  - pip install pdm
-  - pdm install
-
+  - pip install -r requirements.txt
+  
 deploy:
   stage: deploy
   before_script:
