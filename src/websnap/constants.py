@@ -32,4 +32,4 @@ class LogRotation(Enum):
 
     WHEN = "h"
     INTERVAL = 1
-    BACKUP_COUNT = 0
+    BACKUP_COUNT = 7

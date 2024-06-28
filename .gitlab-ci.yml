@@ -2,11 +2,6 @@ image: python:latest
 
 stages:
   - deploy
-#
-#before_script:
-##  - pip install -r requirements.txt
-#  - pip install pdm
-#  - pdm install
 
 deploy:
   stage: deploy
@@ -16,5 +11,4 @@ deploy:
     - echo "$CONFIG_INI" > config.ini
     - scp config.ini "$CI_PROJECT_DIR/src/websnap/config/config.ini"
   script:
-#    - python -m src.websnap.websnap_cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT"
-     - pdm run websnap-cli
+     - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT"
