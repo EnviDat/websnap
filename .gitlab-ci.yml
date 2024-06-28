@@ -11,6 +11,6 @@ deploy:
   stage: deploy
   before_script:
     - echo "$CONFIG_INI" > config.ini
-    - scp config.ini "$CI_PROJECT_DIR/config/config.ini"
+    - scp config.ini "$CI_PROJECT_DIR/src/websnap/config/config.ini"
   script:
     - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT"
