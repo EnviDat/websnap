@@ -21,7 +21,7 @@ from src.websnap.validators import (
 
 def write_urls_locally(
     conf_parser: configparser.ConfigParser, log: logging.getLogger, min_size_kb: int
-) -> None | Exception:
+):
     """
     Download files hosted at URLS in config and then upload them to local machine.
 
@@ -132,6 +132,8 @@ def copy_s3_object(
     except ClientError as e:
         log.error(e)
 
+    return
+
 
 def delete_s3_backup_object(
     client: boto3.Session.client,
@@ -214,6 +216,8 @@ def delete_s3_backup_object(
     except ClientError as e:
         log.error(e)
 
+    return
+
 
 def write_urls_to_s3(
     conf_parser: configparser.ConfigParser,
@@ -221,7 +225,7 @@ def write_urls_to_s3(
     log: logging.getLogger,
     min_size_kb: int,
     backup_s3_count: int | None = None,
-) -> None | Exception:
+):
     """
     Download files hosted at URLS in config and then upload them to S3 bucket.
 

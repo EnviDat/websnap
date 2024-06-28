@@ -91,11 +91,21 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exce
         config_parser: ConfigParser object
     """
     try:
-        return config_parser.getint("DEFAULT", "min_size_kb", fallback=MIN_SIZE_KB)
+        min_size_kb = config_parser.getint(
+            "DEFAULT", "min_size_kb", fallback=MIN_SIZE_KB
+        )
+        if min_size_kb >= 0:
+            return min_size_kb
+        else:
+            raise ValueError(
+                "Value for config value 'min_size_kb' must be greater than 0"
+            )
     except ValidationError as e:
-        return Exception(f"Failed to validate value 'min_size_kb, error(s): {e}")
+        return Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
     except ValueError as e:
-        return Exception(f"Incorrect value for 'min_size_kb', error(s): {e}")
+        return Exception(
+            f"Incorrect value for config value 'min_size_kb', error(s): {e}"
+        )
     except Exception as e:
         return Exception(f"{e}")
 

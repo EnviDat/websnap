@@ -67,8 +67,7 @@ def websnap(
             config=conf_log,
         )
     except Exception as e:
-        print(f"ERROR: {e}")
-        return
+        raise Exception(e)
 
     # Validate min_size_kb in config
     try:
@@ -77,7 +76,7 @@ def websnap(
             raise Exception(min_size_kb)
     except Exception as e:
         log.error(e)
-        return
+        raise Exception(e)
 
     # Download and write URL files
     is_repeat = True
@@ -103,7 +102,7 @@ def websnap(
                 )
             except Exception as e:
                 log.error(e)
-                return
+                raise Exception(e)
         else:
             write_urls_locally(conf_parser, log, min_size_kb)
 
