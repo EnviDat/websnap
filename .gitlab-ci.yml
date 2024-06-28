@@ -2,13 +2,17 @@ image: python:latest
 
 stages:
   - build
-  - deploy
+#  - deploy
 
-build:
-  stage: build
-  script:
-    - pip install pdm
-    - pdm install
+#build:
+#  stage: build
+#  script:
+#    - pip install pdm
+#    - pdm install
+
+before_script:
+  - pip install pdm
+  - pdm install
 
 deploy:
   stage: deploy
