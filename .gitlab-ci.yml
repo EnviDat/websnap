@@ -1,8 +1,8 @@
 image: python:latest
 
 stages:
-  - build
-#  - deploy
+#  - build
+  - deploy
 
 #build:
 #  stage: build
