@@ -1,14 +1,10 @@
 image: python:latest
 
 stages:
-#  - build
   - deploy
 
-#build:
-#  stage: build
-#  script:
-#    - pip install pdm
-#    - pdm install
+variables:
+  CONFIG_PATH: "$CI_PROJECT_DIR/config/$CONFIG_INI"
 
 before_script:
   - pip install pdm
@@ -17,4 +13,4 @@ before_script:
 deploy:
   stage: deploy
   script:
-    - pdm run websnap-cli
+    - pdm run websnap-cli --config $CONFIG_PATH --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT"
