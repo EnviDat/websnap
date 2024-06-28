@@ -9,6 +9,9 @@ before_script:
 deploy:
   stage: deploy
   before_script:
+    - python -m venv .venv
+    - call .venv\Scripts\activate.bat
+    - pip install -r "$CI_PROJECT_DIR/requirements.txt"
     - echo "$CONFIG_INI" > config.ini
     - scp config.ini "$CI_PROJECT_DIR/src/websnap/config/config.ini"
   script:
