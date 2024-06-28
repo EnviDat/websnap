@@ -12,6 +12,7 @@ from src.websnap.validators import (
     validate_s3_config,
     validate_min_size_kb,
     S3ConfigModel,
+    LogConfigModel,
 )
 from src.websnap.logger import get_custom_logger
 from src.websnap.logic import write_urls_locally, write_urls_to_s3
@@ -51,6 +52,9 @@ def websnap(
     try:
         conf_parser = get_config_parser(config)
         conf_log = validate_log_config(conf_parser)
+        if not isinstance(conf_log, LogConfigModel):
+            raise Exception(conf_log)
+
         log = get_custom_logger(
             name=LOGGER_NAME,
             level=log_level,
