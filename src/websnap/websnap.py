@@ -1,8 +1,6 @@
 """
 Supports downloading files hosted at URLs in config and then uploading
 them to S3 bucket or local machine.
-
-TODO test using as a function from a package
 """
 
 from math import ceil

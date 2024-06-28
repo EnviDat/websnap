@@ -59,7 +59,6 @@ def write_urls_locally(
 
             data = response.content
 
-            # TODO test
             data_kb = data.__sizeof__() / 1024
             if data_kb < min_size_kb:
                 log.error(
@@ -83,7 +82,6 @@ def write_urls_locally(
     return
 
 
-# TODO review function
 def copy_s3_object(
     client: boto3.Session.client,
     conf: S3ConfigSectionModel,
@@ -135,7 +133,6 @@ def copy_s3_object(
         log.error(e)
 
 
-# TODO review function
 def delete_s3_backup_object(
     client: boto3.Session.client,
     conf: S3ConfigSectionModel,
@@ -218,8 +215,6 @@ def delete_s3_backup_object(
         log.error(e)
 
 
-# TODO test with slash before config key values, may need to add additional validation
-# TODO review function
 def write_urls_to_s3(
     conf_parser: configparser.ConfigParser,
     conf_s3: S3ConfigModel,
@@ -239,7 +234,7 @@ def write_urls_to_s3(
         backup_s3_count: Copy and backup S3 objects in each config section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
-            If omitted then default value is None and objects are not copied.
+            If omitted then default value is None and objects are not copied or removed.
     """
     session = boto3.Session(
         aws_access_key_id=conf_s3.aws_access_key_id,
@@ -269,7 +264,6 @@ def write_urls_to_s3(
 
             data = response.content
 
-            # TODO test
             data_kb = data.__sizeof__() / 1024
             if data_kb < min_size_kb:
                 log.error(

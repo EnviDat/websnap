@@ -101,7 +101,6 @@ def get_custom_logger(
             )
         )
 
-    # TODO review
     logger.propagate = False
 
     return logger

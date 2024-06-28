@@ -194,6 +194,13 @@ class S3ConfigSectionModel(BaseModel):
             raise ValueError("Config section key requires a file extension")
         return v
 
+    @field_validator("key")
+    @classmethod
+    def key_must_not_start_with_slash(cls, v: str) -> str:
+        if v.startswith("/"):
+            raise ValueError("Config section key cannot start with a '/'")
+        return v
+
 
 def validate_s3_config_section(
     config_parser: configparser.ConfigParser, section: str

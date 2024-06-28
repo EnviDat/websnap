@@ -2,9 +2,6 @@
 CLI that supports downloading files hosted at URLs in config and then uploading
 them to S3 bucket or local machine.
 
-TODO investigate running as single-line script with dependencies or building an
-    exectuable script
-
 Example pdm command without flags (uses default argument values):
     pdm run websnap-cli
 
