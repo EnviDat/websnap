@@ -3,6 +3,8 @@ Supports downloading files hosted at URLs in config and then uploading
 them to S3 bucket or local machine.
 """
 
+import configparser
+
 from math import ceil
 import time
 
@@ -51,6 +53,9 @@ def websnap(
     # Validate log settings in config
     try:
         conf_parser = get_config_parser(config)
+        if not isinstance(conf_parser, configparser.ConfigParser):
+            raise Exception(conf_parser)
+
         conf_log = validate_log_config(conf_parser)
         if not isinstance(conf_log, LogConfigModel):
             raise Exception(conf_log)
