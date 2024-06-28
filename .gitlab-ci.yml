@@ -2,9 +2,15 @@ image: python:latest
 
 stages:
   - build
+  - deploy
 
 build:
   stage: build
   script:
     - pip install pdm
     - pdm install
+
+deploy:
+  stage: deploy
+  script:
+    - pdm run websnap-cli
