@@ -50,7 +50,7 @@ def websnap(
         repeat_interval: Run websnap continuously every <repeat> minutes, if omitted
             then default value is None and websnap will not repeat.
     """
-    # Validate log settings in config
+    # Validate log settings in config and setup log
     try:
         conf_parser = get_config_parser(config)
         if not isinstance(conf_parser, configparser.ConfigParser):
@@ -70,13 +70,9 @@ def websnap(
         raise Exception(e)
 
     # Validate min_size_kb in config
-    try:
-        min_size_kb = validate_min_size_kb(conf_parser)
-        if not isinstance(min_size_kb, int):
-            raise Exception(min_size_kb)
-    except Exception as e:
-        log.error(e)
-        raise Exception(e)
+    min_size_kb = validate_min_size_kb(conf_parser)
+    if not isinstance(min_size_kb, int):
+        raise Exception(min_size_kb)
 
     # Download and write URL files
     is_repeat = True
