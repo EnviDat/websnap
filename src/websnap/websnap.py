@@ -1,6 +1,6 @@
 """
-Supports downloading files hosted at URLs in config and then uploading
-them to S3 bucket or local machine.
+Function websnap() downloads files from URLs and uploads them to S3 bucket.
+Also supports writing downloaded files to local machine.
 """
 
 import configparser

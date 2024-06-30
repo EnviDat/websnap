@@ -1,7 +1,7 @@
 [project]
 name = "websnap"
 version = "0.1.0"
-description = "Download and write files hosted at URLs to S3 bucket or local machine."
+description = "Download files from URLs and upload them to S3 bucket. Also supports writing downloaded files to local machine."
 authors = [
     {name = "Rebecca Kurup Buchholz", email = "rebecca.kurup@wsl.ch"},
 ]

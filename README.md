@@ -1,6 +1,7 @@
 # websnap
 
-Download and write files hosted at URLs to S3 bucket or local machine.
+Download files from URLs and upload them to S3 bucket. \
+Also supports writing downloaded files to local machine. 
 
 TODO document PDM setup and install
 
