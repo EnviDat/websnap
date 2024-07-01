@@ -96,7 +96,9 @@ def websnap(
             conf_s3 = validate_s3_config(conf_parser)
             if not isinstance(conf_s3, S3ConfigModel):
                 raise Exception(conf_s3)
-            write_urls_to_s3(conf_parser, conf_s3, log, min_size_kb, backup_s3_count, has_early_exit)
+            write_urls_to_s3(
+                conf_parser, conf_s3, log, min_size_kb, backup_s3_count, has_early_exit
+            )
         else:
             write_urls_locally(conf_parser, log, min_size_kb, has_early_exit)
 
