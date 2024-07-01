@@ -45,7 +45,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "--loglevel",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
-        help="Level to use for logging. Default value is'INFO'.",
+        help="Level to use for logging. Default value is 'INFO'.",
     )
 
     parser.add_argument(
@@ -64,6 +64,15 @@ def parse_arguments() -> argparse.Namespace | None:
         "<backup_s3_count> times,"
         "remove object with the oldest last modified timestamp."
         "If omitted then objects are not copied or removed.",
+    )
+
+    parser.add_argument(
+        "-e",
+        "--early_exit",
+        action="store_true",
+        help="Enable early program termination after error occurs. "
+        "If ommitted then logs URL processing errors "
+        "but continues program execution.",
     )
 
     parser.add_argument(
@@ -96,6 +105,7 @@ def main():
         has_file_logs=kwargs["file_logs"],
         is_s3_uploader=kwargs["s3_uploader"],
         backup_s3_count=backup_s3_count,
+        has_early_exit=kwargs["early_exit"],
         repeat_interval=repeat_interval,
     )
 

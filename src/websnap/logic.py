@@ -6,9 +6,11 @@ at URLs to S3 bucket or local machine.
 import configparser
 import logging
 import os
+
 import requests
 import boto3
 from botocore.exceptions import ClientError
+import sys
 
 from src.websnap.validators import (
     validate_config_section,
@@ -19,8 +21,18 @@ from src.websnap.validators import (
 )
 
 
+def terminate_program(has_early_exit: bool):
+    """Terminates program execution if argument has_early_exit is True."""
+    if has_early_exit:
+        sys.exit("Error occured: check logs for details")
+    return
+
+
 def write_urls_locally(
-    conf_parser: configparser.ConfigParser, log: logging.getLogger, min_size_kb: int
+    conf_parser: configparser.ConfigParser,
+    log: logging.getLogger,
+    min_size_kb: int,
+    has_early_exit: bool = False,
 ):
     """
     Download files hosted at URLS in config and then upload them to local machine.
@@ -30,6 +42,9 @@ def write_urls_locally(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             write file.
+        has_early_exit: If True then terminates program immediately after error occurs.
+            Default value is False.
+            If False then only logs error and continues execution.
     """
     for section in conf_parser.sections():
 
@@ -37,6 +52,7 @@ def write_urls_locally(
             conf = validate_config_section(conf_parser, section)
             if not isinstance(conf, ConfigSectionModel):
                 log.error(f"Config section '{section}': {conf}")
+                terminate_program(has_early_exit)
                 continue
 
             if not os.path.isdir(conf.directory):
@@ -44,6 +60,7 @@ def write_urls_locally(
                     f"Config section '{section}': directory '{conf.directory}' "
                     f"does not exist"
                 )
+                terminate_program(has_early_exit)
                 continue
 
             url = str(conf.url)
@@ -55,6 +72,7 @@ def write_urls_locally(
                     f"URL returned unsuccessful HTTP response "
                     f"status code {response.status_code}"
                 )
+                terminate_program(has_early_exit)
                 continue
 
             data = response.content
@@ -66,6 +84,7 @@ def write_urls_locally(
                     f"URL response content in config section {section} is less than "
                     f"config value 'min_size_kb' {min_size_kb}"
                 )
+                terminate_program(has_early_exit)
                 continue
 
             file_path = f"{conf.directory}/{conf.file_name}"
@@ -78,6 +97,7 @@ def write_urls_locally(
 
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
+            terminate_program(has_early_exit)
 
     return
 
@@ -87,6 +107,7 @@ def copy_s3_object(
     conf: S3ConfigSectionModel,
     log: logging.getLogger,
     section: str,
+    has_early_exit: bool = False,
 ):
     """
     Copy an object using S3 object config.
@@ -100,6 +121,9 @@ def copy_s3_object(
             section of configuration file.
         log: Logger object created with customized configuration file.
         section: Name of config section being processed.
+        has_early_exit: If True then terminates program immediately after error occurs.
+            Default value is False.
+            If False then only logs error and continues execution.
     """
 
     try:
@@ -128,9 +152,11 @@ def copy_s3_object(
                 f"S3 config section '{section}': Object backup attempt returned "
                 f"unexpected HTTP response {status_code}"
             )
+            terminate_program(has_early_exit)
 
     except ClientError as e:
         log.error(e)
+        terminate_program(has_early_exit)
 
     return
 
@@ -141,6 +167,7 @@ def delete_s3_backup_object(
     log: logging.getLogger,
     section: str,
     backup_s3_count: int,
+    has_early_exit: bool = False,
 ):
     """
     Delete a S3 backup object using S3 object config.
@@ -157,6 +184,9 @@ def delete_s3_backup_object(
         section: Name of config section being processed.
         backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
+        has_early_exit: If True then terminates program immediately after error occurs.
+            Default value is False.
+            If False then only logs error and continues execution.
     """
 
     try:
@@ -206,6 +236,7 @@ def delete_s3_backup_object(
                     f"S3 config section '{section}': Backup file delete attempt "
                     f"returned unexpected HTTP response {status_code}"
                 )
+                terminate_program(has_early_exit)
 
         else:
             log.info(
@@ -215,6 +246,7 @@ def delete_s3_backup_object(
 
     except ClientError as e:
         log.error(e)
+        terminate_program(has_early_exit)
 
     return
 
@@ -225,6 +257,7 @@ def write_urls_to_s3(
     log: logging.getLogger,
     min_size_kb: int,
     backup_s3_count: int | None = None,
+    has_early_exit: bool = False,
 ):
     """
     Download files hosted at URLS in config and then upload them to S3 bucket.
@@ -239,6 +272,9 @@ def write_urls_to_s3(
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied or removed.
+        has_early_exit: If True then terminates program immediately after error occurs.
+            Default value is False.
+            If False then only logs error and continues execution.
     """
     session = boto3.Session(
         aws_access_key_id=conf_s3.aws_access_key_id,
@@ -253,6 +289,7 @@ def write_urls_to_s3(
             conf = validate_s3_config_section(conf_parser, section)
             if not isinstance(conf, S3ConfigSectionModel):
                 log.error(f"Config section '{section}': {conf}")
+                terminate_program(has_early_exit)
                 continue
 
             url = str(conf.url)
@@ -264,6 +301,7 @@ def write_urls_to_s3(
                     f"URL returned unsuccessful HTTP response "
                     f"status code {response.status_code}"
                 )
+                terminate_program(has_early_exit)
                 continue
 
             data = response.content
@@ -275,10 +313,11 @@ def write_urls_to_s3(
                     f"URL response content in config section {section} is less than "
                     f"config value 'min_size_kb' {min_size_kb}"
                 )
+                terminate_program(has_early_exit)
                 continue
 
             if backup_s3_count:
-                copy_s3_object(client, conf, log, section)
+                copy_s3_object(client, conf, log, section, has_early_exit)
                 delete_s3_backup_object(client, conf, log, section, backup_s3_count)
 
             response_s3 = client.put_object(Body=data, Bucket=conf.bucket, Key=conf.key)
@@ -294,8 +333,10 @@ def write_urls_to_s3(
                     f"S3 config section '{section}': S3 returned unexpected "
                     f"HTTP response {status_code}"
                 )
+                terminate_program(has_early_exit)
 
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
+            terminate_program(has_early_exit)
 
     return
