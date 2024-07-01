@@ -39,6 +39,8 @@ def websnap(
     Optionally customize rotating logs.
     Optionally repeat websnap file processing iteration.
 
+    TEST pre-commit hook TEST pre-commit hook TEST pre-commit hook TEST pre-commit hook TEST pre-commit hook TEST pre-commit hook 
+
     Args:
         config: Path to ini config file.
         log_level: Level to use for logging.
