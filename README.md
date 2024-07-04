@@ -6,19 +6,15 @@ Also supports writing downloaded files to local machine.
 
 [EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL.
 
-TODO document PDM setup and install
-
-TODO document usage uncluding pdm commands 
-
-TODO document config citing example.ini files
-
 TODO include diagram
 
 
 ## Documentation Topics
 
 > - [Installation](#installation)
-> - [Usage](#usage)
+> - [CLI Options](#cli-options)
+> - [Usage: S3 Bucket](#usage-s3-bucket)
+> - [Usage: Local Machine](#usage-local-machine)
 > - [Configuration](#configuration)
 > - [Scheduled Websnap](#scheduled-websnap)
 > - [Pre-commit Hooks](#pre-commit-hooks)
@@ -28,17 +24,44 @@ TODO include diagram
 
 ## Installation
 
-TODO review and test usage installation instructions
+   ```bash
+    pip install pdm
+    pdm install
+   ```
 
 
-## Usage
+## CLI Options
 
-TODO document
+To access CLI options in terminal execute: `pdm run websnap-cli --help`
+
+TODO document CLI options in table here.
 
 
-## Configuration
+## Usage: S3 Bucket
 
-TODO document
+Download files from URLs and upload them to S3 bucket.
+
+### Commands
+
+TODO document S3 commands here.
+
+### Configuration
+
+TODO document S3 configuration here
+TODO document config citing example.ini files
+
+
+## Usage: Local Machine
+
+### Commands
+
+TODO document local machine commands here
+
+### Configuration
+
+TODO document local machine configuration here
+
+TODO document config citing example.ini files
 
 
 ## Scheduled Websnap
