@@ -10,6 +10,7 @@ from pydantic import (
     AnyUrl,
     field_validator,
 )
+from typing import Optional
 
 from src.websnap.constants import LogRotation, MIN_SIZE_KB
 
@@ -116,8 +117,8 @@ class ConfigSectionModel(BaseModel):
     """
 
     url: AnyHttpUrl
-    directory: str
     file_name: str
+    directory: Optional[str] = None
 
 
 def validate_config_section(
@@ -134,9 +135,10 @@ def validate_config_section(
     try:
         conf_section = {
             "url": config_parser.get(section, "url"),
-            "directory": config_parser.get(section, "directory"),
             "file_name": config_parser.get(section, "file_name"),
         }
+        if directory := config_parser.get(section, "directory", fallback=None):
+            conf_section["directory"] = directory
         return ConfigSectionModel(**conf_section)
     except ValidationError as e:
         return Exception(

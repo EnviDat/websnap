@@ -61,8 +61,8 @@ def parse_arguments() -> argparse.Namespace | None:
         "--backup_s3_count",
         type=int,
         help="Copy and backup S3 objects in each config section"
-        "<backup_s3_count> times,"
-        "remove object with the oldest last modified timestamp."
+        "<backup_s3_count> times, "
+        "remove object with the oldest last modified timestamp. "
         "If omitted then objects are not copied or removed.",
     )
 

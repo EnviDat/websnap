@@ -9,7 +9,9 @@ MIN_SIZE_KB: int = 0
 class LogFormatter(Enum):
     """Class with values used to format logs."""
 
-    FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
+    FORMAT = (
+        "%(asctime)s | %(levelname)s | %(module)s.%(funcName)s:%(lineno)d | %(message)s"
+    )
     DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     @classmethod

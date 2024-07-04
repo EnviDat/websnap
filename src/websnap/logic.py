@@ -55,7 +55,7 @@ def write_urls_locally(
                 terminate_program(has_early_exit)
                 continue
 
-            if not os.path.isdir(conf.directory):
+            if conf.directory and not os.path.isdir(conf.directory):
                 log.error(
                     f"Config section '{section}': directory '{conf.directory}' "
                     f"does not exist"
@@ -87,7 +87,11 @@ def write_urls_locally(
                 terminate_program(has_early_exit)
                 continue
 
-            file_path = f"{conf.directory}/{conf.file_name}"
+            if conf.directory:
+                file_path = f"{conf.directory}/{conf.file_name}"
+            else:
+                file_path = f"{conf.file_name}"
+
             with open(file_path, "wb") as f:
                 f.write(data)
                 log.info(
