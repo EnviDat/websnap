@@ -36,13 +36,13 @@ def parse_arguments() -> argparse.Namespace | None:
         "-c",
         "--config",
         default="./src/websnap/config/config.ini",
-        help="Path to 'config.ini' file."
+        help="Path to configuration file."
         "Default value is './src/websnap/config/config.ini'.",
     )
 
     parser.add_argument(
         "-l",
-        "--loglevel",
+        "--log_level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
         help="Level to use for logging. Default value is 'INFO'.",
@@ -96,17 +96,14 @@ def main():
     """
     kwargs = vars(parse_arguments())
 
-    backup_s3_count = kwargs["backup_s3_count"] if kwargs["backup_s3_count"] else None
-    repeat_interval = kwargs["repeat"] if kwargs["repeat"] else None
-
     websnap.websnap(
         config=kwargs["config"],
-        log_level=kwargs["loglevel"],
+        log_level=kwargs["log_level"],
         has_file_logs=kwargs["file_logs"],
         is_s3_uploader=kwargs["s3_uploader"],
-        backup_s3_count=backup_s3_count,
+        backup_s3_count=kwargs["backup_s3_count"],
         has_early_exit=kwargs["early_exit"],
-        repeat_interval=repeat_interval,
+        repeat_interval=kwargs["repeat"],
     )
 
 
