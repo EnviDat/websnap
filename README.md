@@ -1,6 +1,6 @@
 # websnap
 
-#### CLI that downloads files from URLs and upload them to S3 bucket. 
+#### CLI that downloads files from URLs and upload them to a S3 bucket. 
 
 Also supports writing downloaded files to local machine. 
 
@@ -15,8 +15,8 @@ TODO include diagram
 > - [CLI Options](#cli-options)
 > - [Usage: S3 Bucket](#usage-s3-bucket)
 > - [Usage: Local Machine](#usage-local-machine)
-> - [Configuration](#configuration)
-> - [Scheduled Websnap](#scheduled-websnap)
+> - [Log Support](#log-support)
+> - [Scheduled Pipelines](#scheduled-pipelines)
 > - [Pre-commit Hooks](#pre-commit-hooks)
 > - [Author](#author)
 > - [License](#license)
@@ -24,17 +24,35 @@ TODO include diagram
 
 ## Installation
 
+Project uses PDM package and dependency manager. 
+
+Clone repository and then execute:
+
    ```bash
     pip install pdm
     pdm install
    ```
 
+Project metadata and dependecncies are listed in `pyproject.toml`
+
+[Click here for PDM official documentation.](https://pdm-project.org/en/latest/)
+
 
 ## CLI Options
 
-To access CLI options in terminal execute: `pdm run websnap-cli --help`
+To access CLI help execute: `pdm run websnap-cli --help`
 
-TODO document CLI options in table here.
+| CLI Option        | Default                           |
+|-------------------|-----------------------------------|
+| `config`          | `./src/websnap/config/config.ini` |
+| `log_level`       | `INFO`                            |
+| `file_logs`       | `False`                           |
+| `s3_uploader`     | `False`                           |
+| `backup_s3_count` | `None`                            |
+| `early_exit`      | `False`                           |
+| `repeat`          | `None`                            |
+
+TODO document options here.
 
 
 ## Usage: S3 Bucket
@@ -64,12 +82,19 @@ TODO document local machine configuration here
 TODO document config citing example.ini files
 
 
-## Scheduled Websnap
+## Log Support
+
+TODO document configuring file logs.
+
+
+## Scheduled Pipelines
 
 TODO document
 
 
 ## Pre-commit Hooks
+
+TODO test pre-commit hook. 
 
 - To run the pre-commit hooks manually open app in terminal and execute: `pre-commit run --all-files`
 - These hooks ensure that the application uses standard stylistic conventions
