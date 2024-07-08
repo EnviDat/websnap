@@ -33,26 +33,31 @@ Clone repository and then execute:
     pdm install
    ```
 
-Project metadata and dependecncies are listed in `pyproject.toml`
+Project metadata and dependencies are listed in `pyproject.toml`
 
 [Click here for PDM official documentation.](https://pdm-project.org/en/latest/)
 
 
 ## CLI Options
 
-To access CLI help execute: `pdm run websnap-cli --help`
+To access CLI options documentation in terminal execute: 
+   ```bash
+    pdm run websnap-cli --help
+   ```
 
-| CLI Option        | Default                           |
-|-------------------|-----------------------------------|
-| `config`          | `./src/websnap/config/config.ini` |
-| `log_level`       | `INFO`                            |
-| `file_logs`       | `False`                           |
-| `s3_uploader`     | `False`                           |
-| `backup_s3_count` | `None`                            |
-| `early_exit`      | `False`                           |
-| `repeat`          | `None`                            |
+###
+| Option              | Shortcut  | Default                           |
+|---------------------|-----------|-----------------------------------|
+| `--config`          | `-c`      | `./src/websnap/config/config.ini` |
+| `--log_level`       | `-l`      | `INFO`                            |
+| `--file_logs`       | `-f`      | `False`                           |
+| `--s3_uploader`     | `-s`      | `False`                           |
+| `--backup_s3_count` | `-b`      | `None`                            |
+| `--early_exit`      | `-e`      | `False`                           |
+| `--repeat`          | `-r`      | `None`                            |
 
-TODO document options here.
+- **-config** - Path to configuration `.ini` file. Default expects `config.ini` at `./src/websnap/config/config.ini`.
+- **log_level** - Level to use for logging. 
 
 
 ## Usage: S3 Bucket
