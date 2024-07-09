@@ -28,11 +28,7 @@ def terminate_program(has_early_exit: bool):
     return
 
 
-def write_urls_locally(
-    conf_parser: configparser.ConfigParser,
-    log: logging.getLogger,
-    min_size_kb: int,
-    has_early_exit: bool = False,
+def write_urls_locally(conf_parser: configparser.ConfigParser, log: logging.getLogger, min_size_kb: int, has_early_exit: bool = False,
 ):
     """
     Download files hosted at URLS in config and then upload them to local machine.
