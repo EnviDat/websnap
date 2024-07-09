@@ -53,7 +53,7 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-s", "--s3_uploader", action="store_true", help="Enable S3 uploader."
+        "-s", "--s3_uploader", action="store_true", help="Enable uploading of files to S3 bucket. "
     )
 
     parser.add_argument(
