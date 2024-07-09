@@ -53,7 +53,10 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-s", "--s3_uploader", action="store_true", help="Enable uploading of files to S3 bucket. "
+        "-s",
+        "--s3_uploader",
+        action="store_true",
+        help="Enable uploading of files to S3 bucket. ",
     )
 
     parser.add_argument(
@@ -71,7 +74,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "--early_exit",
         action="store_true",
         help="Enable early program termination after error occurs. "
-        "If ommitted then logs URL processing errors "
+        "If omitted then logs URL processing errors "
         "but continues program execution.",
     )
 
