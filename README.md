@@ -29,8 +29,8 @@ Project uses PDM package and dependency manager.
 Clone repository and then execute:
 
    ```bash
-    pip install pdm
-    pdm install
+  pip install pdm
+  pdm install
    ```
 
 Project metadata and dependencies are listed in `pyproject.toml`
@@ -42,7 +42,7 @@ Project metadata and dependencies are listed in `pyproject.toml`
 
 To access CLI options documentation in terminal execute: 
    ```bash
-    pdm run websnap-cli --help
+  pdm run websnap-cli --help
    ```
 
 ###
@@ -86,14 +86,17 @@ To access CLI options documentation in terminal execute:
 
 ### Example Commands
 
+- The following CLI option **must** be used to enable websnap to upload files to a S3 bucket: `--s3_uploader`
+
+
 - Uploads files to a S3 bucket using default argument values:
      ```bash
-        pdm run websnap-cli --s3_uploader 
+      pdm run websnap-cli --s3_uploader 
      ```
 
 - Uploads files to a S3 bucket and repeat every 1440 minutes (24 hours), file logs are enabled and only 3 backup objects are allowed for each config section:
      ```bash
-        pdm run websnap-cli --file_logs --s3_uploader --backup_s3_count 3 --repeat 1440
+      pdm run websnap-cli --file_logs --s3_uploader --backup_s3_count 3 --repeat 1440
      ```
 
 ### Configuration
@@ -145,12 +148,12 @@ key=subdirectory_resource/resource.json
 
 - Write downloaded files to local machine using default argument values:
      ```bash
-        pdm run websnap-cli 
+      pdm run websnap-cli 
      ```
 
 - Write downloaded files locally and repeats every 60 minutes (1 hour), file logs are enabled:
      ```bash
-        pdm run websnap-cli --file_logs --repeat 60
+      pdm run websnap-cli --file_logs --repeat 60
      ```
 
 ### Configuration
@@ -181,7 +184,27 @@ directory=projectdata
 
 ## Log Support
 
-TODO document configuring file logs.
+Websnap offers support for rotating file logs.
+
+- The following CLI option **must** be used to enable websnap to support rotating file logs: `--file_logs`
+- If log keys are not specified in the configuration `[DEFAULT]` section then default values in the table below will be used. 
+- `log_when` expects a value used by logging module TimedRotatingFileHandler.
+- For more details about how to use TimedRotatingFileHandler please [click here](https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler)
+- The default values result in the file logs being rotated once every day and no removal of backup log files. 
+
+### Configuration
+
+#### `[DEFAULT]` Section
+| Key                | Default | Value Description                                                                                                 |
+|--------------------|---------|-------------------------------------------------------------------------------------------------------------------|
+| `log_when`         | `D`     | Specifies type of interval                                                                                        |
+| `log_interval`     | `1`     | Duration of interval (positive integer)                                                                           |
+| `log_backup_count` | `0`     | If nonzero then at most <log_backup_count> files will be kept, oldest log file is deleted. (non-negative integer) |
+
+
+## Minimum Download Size
+
+TODO document
 
 
 ## Scheduled Pipelines
@@ -191,11 +214,19 @@ TODO document
 
 ## Pre-commit Hooks
 
-TODO test pre-commit hook. 
+Pre-commit hooks ensure that the application uses stylistic conventions before code changes can be commited.
 
-- To run the pre-commit hooks manually open app in terminal and execute: `pre-commit run --all-files`
-- These hooks ensure that the application uses standard stylistic conventions
-- To view or alter the pre-commit hooks see: `.pre-commit-config.yaml`
+Pre-commit hooks are specified in `.pre-commit-config.yaml`
+
+To install pre-commit hooks for use during development execute:
+ ```bash
+  pdm run pre-commit install
+  ```
+
+To run pre-commit hooks manually on all files execute:
+  ```bash
+  pre-commit run --all-files
+  ```
 
 
 ## Author
