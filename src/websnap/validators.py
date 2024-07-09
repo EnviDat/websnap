@@ -9,6 +9,7 @@ from pydantic import (
     AnyHttpUrl,
     AnyUrl,
     field_validator,
+    NonNegativeInt,
 )
 from typing import Optional
 
@@ -49,7 +50,7 @@ class LogConfigModel(BaseModel):
 
     log_when: str
     log_interval: PositiveInt
-    log_backup_count: PositiveInt
+    log_backup_count: NonNegativeInt
 
 
 def validate_log_config(

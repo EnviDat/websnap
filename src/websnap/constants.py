@@ -32,6 +32,6 @@ class LogLevel(Enum):
 class LogRotation(Enum):
     """Class with default values used by rotating file logs."""
 
-    WHEN = "h"
+    WHEN = "D"
     INTERVAL = 1
-    BACKUP_COUNT = 7
+    BACKUP_COUNT = 0
