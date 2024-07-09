@@ -194,6 +194,16 @@ Websnap offers support for rotating file logs.
 
 ### Configuration
 
+Example log configuration:
+
+```
+[DEFAULT]
+log_when=midnight
+log_interval=1
+log_backup_count=7
+```
+
+
 #### `[DEFAULT]` Section
 | Key                | Default | Value Description                                                                                                 |
 |--------------------|---------|-------------------------------------------------------------------------------------------------------------------|
