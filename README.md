@@ -59,27 +59,21 @@ To access CLI options documentation in terminal execute:
 - **config** - Path to configuration `.ini` file. 
   - Default value expects `config.ini` at `./src/websnap/config/config.ini`.
 
-
 - **log_level** - Level to use for logging. Default value is `INFO`. 
   - Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
   - [Click here to learn more about logging levels.](https://docs.python.org/3/library/logging.html#levels)
- 
 
 - **file_logs** - Enable rotating file logs. 
 
-
 - **s3_uploader** - Enable uploading of files to S3 bucket. 
-
 
 - **backup_s3_count** - Copy and backup S3 objects in each config section 
                         <backup_s3_count> times, remove object with the oldest last 
                         modified timestamp. 
   - If omitted then objects are not copied or removed.
- 
 
 - **early_exit** - Enable early program termination after error occurs. 
   - If omitted logs URL processing errors but continues program execution.
-
 
 - **repeat** - Run websnap continuously every <repeat> minutes. 
   - If omitted then websnap does not repeat.
