@@ -155,7 +155,7 @@ def validate_config_section(
 
 class S3ConfigModel(BaseModel):
     """
-    Class with requried S3 config values and their types.
+    Class with required S3 config values and their types.
     """
 
     endpoint_url: AnyUrl
@@ -195,7 +195,7 @@ class S3ConfigSectionModel(BaseModel):
     Class with required config section values (for writing to S3 bucket).
     """
 
-    url: AnyHttpUrl
+    url: AnyUrl
     bucket: str
     key: str
 

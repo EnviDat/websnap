@@ -16,7 +16,7 @@ TODO include diagram
 > - [Usage: S3 Bucket](#usage-s3-bucket)
 > - [Usage: Local Machine](#usage-local-machine)
 > - [Log Support](#log-support)
-> - [Scheduled Pipelines](#scheduled-pipelines)
+> - [Scheduled Pipelines Automation](#scheduled-pipelines-automation)
 > - [Pre-commit Hooks](#pre-commit-hooks)
 > - [Author](#author)
 > - [License](#license)
@@ -71,6 +71,7 @@ To access CLI options documentation in terminal execute:
                         <backup_s3_count> times, remove object with the oldest last 
                         modified timestamp. 
   - If omitted then objects are not copied or removed.
+  - If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. 
 
 - **early_exit** - Enable early program termination after error occurs. 
   - If omitted logs URL processing errors but continues program execution.
@@ -82,7 +83,7 @@ To access CLI options documentation in terminal execute:
 
 ## Usage: S3 Bucket
 
-**Download files from URLs and upload them to S3 bucket.**
+**Download files from URLs and upload them to a S3 bucket.**
 
 ### Example Commands
 
@@ -106,23 +107,17 @@ To access CLI options documentation in terminal execute:
   - However, this can be changed using the CLI `--config` option.  
 - S3 config example file: `src/websnap/config/s3.config.example.ini`
 - All keys in tables below are **mandatory**.
-- Each URL file that will be downloaded requires its _own section_. 
 
-Example S3 configuration:
+#### `[DEFAULT]` Section
+
+Example S3 configuration `[DEFAULT]` section:
 
 ```
 [DEFAULT]
 endpoint_url=https://dreamycloud.com
 aws_access_key_id=1234567abcdefg
 aws_secret_access_key=hijklmn1234567
-
-[resource]
-url=https://www.example.com/api/resource
-bucket=exampledata
-key=subdirectory_resource/resource.json
 ```
-
-#### `[DEFAULT]` Section
 
 | Key                     | Value Description                            |
 |-------------------------|----------------------------------------------|
@@ -131,6 +126,28 @@ key=subdirectory_resource/resource.json
 | `aws_secret_access_key` | AWS secret access key                        |
 
 #### Other Sections (one per URL)
+
+- _Each URL file that will be downloaded requires its **own config section!**_
+- The section name be anything, it is suggested to have a name that relates to the downloaded file.
+
+Example S3 config section configuration with key prefix:
+
+```
+[resource]
+url=https://www.example.com/api/resource
+bucket=exampledata
+key=subdirectory_resource/resource.json
+```
+
+Example S3 config section configuration without key prefix:
+
+```
+[project]
+url=https://www.example.com/api/project
+bucket=exampledata
+key=project.json
+```
+
 
 | Key      | Value Description                                       |
 |----------|---------------------------------------------------------|
@@ -175,16 +192,16 @@ directory=projectdata
 
 #### Sections (one per URL)
 
-| Key                    | Value Description                           |
-|------------------------|---------------------------------------------|
-| `url`                  | URL that file will be downloaded from       |
-| `file_name`            | File name with extension                    |
-| `directory` (optional) | Directory name that file will be written in |
+| Key                      | Value Description                           |
+|--------------------------|---------------------------------------------|
+| `url`                    | URL that file will be downloaded from       |
+| `file_name`              | File name with extension                    |
+| `directory` (_optional_) | Directory name that file will be written in |
 
 
 ## Log Support
 
-Websnap offers support for rotating file logs.
+Websnap supports optional rotating file logs.
 
 - The following CLI option **must** be used to enable websnap to support rotating file logs: `--file_logs`
 - If log keys are not specified in the configuration `[DEFAULT]` section then default values in the table below will be used. 
@@ -203,30 +220,60 @@ log_interval=1
 log_backup_count=7
 ```
 
-
 #### `[DEFAULT]` Section
-| Key                | Default | Value Description                                                                                                 |
-|--------------------|---------|-------------------------------------------------------------------------------------------------------------------|
-| `log_when`         | `D`     | Specifies type of interval                                                                                        |
-| `log_interval`     | `1`     | Duration of interval (positive integer)                                                                           |
-| `log_backup_count` | `0`     | If nonzero then at most <log_backup_count> files will be kept, oldest log file is deleted. (non-negative integer) |
+| Key                | Default | Value Description                                                                                                        |
+|--------------------|---------|--------------------------------------------------------------------------------------------------------------------------|
+| `log_when`         | `D`     | Specifies type of interval                                                                                               |
+| `log_interval`     | `1`     | Duration of interval (must be positive integer)                                                                          |
+| `log_backup_count` | `0`     | If nonzero then at most <log_backup_count> files will be kept, oldest log file is deleted (must be non-negative integer) |
 
 
 ## Minimum Download Size
 
-TODO document
+Websnap supports optionally specifying the minimum download size (in kilobytes) a file must be to download it from the configured URL.
+
+- **By default the minimum default minimum size is 0 kb.**
+  - Unless specified in the configuration this means that a file of any size can be downloaded by websnap.
+- Configured minimum download size must be a non-negative integer.
+- If the content from the URL is less than the configured size:
+  - An error will be logged and the program continues to the next config section.
+  - If the CLI option `--early_exit` is enabled then the program will terminate early.
+
+### Configuration
+
+Example minimum download size configuration:
+
+```
+[DEFAULT]
+min_size_kb=1
+```
+
+#### `[DEFAULT]` Section
+| Key           | Default | Value Description                                                 |
+|---------------|---------|-------------------------------------------------------------------|
+| `min_size_kb` | `0`     | Minimum download size in kilobytes (must be non-negative integer) |
 
 
-## Scheduled Pipelines
+## Scheduled Pipelines Automation
 
-TODO document
+A CI/CD pipeline is currently used to automate execution of websnap using a GitLab pipeline schedule. 
+
+#### Pipeline script specifications:
+- For details see `.gitlab-ci.yml`
+- Uploads objects to a S3 bucket
+- Backs up S3 objects
+- Early exit is enabled, this causes pipeline failure if an error occurs
+
+#### Pipeline required CI/CD variables:
+- CONFIG_INI - text with required S3 config values, for example see `src/websnap/config/s3.config.example.ini`
+- BACKUP_S3_COUNT - number of S3 objects to back up for each configured URL
 
 
 ## Pre-commit Hooks
 
 Pre-commit hooks ensure that the application uses stylistic conventions before code changes can be commited.
 
-Pre-commit hooks are specified in `.pre-commit-config.yaml`
+Pre-commit hooks are specified in `.pre-commit-config.yaml`.
 
 To install pre-commit hooks for use during development execute:
  ```bash

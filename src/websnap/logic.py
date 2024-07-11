@@ -24,11 +24,15 @@ from src.websnap.validators import (
 def terminate_program(has_early_exit: bool):
     """Terminates program execution if argument has_early_exit is True."""
     if has_early_exit:
-        sys.exit("Error occured: check logs for details")
+        sys.exit("Error occurred: check logs for details")
     return
 
 
-def write_urls_locally(conf_parser: configparser.ConfigParser, log: logging.getLogger, min_size_kb: int, has_early_exit: bool = False,
+def write_urls_locally(
+    conf_parser: configparser.ConfigParser,
+    log: logging.getLogger,
+    min_size_kb: int,
+    has_early_exit: bool = False,
 ):
     """
     Download files hosted at URLS in config and then upload them to local machine.
