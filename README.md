@@ -9,6 +9,7 @@ Also supports writing downloaded files to local machine.
 
 ## Documentation Topics
 
+> - [Overview Diagram](#overview-diagram)
 > - [Installation](#installation)
 > - [CLI Options](#cli-options)
 > - [Usage: S3 Bucket](#usage-s3-bucket)
@@ -19,6 +20,11 @@ Also supports writing downloaded files to local machine.
 > - [Pre-commit Hooks](#pre-commit-hooks)
 > - [Author](#author)
 > - [License](#license)
+
+
+## Overview Diagram
+
+![image](/overview_diagram.png)
 
 
 ## Installation
