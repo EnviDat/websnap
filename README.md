@@ -16,6 +16,7 @@ TODO include diagram
 > - [Usage: S3 Bucket](#usage-s3-bucket)
 > - [Usage: Local Machine](#usage-local-machine)
 > - [Log Support](#log-support)
+> - [Minimum Download Size](#minimum-download-size)
 > - [Scheduled Pipelines Automation](#scheduled-pipelines-automation)
 > - [Pre-commit Hooks](#pre-commit-hooks)
 > - [Author](#author)
