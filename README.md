@@ -6,8 +6,6 @@ Also supports writing downloaded files to local machine.
 
 [EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL.
 
-TODO include diagram
-
 
 ## Documentation Topics
 
