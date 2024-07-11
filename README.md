@@ -291,7 +291,7 @@ To run pre-commit hooks manually on all files execute:
 
 ## Purpose
 
-This project was developed to EnviDat resiliency and support continuous operation during server maintenance.
+This project was developed to facilitate EnviDat resiliency and support continuous operation during server maintenance.
 [EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 ## Author
