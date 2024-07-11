@@ -4,8 +4,6 @@
 
 Also supports writing downloaded files to local machine. 
 
-[EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL.
-
 
 ## Documentation Topics
 
@@ -18,6 +16,7 @@ Also supports writing downloaded files to local machine.
 > - [Minimum Download Size](#minimum-download-size)
 > - [Scheduled Pipelines Automation](#scheduled-pipelines-automation)
 > - [Pre-commit Hooks](#pre-commit-hooks)
+> - [Purpose](#purpose)
 > - [Author](#author)
 > - [License](#license)
 
@@ -290,6 +289,10 @@ To run pre-commit hooks manually on all files execute:
   pre-commit run --all-files
   ```
 
+## Purpose
+
+This project was developed to EnviDat resiliency and support continuous operation during server maintenance.
+[EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 ## Author
 [Rebecca Kurup Buchholz](https://www.linkedin.com/in/rebeccakurupbuchholz/), Swiss Federal Institute for Forest, Snow and Landscape Research WSL 
