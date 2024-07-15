@@ -7,6 +7,7 @@ Also supports writing downloaded files to a local machine.
 
 ## Documentation Topics
 
+> - [Purpose](#purpose)
 > - [Overview Diagram](#overview-diagram)
 > - [Installation](#installation)
 > - [CLI Options](#cli-options)
@@ -16,9 +17,15 @@ Also supports writing downloaded files to a local machine.
 > - [Minimum Download Size](#minimum-download-size)
 > - [Scheduled Pipelines Automation](#scheduled-pipelines-automation)
 > - [Pre-commit Hooks](#pre-commit-hooks)
-> - [Purpose](#purpose)
 > - [Author](#author)
 > - [License](#license)
+
+
+## Purpose
+
+This project was developed to facilitate EnviDat resiliency and support continuous operation during server maintenance.
+
+[EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 
 ## Overview Diagram
@@ -288,11 +295,6 @@ To run pre-commit hooks manually on all files execute:
   ```bash
   pre-commit run --all-files
   ```
-
-## Purpose
-
-This project was developed to facilitate EnviDat resiliency and support continuous operation during server maintenance.
-[EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 ## Author
 [Rebecca Kurup Buchholz](https://www.linkedin.com/in/rebeccakurupbuchholz/), Swiss Federal Institute for Forest, Snow and Landscape Research WSL 
