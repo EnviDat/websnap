@@ -191,6 +191,7 @@ key=project.json
   - However, this can be changed using the CLI `--config` option.  
 - Local machine config example file: `src/websnap/config/config.example.ini`
 - Each URL file that will be downloaded requires its _own section_. 
+- If the optional `directory` key/value pair is omitted then the file will be written in the directory that the program is executed from.
 
 Example local machine configuration section:
 
