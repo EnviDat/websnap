@@ -28,6 +28,36 @@ def terminate_program(has_early_exit: bool):
     return
 
 
+def get_url_content(
+    url: str, section: str, log: logging.getLogger, has_early_exit: bool = False
+) -> bytes | None:
+    """
+    Return content of response from HTTP GET request.
+    If response status code is >= 400 then terminate program if argument has_early_exit
+    is True, else return None.
+
+    Args:
+        url: URL to download.
+        section: Name of config section being processed.
+        log: Logger object created with customized configuration file.
+        has_early_exit: If True then terminates program immediately after error occurs.
+            Default value is False.
+            If False then only logs error and continues execution.
+    """
+    response = requests.get(url)
+
+    if not response.ok:
+        log.error(
+            f"Config section '{section}': "
+            f"URL returned unsuccessful HTTP response "
+            f"status code {response.status_code}"
+        )
+        terminate_program(has_early_exit)
+        return None
+
+    return response.content
+
+
 def write_urls_locally(
     conf_parser: configparser.ConfigParser,
     log: logging.getLogger,
@@ -63,21 +93,12 @@ def write_urls_locally(
                 terminate_program(has_early_exit)
                 continue
 
-            url = str(conf.url)
-            response = requests.get(url)
+            url_content = get_url_content(str(conf.url), section, log, has_early_exit)
 
-            if not response.ok:
-                log.error(
-                    f"Config section '{section}': "
-                    f"URL returned unsuccessful HTTP response "
-                    f"status code {response.status_code}"
-                )
-                terminate_program(has_early_exit)
+            if not url_content:
                 continue
 
-            data = response.content
-
-            data_kb = data.__sizeof__() / 1024
+            data_kb = url_content.__sizeof__() / 1024
             if data_kb < min_size_kb:
                 log.error(
                     f"Config section '{section}': "
@@ -93,7 +114,7 @@ def write_urls_locally(
                 file_path = f"{conf.file_name}"
 
             with open(file_path, "wb") as f:
-                f.write(data)
+                f.write(url_content)
                 log.info(
                     f"Successfully downloaded URL content and wrote file in "
                     f"config section: {section}"
@@ -301,7 +322,7 @@ def write_urls_to_s3(
 
             if not response.ok:
                 log.error(
-                    f"S3 config section '{section}': "
+                    f"Config section '{section}': "
                     f"URL returned unsuccessful HTTP response "
                     f"status code {response.status_code}"
                 )
@@ -313,7 +334,7 @@ def write_urls_to_s3(
             data_kb = data.__sizeof__() / 1024
             if data_kb < min_size_kb:
                 log.error(
-                    f"S3 config section '{section}': "
+                    f"Config section '{section}': "
                     f"URL response content in config section {section} is less than "
                     f"config value 'min_size_kb' {min_size_kb}"
                 )
@@ -329,12 +350,12 @@ def write_urls_to_s3(
 
             if status_code == 200:
                 log.info(
-                    f"S3 config section '{section}': Successfully downloaded URL "
+                    f"Config section '{section}': Successfully downloaded URL "
                     f"content and uploaded file '{conf.key}'"
                 )
             else:
                 log.error(
-                    f"S3 config section '{section}': S3 returned unexpected "
+                    f"Config section '{section}': S3 returned unexpected "
                     f"HTTP response {status_code}"
                 )
                 terminate_program(has_early_exit)

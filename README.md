@@ -2,7 +2,7 @@
 
 #### CLI that downloads files from URLs and uploads them to a S3 bucket. 
 
-Also supports writing downloaded files to local machine. 
+Also supports writing downloaded files to a local machine. 
 
 
 ## Documentation Topics
