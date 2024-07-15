@@ -58,6 +58,41 @@ def get_url_content(
     return response.content
 
 
+def is_min_size_kb(
+    url_content: bytes,
+    min_size_kb: int,
+    section: str,
+    log: logging.getLogger,
+    has_early_exit: bool = False,
+) -> bool | None:
+    """
+    Return True if url_content is greater than min_size_kb.
+    Else return False or terminate program (if argument has_early_exit is True).
+
+    Args:
+        url_content: Content of response from HTTP request.
+        min_size_kb: Minimum threshold in kilobytes that URL response content must be to
+            write or upload file.
+        section: Name of config section being processed.
+        log: Logger object created with customized configuration file.
+        has_early_exit: If True then terminates program immediately after error occurs.
+            Default value is False.
+            If False then only logs error and continues execution.
+    """
+    data_kb = url_content.__sizeof__() / 1024
+
+    if data_kb < min_size_kb:
+        log.error(
+            f"Config section '{section}': "
+            f"URL response content in config section {section} is less than "
+            f"config value 'min_size_kb' {min_size_kb}"
+        )
+        terminate_program(has_early_exit)
+        return False
+
+    return True
+
+
 def write_urls_locally(
     conf_parser: configparser.ConfigParser,
     log: logging.getLogger,
@@ -94,18 +129,13 @@ def write_urls_locally(
                 continue
 
             url_content = get_url_content(str(conf.url), section, log, has_early_exit)
-
             if not url_content:
                 continue
 
-            data_kb = url_content.__sizeof__() / 1024
-            if data_kb < min_size_kb:
-                log.error(
-                    f"Config section '{section}': "
-                    f"URL response content in config section {section} is less than "
-                    f"config value 'min_size_kb' {min_size_kb}"
-                )
-                terminate_program(has_early_exit)
+            is_min_size = is_min_size_kb(
+                url_content, min_size_kb, section, log, has_early_exit
+            )
+            if not is_min_size:
                 continue
 
             if conf.directory:
@@ -116,7 +146,7 @@ def write_urls_locally(
             with open(file_path, "wb") as f:
                 f.write(url_content)
                 log.info(
-                    f"Successfully downloaded URL content and wrote file in "
+                    f"Successfully downloaded URL content and wrote file locally in "
                     f"config section: {section}"
                 )
 
@@ -317,41 +347,29 @@ def write_urls_to_s3(
                 terminate_program(has_early_exit)
                 continue
 
-            url = str(conf.url)
-            response = requests.get(url)
-
-            if not response.ok:
-                log.error(
-                    f"Config section '{section}': "
-                    f"URL returned unsuccessful HTTP response "
-                    f"status code {response.status_code}"
-                )
-                terminate_program(has_early_exit)
+            url_content = get_url_content(str(conf.url), section, log, has_early_exit)
+            if not url_content:
                 continue
 
-            data = response.content
-
-            data_kb = data.__sizeof__() / 1024
-            if data_kb < min_size_kb:
-                log.error(
-                    f"Config section '{section}': "
-                    f"URL response content in config section {section} is less than "
-                    f"config value 'min_size_kb' {min_size_kb}"
-                )
-                terminate_program(has_early_exit)
+            is_min_size = is_min_size_kb(
+                url_content, min_size_kb, section, log, has_early_exit
+            )
+            if not is_min_size:
                 continue
 
             if backup_s3_count:
                 copy_s3_object(client, conf, log, section, has_early_exit)
                 delete_s3_backup_object(client, conf, log, section, backup_s3_count)
 
-            response_s3 = client.put_object(Body=data, Bucket=conf.bucket, Key=conf.key)
+            response_s3 = client.put_object(
+                Body=url_content, Bucket=conf.bucket, Key=conf.key
+            )
             status_code = response_s3.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
             if status_code == 200:
                 log.info(
                     f"Config section '{section}': Successfully downloaded URL "
-                    f"content and uploaded file '{conf.key}'"
+                    f"content and uploaded content to S3 object '{conf.key}'"
                 )
             else:
                 log.error(
