@@ -65,7 +65,7 @@ To access CLI options documentation in terminal execute:
 | `--s3_uploader`     | `-s`      | `False`                           |
 | `--backup_s3_count` | `-b`      | `None`                            |
 | `--early_exit`      | `-e`      | `False`                           |
-| `--repeat`          | `-r`      | `None`                            |
+| `--repeat_minutes`  | `-r`      | `None`                            |
 
 - **config** - Path to configuration `.ini` file. 
   - Default value expects `config.ini` at `./src/websnap/config/config.ini`.
@@ -87,7 +87,7 @@ To access CLI options documentation in terminal execute:
 - **early_exit** - Enable early program termination after error occurs. 
   - If omitted logs URL processing errors but continues program execution.
 
-- **repeat** - Run websnap continuously every <repeat> minutes. 
+- **repeat_minutes** - Run websnap continuously every <repeat_minutes> minutes. 
   - If omitted then websnap does not repeat.
 
 
