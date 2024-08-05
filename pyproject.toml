@@ -23,3 +23,6 @@ build-backend = "pdm.backend"
 
 [project.scripts]
 websnap_cli = "websnap.websnap_cli:main"
+
+[tool.pdm.scripts]
+websnap-cli = {call = "websnap.websnap_cli:main"}
