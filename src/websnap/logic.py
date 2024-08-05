@@ -12,7 +12,7 @@ import boto3
 from botocore.exceptions import ClientError
 import sys
 
-from src.websnap.validators import (
+from websnap.validators import (
     validate_config_section,
     S3ConfigModel,
     validate_s3_config_section,
@@ -38,7 +38,7 @@ def get_url_content(
 
     Args:
         url: URL to download.
-        section: Name of config section being processed.
+        section: Name of config_templates section being processed.
         log: Logger object created with customized configuration file.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
@@ -73,7 +73,7 @@ def is_min_size_kb(
         url_content: Content of response from HTTP request.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             write or upload file.
-        section: Name of config section being processed.
+        section: Name of config_templates section being processed.
         log: Logger object created with customized configuration file.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
@@ -84,8 +84,8 @@ def is_min_size_kb(
     if data_kb < min_size_kb:
         log.error(
             f"Config section '{section}': "
-            f"URL response content in config section {section} is less than "
-            f"config value 'min_size_kb' {min_size_kb}"
+            f"URL response content in config_templates section {section} is less than "
+            f"config_templates value 'min_size_kb' {min_size_kb}"
         )
         terminate_program(early_exit)
         return False
@@ -100,7 +100,8 @@ def write_urls_locally(
     early_exit: bool = False,
 ):
     """
-    Download files hosted at URLS in config and then upload them to local machine.
+    Download files hosted at URLS in config_templates and then write them to local
+    machine.
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
@@ -147,7 +148,7 @@ def write_urls_locally(
                 f.write(url_content)
                 log.info(
                     f"Successfully downloaded URL content and wrote file locally in "
-                    f"config section: {section}"
+                    f"config_templates section: {section}"
                 )
 
         except Exception as e:
@@ -165,7 +166,7 @@ def copy_s3_object(
     early_exit: bool = False,
 ):
     """
-    Copy an object using S3 object config.
+    Copy an object using S3 object config_templates.
 
     New object's name is constructed using the 'LastModified' timestamp of original
     object.
@@ -175,7 +176,7 @@ def copy_s3_object(
         conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
-        section: Name of config section being processed.
+        section: Name of config_templates section being processed.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
@@ -200,11 +201,13 @@ def copy_s3_object(
 
         if status_code == 200:
             log.info(
-                f"S3 config section '{section}': Created new backup file '{key_copy}'"
+                f"S3 config_templates section '{section}': "
+                f"Created new backup file '{key_copy}'"
             )
         else:
             log.error(
-                f"S3 config section '{section}': Object backup attempt returned "
+                f"S3 config_templates section '{section}': "
+                f"Object backup attempt returned "
                 f"unexpected HTTP response {status_code}"
             )
             terminate_program(early_exit)
@@ -225,7 +228,7 @@ def delete_s3_backup_object(
     early_exit: bool = False,
 ):
     """
-    Delete a S3 backup object using S3 object config.
+    Delete a S3 backup object using S3 object config_templates.
     Only deletes object if backup objects exceed backup_s3_count.
 
     Only deletes object that corresponds to the file name in the configured key,
@@ -236,9 +239,10 @@ def delete_s3_backup_object(
         conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
-        section: Name of config section being processed.
-        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
-            remove object with the oldest last modified timestamp.
+        section: Name of config_templates section being processed.
+        backup_s3_count: Copy and backup S3 objects in config_templates
+            <backup_s3_count> times, remove object with the oldest last modified
+            timestamp.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
@@ -283,20 +287,20 @@ def delete_s3_backup_object(
 
             if status_code == 204:
                 log.info(
-                    f"S3 config section '{section}': "
+                    f"S3 config_templates section '{section}': "
                     f"Deleted backup file '{delete_key}'"
                 )
             else:
                 log.error(
-                    f"S3 config section '{section}': Backup file delete attempt "
-                    f"returned unexpected HTTP response {status_code}"
+                    f"S3 config_templates section '{section}': Backup file delete "
+                    f"attempt returned unexpected HTTP response {status_code}"
                 )
                 terminate_program(early_exit)
 
         else:
             log.info(
-                f"S3 config section '{section}': Current number of backup files "
-                f"does not exceed backup S3 count {backup_s3_count}"
+                f"S3 config_templates section '{section}': Current number of backup "
+                f"files does not exceed backup S3 count {backup_s3_count}"
             )
 
     except ClientError as e:
@@ -315,7 +319,7 @@ def write_urls_to_s3(
     early_exit: bool = False,
 ):
     """
-    Download files hosted at URLS in config and then upload them to S3 bucket.
+    Download files hosted at URLS in config_templates and then upload them to S3 bucket.
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
@@ -323,7 +327,7 @@ def write_urls_to_s3(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             upload file to S3 bucket.
-        backup_s3_count: Copy and backup S3 objects in each config section
+        backup_s3_count: Copy and backup S3 objects in each config_templates section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied or removed.

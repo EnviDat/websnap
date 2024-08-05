@@ -1,5 +1,5 @@
 """
-CLI that supports downloading files hosted at URLs in config and then uploading
+CLI that supports copying files hosted at URLs in config_templates and then uploading
 them to S3 bucket or local machine.
 
 Example pdm command without flags (uses default argument values):
@@ -18,7 +18,7 @@ from project root directory without flags:
 """
 
 import argparse
-from src.websnap import websnap
+import websnap
 
 
 def parse_arguments() -> argparse.Namespace | None:
@@ -28,16 +28,15 @@ def parse_arguments() -> argparse.Namespace | None:
     """
 
     parser = argparse.ArgumentParser(
-        description="Websnap CLI: Supports downloading files hosted at URLs in config "
-        "and then uploading them to S3 bucket or local machine."
+        description="Supports copying files hosted at URLs in "
+        "config and then uploading them to S3 bucket or local machine."
     )
 
     parser.add_argument(
         "-c",
         "--config",
-        default="./src/websnap/config/config.ini",
-        help="Path to configuration file."
-        "Default value is './src/websnap/config/config.ini'.",
+        default="config.ini",
+        help="Path to configuration file." "Default value is 'config.ini'.",
     )
 
     parser.add_argument(
@@ -63,7 +62,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-b",
         "--backup_s3_count",
         type=int,
-        help="Copy and backup S3 objects in each config section"
+        help="Copy and backup S3 objects in each config_templates section"
         "<backup_s3_count> times, "
         "remove object with the oldest last modified timestamp. "
         "If omitted then objects are not copied or removed.",

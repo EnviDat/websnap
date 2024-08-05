@@ -6,8 +6,8 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
 
-from src.websnap.validators import LogConfigModel
-from src.websnap.constants import LogFormatter, LogLevel
+from websnap.validators import LogConfigModel
+from websnap.constants import LogFormatter, LogLevel
 
 
 def get_log_level(log_level: str = "INFO") -> int:
@@ -80,7 +80,7 @@ def get_custom_logger(
         name: Name of logger.
         level: Logging level represented as string.
         file_logs: If True then implements rotating file logs.
-        config: Validated log config.
+        config: Validated log config_templates.
     """
     try:
         _loglevel = level.upper()

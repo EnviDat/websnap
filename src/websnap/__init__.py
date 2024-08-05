@@ -1,3 +1,6 @@
 """
-Project that downloads and write files hosted at URLs to S3 bucket or local machine.
+Project that copies files hosted at URLs in config_templates and then uploads
+them to S3 bucket or local machine.
 """
+
+from .websnap import websnap
