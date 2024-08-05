@@ -1,6 +1,6 @@
 # websnap
 
-#### CLI that downloads files from URLs and uploads them to a S3 bucket. 
+#### CLI that copies files from URLs and uploads them to a S3 bucket. 
 
 Also supports writing downloaded files to a local machine. 
 
