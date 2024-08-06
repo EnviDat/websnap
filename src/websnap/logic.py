@@ -12,7 +12,7 @@ import boto3
 from botocore.exceptions import ClientError
 import sys
 
-from src.websnap.validators import (
+from websnap.validators import (
     validate_config_section,
     S3ConfigModel,
     validate_s3_config_section,
@@ -21,26 +21,26 @@ from src.websnap.validators import (
 )
 
 
-def terminate_program(has_early_exit: bool):
-    """Terminates program execution if argument has_early_exit is True."""
-    if has_early_exit:
+def terminate_program(early_exit: bool):
+    """Terminates program execution if argument early_exit is True."""
+    if early_exit:
         sys.exit("Error occurred: check logs for details")
     return
 
 
 def get_url_content(
-    url: str, section: str, log: logging.getLogger, has_early_exit: bool = False
+    url: str, section: str, log: logging.getLogger, early_exit: bool = False
 ) -> bytes | None:
     """
     Return content of response from HTTP GET request.
-    If response status code is >= 400 then terminate program if argument has_early_exit
+    If response status code is >= 400 then terminate program if argument early_exit
     is True, else return None.
 
     Args:
         url: URL to download.
-        section: Name of config section being processed.
+        section: Name of config_templates section being processed.
         log: Logger object created with customized configuration file.
-        has_early_exit: If True then terminates program immediately after error occurs.
+        early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
@@ -52,7 +52,7 @@ def get_url_content(
             f"URL returned unsuccessful HTTP response "
             f"status code {response.status_code}"
         )
-        terminate_program(has_early_exit)
+        terminate_program(early_exit)
         return None
 
     return response.content
@@ -63,19 +63,19 @@ def is_min_size_kb(
     min_size_kb: int,
     section: str,
     log: logging.getLogger,
-    has_early_exit: bool = False,
+    early_exit: bool = False,
 ) -> bool | None:
     """
     Return True if url_content is greater than min_size_kb.
-    Else return False or terminate program (if argument has_early_exit is True).
+    Else return False or terminate program (if argument early_exit is True).
 
     Args:
         url_content: Content of response from HTTP request.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             write or upload file.
-        section: Name of config section being processed.
+        section: Name of config_templates section being processed.
         log: Logger object created with customized configuration file.
-        has_early_exit: If True then terminates program immediately after error occurs.
+        early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
@@ -84,10 +84,10 @@ def is_min_size_kb(
     if data_kb < min_size_kb:
         log.error(
             f"Config section '{section}': "
-            f"URL response content in config section {section} is less than "
-            f"config value 'min_size_kb' {min_size_kb}"
+            f"URL response content in config_templates section {section} is less than "
+            f"config_templates value 'min_size_kb' {min_size_kb}"
         )
-        terminate_program(has_early_exit)
+        terminate_program(early_exit)
         return False
 
     return True
@@ -97,17 +97,18 @@ def write_urls_locally(
     conf_parser: configparser.ConfigParser,
     log: logging.getLogger,
     min_size_kb: int,
-    has_early_exit: bool = False,
+    early_exit: bool = False,
 ):
     """
-    Download files hosted at URLS in config and then upload them to local machine.
+    Download files hosted at URLS in config_templates and then write them to local
+    machine.
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             write file.
-        has_early_exit: If True then terminates program immediately after error occurs.
+        early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
@@ -117,7 +118,7 @@ def write_urls_locally(
             conf = validate_config_section(conf_parser, section)
             if not isinstance(conf, ConfigSectionModel):
                 log.error(f"Config section '{section}': {conf}")
-                terminate_program(has_early_exit)
+                terminate_program(early_exit)
                 continue
 
             if conf.directory and not os.path.isdir(conf.directory):
@@ -125,15 +126,15 @@ def write_urls_locally(
                     f"Config section '{section}': directory '{conf.directory}' "
                     f"does not exist"
                 )
-                terminate_program(has_early_exit)
+                terminate_program(early_exit)
                 continue
 
-            url_content = get_url_content(str(conf.url), section, log, has_early_exit)
+            url_content = get_url_content(str(conf.url), section, log, early_exit)
             if not url_content:
                 continue
 
             is_min_size = is_min_size_kb(
-                url_content, min_size_kb, section, log, has_early_exit
+                url_content, min_size_kb, section, log, early_exit
             )
             if not is_min_size:
                 continue
@@ -147,12 +148,12 @@ def write_urls_locally(
                 f.write(url_content)
                 log.info(
                     f"Successfully downloaded URL content and wrote file locally in "
-                    f"config section: {section}"
+                    f"config_templates section: {section}"
                 )
 
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
-            terminate_program(has_early_exit)
+            terminate_program(early_exit)
 
     return
 
@@ -162,10 +163,10 @@ def copy_s3_object(
     conf: S3ConfigSectionModel,
     log: logging.getLogger,
     section: str,
-    has_early_exit: bool = False,
+    early_exit: bool = False,
 ):
     """
-    Copy an object using S3 object config.
+    Copy an object using S3 object config_templates.
 
     New object's name is constructed using the 'LastModified' timestamp of original
     object.
@@ -175,8 +176,8 @@ def copy_s3_object(
         conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
-        section: Name of config section being processed.
-        has_early_exit: If True then terminates program immediately after error occurs.
+        section: Name of config_templates section being processed.
+        early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
@@ -200,18 +201,20 @@ def copy_s3_object(
 
         if status_code == 200:
             log.info(
-                f"S3 config section '{section}': Created new backup file '{key_copy}'"
+                f"S3 config_templates section '{section}': "
+                f"Created new backup file '{key_copy}'"
             )
         else:
             log.error(
-                f"S3 config section '{section}': Object backup attempt returned "
+                f"S3 config_templates section '{section}': "
+                f"Object backup attempt returned "
                 f"unexpected HTTP response {status_code}"
             )
-            terminate_program(has_early_exit)
+            terminate_program(early_exit)
 
     except ClientError as e:
         log.error(e)
-        terminate_program(has_early_exit)
+        terminate_program(early_exit)
 
     return
 
@@ -222,10 +225,10 @@ def delete_s3_backup_object(
     log: logging.getLogger,
     section: str,
     backup_s3_count: int,
-    has_early_exit: bool = False,
+    early_exit: bool = False,
 ):
     """
-    Delete a S3 backup object using S3 object config.
+    Delete a S3 backup object using S3 object config_templates.
     Only deletes object if backup objects exceed backup_s3_count.
 
     Only deletes object that corresponds to the file name in the configured key,
@@ -236,10 +239,11 @@ def delete_s3_backup_object(
         conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
-        section: Name of config section being processed.
-        backup_s3_count: Copy and backup S3 objects in config <backup_s3_count> times,
-            remove object with the oldest last modified timestamp.
-        has_early_exit: If True then terminates program immediately after error occurs.
+        section: Name of config_templates section being processed.
+        backup_s3_count: Copy and backup S3 objects in config_templates
+            <backup_s3_count> times, remove object with the oldest last modified
+            timestamp.
+        early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
@@ -283,25 +287,25 @@ def delete_s3_backup_object(
 
             if status_code == 204:
                 log.info(
-                    f"S3 config section '{section}': "
+                    f"S3 config_templates section '{section}': "
                     f"Deleted backup file '{delete_key}'"
                 )
             else:
                 log.error(
-                    f"S3 config section '{section}': Backup file delete attempt "
-                    f"returned unexpected HTTP response {status_code}"
+                    f"S3 config_templates section '{section}': Backup file delete "
+                    f"attempt returned unexpected HTTP response {status_code}"
                 )
-                terminate_program(has_early_exit)
+                terminate_program(early_exit)
 
         else:
             log.info(
-                f"S3 config section '{section}': Current number of backup files "
-                f"does not exceed backup S3 count {backup_s3_count}"
+                f"S3 config_templates section '{section}': Current number of backup "
+                f"files does not exceed backup S3 count {backup_s3_count}"
             )
 
     except ClientError as e:
         log.error(e)
-        terminate_program(has_early_exit)
+        terminate_program(early_exit)
 
     return
 
@@ -312,10 +316,10 @@ def write_urls_to_s3(
     log: logging.getLogger,
     min_size_kb: int,
     backup_s3_count: int | None = None,
-    has_early_exit: bool = False,
+    early_exit: bool = False,
 ):
     """
-    Download files hosted at URLS in config and then upload them to S3 bucket.
+    Download files hosted at URLS in config_templates and then upload them to S3 bucket.
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
@@ -323,11 +327,11 @@ def write_urls_to_s3(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             upload file to S3 bucket.
-        backup_s3_count: Copy and backup S3 objects in each config section
+        backup_s3_count: Copy and backup S3 objects in each config_templates section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied or removed.
-        has_early_exit: If True then terminates program immediately after error occurs.
+        early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
@@ -344,21 +348,21 @@ def write_urls_to_s3(
             conf = validate_s3_config_section(conf_parser, section)
             if not isinstance(conf, S3ConfigSectionModel):
                 log.error(f"Config section '{section}': {conf}")
-                terminate_program(has_early_exit)
+                terminate_program(early_exit)
                 continue
 
-            url_content = get_url_content(str(conf.url), section, log, has_early_exit)
+            url_content = get_url_content(str(conf.url), section, log, early_exit)
             if not url_content:
                 continue
 
             is_min_size = is_min_size_kb(
-                url_content, min_size_kb, section, log, has_early_exit
+                url_content, min_size_kb, section, log, early_exit
             )
             if not is_min_size:
                 continue
 
             if backup_s3_count:
-                copy_s3_object(client, conf, log, section, has_early_exit)
+                copy_s3_object(client, conf, log, section, early_exit)
                 delete_s3_backup_object(client, conf, log, section, backup_s3_count)
 
             response_s3 = client.put_object(
@@ -376,10 +380,10 @@ def write_urls_to_s3(
                     f"Config section '{section}': S3 returned unexpected "
                     f"HTTP response {status_code}"
                 )
-                terminate_program(has_early_exit)
+                terminate_program(early_exit)
 
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
-            terminate_program(has_early_exit)
+            terminate_program(early_exit)
 
     return

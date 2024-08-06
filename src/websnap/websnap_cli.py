@@ -1,16 +1,16 @@
 """
-CLI that supports downloading files hosted at URLs in config and then uploading
+CLI that supports copying files hosted at URLs in config_templates and then uploading
 them to S3 bucket or local machine.
 
 Example pdm command without flags (uses default argument values):
     pdm run websnap-cli
 
 Example pdm command, writes files locally and repeats every 60 minutes (1 hour):
-pdm run websnap-cli --file_logs --repeat 60
+pdm run websnap-cli --file_logs --repeat_minutes 60
 
 Example pdm command, uploads files to a S3 bucket and
 repeats every 1440 minutes (24 hours):
-    pdm run websnap-cli --file_logs --s3_uploader --backup_s3_count 3 --repeat 1440
+pdm run websnap-cli --file_logs --s3_uploader --backup_s3_count 3 --repeat_minutes 1440
 
 Example command to run command directly with python
 from project root directory without flags:
@@ -18,7 +18,7 @@ from project root directory without flags:
 """
 
 import argparse
-from src.websnap import websnap
+import websnap
 
 
 def parse_arguments() -> argparse.Namespace | None:
@@ -28,16 +28,15 @@ def parse_arguments() -> argparse.Namespace | None:
     """
 
     parser = argparse.ArgumentParser(
-        description="Websnap CLI: Supports downloading files hosted at URLs in config "
-        "and then uploading them to S3 bucket or local machine."
+        description="Supports copying files hosted at URLs in "
+        "config and then uploading them to S3 bucket or local machine."
     )
 
     parser.add_argument(
         "-c",
         "--config",
-        default="./src/websnap/config/config.ini",
-        help="Path to configuration file."
-        "Default value is './src/websnap/config/config.ini'.",
+        default="config.ini",
+        help="Path to configuration file." "Default value is 'config.ini'.",
     )
 
     parser.add_argument(
@@ -63,7 +62,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-b",
         "--backup_s3_count",
         type=int,
-        help="Copy and backup S3 objects in each config section"
+        help="Copy and backup S3 objects in each config_templates section"
         "<backup_s3_count> times, "
         "remove object with the oldest last modified timestamp. "
         "If omitted then objects are not copied or removed.",
@@ -80,9 +79,9 @@ def parse_arguments() -> argparse.Namespace | None:
 
     parser.add_argument(
         "-r",
-        "--repeat",
+        "--repeat_minutes",
         type=int,
-        help="Run websnap continuously every <repeat> minutes. "
+        help="Run websnap continuously every <repeat_minutes>. "
         "If omitted then websnap does not repeat.",
     )
 
@@ -102,11 +101,11 @@ def main():
     websnap.websnap(
         config=kwargs["config"],
         log_level=kwargs["log_level"],
-        has_file_logs=kwargs["file_logs"],
-        is_s3_uploader=kwargs["s3_uploader"],
+        file_logs=kwargs["file_logs"],
+        s3_uploader=kwargs["s3_uploader"],
         backup_s3_count=kwargs["backup_s3_count"],
-        has_early_exit=kwargs["early_exit"],
-        repeat_interval=kwargs["repeat"],
+        early_exit=kwargs["early_exit"],
+        repeat_minutes=kwargs["repeat_minutes"],
     )
 
 
