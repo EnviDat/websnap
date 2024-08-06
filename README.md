@@ -43,7 +43,7 @@ This project was developed to facilitate EnviDat resiliency and support continuo
 
 ## Quickstart
 
-### Websnap can be used as a function or as a CLI (command-line interface)
+### Websnap can be used as a function or as a CLI 
 
 ###
 #### Function
@@ -61,7 +61,7 @@ websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=7, early_exit=
 ###
 #### CLI
 
-To access CLI options documentation in terminal execute: 
+To access CLI documentation in terminal execute: 
    ```bash
   websnap_cli --help
    ```
@@ -69,15 +69,15 @@ To access CLI options documentation in terminal execute:
 ## Function Parameters / CLI Options
 
 ### Function Parameters
-| Parameter         | Type          | Default      |
-|-------------------|---------------|--------------|
-| `config`          | `str`         | `config.ini` |
-| `log_level`       | `str`         | `INFO`       |
-| `file_logs`       | `bool`        | `False`      |
-| `s3_uploader`     | `bool`        | `False`      |
-| `backup_s3_count` | `int \| None` | `None`       |
-| `early_exit`      | `bool`        | `False`      |
-| `repeat_minutes`  | `int \| None` | `None`       |
+| Parameter         | Type          | Default        |
+|-------------------|---------------|----------------|
+| `config`          | `str`         | `"config.ini"` |
+| `log_level`       | `str`         | `"INFO"`       |
+| `file_logs`       | `bool`        | `False`        |
+| `s3_uploader`     | `bool`        | `False`        |
+| `backup_s3_count` | `int \| None` | `None`         |
+| `early_exit`      | `bool`        | `False`        |
+| `repeat_minutes`  | `int \| None` | `None`         |
 
 ### CLI Options
 | Option              | Shortcut | Default      |
@@ -91,37 +91,23 @@ To access CLI options documentation in terminal execute:
 | `--repeat_minutes`  | `-r`     | `None`       |
 
 
-### Explanation
+### Description
 
-- **config** - Path to configuration `.ini` file. 
-  - Default value expects `config.ini` in same directory as websnap package is being 
-    executed from.
-
-- **log_level** - Level to use for logging. Default value is `INFO`. 
-  - Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
-  - [Click here to learn more about logging levels.](https://docs.python.org/3/library/logging.html#levels)
-
-- **file_logs** - Enable rotating file logs. 
-
-- **s3_uploader** - Enable uploading of files to S3 bucket. 
-
-- **backup_s3_count** - Copy and backup S3 objects in each config section 
-                        <backup_s3_count> times, remove object with the oldest last 
-                        modified timestamp. 
-  - If omitted then objects are not copied or removed.
-  - If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. 
-
-- **early_exit** - Enable early program termination after error occurs. 
-  - If omitted logs URL processing errors but continues program execution.
-
-- **repeat_minutes** - Run websnap continuously every <repeat_minutes> minutes. 
-  - If omitted then websnap does not repeat.
-
+| Function parameter / CLI option | Description                                                                                                                                                                                                                                                                                                               |
+|---------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `config`                        | Path to configuration `.ini` file.<br/> Default value expects file called `config.ini` in same directory as websnap package is being executed from.                                                                                                                                                                       |
+| `log_level`                     | Level to use for logging. Default value is `INFO`.<br/>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.<br/>[Click here to learn more about logging levels.](https://docs.python.org/3/library/logging.html#levels)                                                                           |
+| `file_logs`                     | Enable rotating file logs.                                                                                                                                                                                                                                                                                                |
+| `s3_uploader`                   | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                   |
+| `backup_s3_count`               | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
+| `early_exit`                    | Enable early program termination after error occurs.<br/>If omitted logs URL processing errors but continues program execution.                                                                                                                                                                                           |
+| `repeat_minutes`                | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
+                                                                                                                                                                                                                        
 
 
 ## Usage: S3 Bucket
 
-**Download files from URLs and upload them to a S3 bucket.**
+**Copy files from URLs and upload them to a S3 bucket.**
 
 ### Examples
 
@@ -140,12 +126,13 @@ websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minu
 #### CLI
 - The following CLI option **must** be used to enable websnap to upload files to a S3 bucket: `--s3_uploader`
 
-- Uploads files to a S3 bucket using default argument values
+- Uploads files to a S3 bucket using default argument values:
      ```bash
       websnap_cli --s3_uploader 
      ```
 
-- Uploads files to a S3 bucket and repeat every 1440 minutes (24 hours), file logs are enabled and only 3 backup objects are allowed for each config section
+- Uploads files to a S3 bucket and repeat every 1440 minutes (24 hours), file logs 
+  are enabled and only 3 backup objects are allowed for each config section:
      ```bash
       websnap_cli --file_logs --s3_uploader --backup_s3_count 3 --repeat_minutes 1440
      ```
@@ -153,10 +140,11 @@ websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minu
 ### Configuration
 
 - A valid `.ini` configuration file is **required** for both function and CLI usage.
-- Websnap expects the config to be `config.ini` same directory as websnap package is 
-  being executed from.
-  - However, this can be changed using the `config` argument / `--config` option.  
-- S3 config example file: `src/websnap/config_templates/s3_config_template.ini`
+- Websnap expects the config to be `config.ini` in the same directory as websnap 
+  package is being executed from.
+  - However, this can be changed using the `config` function argument (or CLI 
+   `--config` option).  
+- S3 config example file: [src/websnap/config_templates/s3_config_template.ini](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config/s3.config.example.ini?ref_type=heads)
 - All keys in tables below are **mandatory**.
 
 #### `[DEFAULT]` Section
@@ -225,12 +213,13 @@ websnap.websnap(file_logs=True, repeat_minutes=60)
 
 #### CLI 
 
-- Write downloaded files to local machine using default argument values
+- Write downloaded files to local machine using default argument values:
      ```bash
       websnap_cli 
      ```
 
-- Write downloaded files locally and repeats every 60 minutes (1 hour), file logs are enabled
+- Write downloaded files locally and repeats every 60 minutes (1 hour), file logs 
+  are enabled:
      ```bash
       websnap_cli --file_logs --repeat_minutes 60
      ```
@@ -238,10 +227,11 @@ websnap.websnap(file_logs=True, repeat_minutes=60)
 ### Configuration
 
 - A valid `.ini` configuration file is **required** for both function and CLI usage.
-- Websnap expects the config to be `config.ini` same directory as websnap package is 
-  being executed from.
-  - However, this can be changed using the `config` argument / `--config` option.  
-- Local machine config example file: `src/websnap/config_templates/config_template.ini`
+- Websnap expects the config to be `config.ini` in the same directory as websnap 
+  package is being executed from.
+  - However, this can be changed using the `config` function argument (or CLI 
+   `--config` option).  
+- Local machine config example file: [src/websnap/config_templates/config_template.ini](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config/config.example.ini?ref_type=heads)
 - Each URL file that will be downloaded requires its _own section_. 
 - If the optional `directory` key/value pair is omitted then the file will be written in the directory that the program is executed from.
 
