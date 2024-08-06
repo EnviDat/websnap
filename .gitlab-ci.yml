@@ -8,7 +8,7 @@ deploy:
   before_script:
     - pip install pdm
     - pdm install
-    - echo "$CONFIG_INI" > config.ini
-    - scp config.ini "$CI_PROJECT_DIR/config.ini"
+    - echo "$CONFIG_INI" > config_ci.ini
+    - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
   script:
      - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
