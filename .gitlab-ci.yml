@@ -2,8 +2,9 @@ image: python:latest
 
 stages:
   - deploy
+  - publish
 
-deploy:
+deploy-backup:
   stage: deploy
   before_script:
     - pip install pdm
@@ -12,3 +13,26 @@ deploy:
     - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
   script:
      - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
+
+publish-package:
+  stage: publish
+  image: python:3.11-slim-bookworm
+  dependencies:
+    - deploy-backup
+  id_tokens:
+    PYPI_ID_TOKEN:
+      aud: pypi
+  before_script:
+    - pip install pdm
+  script:
+    # Retrieve the OIDC token from GitLab CI/CD, and exchange it for a PyPI API token
+    - oidc_token=$(python -m id PYPI)
+
+    # Replace "https://pypi.org/*" with "https://test.pypi.org/*" if uploading to TestPyPI
+    - resp=$(curl -X POST https://pypi.org/_/oidc/mint-token -d "{\"token\":\"${oidc_token}\"}")
+    - api_token=$(jq --raw-output '.token' <<< "${resp}")
+
+    # Upload to PyPI authenticating via the newly-minted token
+    - pdm config repository.pypi.username "__token__"
+    - pdm config repository.pypi.password "${api_token}"
+    - pdm publish
