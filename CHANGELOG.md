@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.1.1 (2024-08-07)
+
+### Docs
+
+- improve docs overview diagram image
+
 ## 1.1.0 (2024-08-07)
 
 ### Feat
