@@ -1,7 +1,10 @@
 # CHANGELOG
 
-## 1.1.2 (2024-08-07)
+## 1.1.3 (2024-08-07)
+### Docs
+- improve project description
 
+## 1.1.2 (2024-08-07)
 ### Fix
 - remove automated pip-package CI stage
 
