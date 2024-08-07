@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.5 (2024-08-07)
+### Docs
+- improve readme 
+
 ## 1.1.4 (2024-08-07)
 ### CI
 - test automated package publishing
