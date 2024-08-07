@@ -9,7 +9,6 @@ Also supports writing files downloaded from URLs to a local machine.
 
 > - [Purpose](#purpose)
 > - [Installation](#installation)
-> - [Overview Diagram](#overview-diagram)
 > - [Quickstart](#quickstart)
 > - [Function Parameters / CLI Options](#function-parameters--cli-options)
 > - [Usage: S3 Bucket](#usage-s3-bucket)
@@ -36,13 +35,11 @@ This project was developed to facilitate EnviDat resiliency and support continuo
   pip install websnap
    ```
 
-## Overview Diagram
-
-![image](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png?ref_type=heads)
-
 ## Quickstart
 
 ### Websnap can be used as a function or as a CLI 
+
+#### [Click here to view a websnap overview diagram](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png?ref_type=heads)
 
 ###
 #### Function
