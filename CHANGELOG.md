@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.6 (2024-08-07)
+### CI
+- refactor package publishing stage
+
 ## 1.1.5 (2024-08-07)
 ### Docs
 - improve readme 
