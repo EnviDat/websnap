@@ -2,14 +2,14 @@
 
 #### Copies files from URLs and uploads them to a S3 bucket. 
 
-Also supports writing downloaded files to a local machine. 
+Also supports writing files downloaded from URLs to a local machine. 
 
 
 ## Documentation Topics
 
 > - [Purpose](#purpose)
-> - [Overview Diagram](#overview-diagram)
 > - [Installation](#installation)
+> - [Overview Diagram](#overview-diagram)
 > - [Quickstart](#quickstart)
 > - [Function Parameters / CLI Options](#function-parameters--cli-options)
 > - [Usage: S3 Bucket](#usage-s3-bucket)
@@ -29,17 +29,16 @@ This project was developed to facilitate EnviDat resiliency and support continuo
 [EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 
-## Overview Diagram
-
-![image](/overview_diagram.png)
-
-
 ## Installation
 
 
    ```bash
   pip install websnap
    ```
+
+## Overview Diagram
+
+![image](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png?ref_type=heads)
 
 ## Quickstart
 

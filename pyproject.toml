@@ -14,8 +14,20 @@ dependencies = [
     "requests>=2.32.3",
 ]
 requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License"
+]
 readme = "README.md"
 license = {text = "MIT"}
+
+[project.urls]
+homepage = "https://www.envidat.ch"
+documentation = "https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/README.md"
+repository = "https://gitlabext.wsl.ch/EnviDat/websnap"
+
 
 [build-system]
 requires = ["pdm-backend"]

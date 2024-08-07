@@ -1,7 +1,20 @@
 image: python:latest
 
 stages:
+  - pip-package
   - deploy
+
+pip-package:
+  stage: pip-package
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - pip install pdm
+  script:
+    - pdm config repository.pypi.username "__token__"
+    - pdm config repository.pypi.password "${PYPI_API_TOKEN}"
+    - pdm publish
+
 
 deploy:
   stage: deploy
