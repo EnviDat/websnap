@@ -15,8 +15,6 @@ Also supports writing files downloaded from URLs to a local machine.
 > - [Usage: Local Machine](#usage-local-machine)
 > - [Log Support](#log-support)
 > - [Minimum Download Size](#minimum-download-size)
-> - [Scheduled Pipelines Automation](#scheduled-pipelines-automation)
-> - [Pre-commit Hooks](#pre-commit-hooks)
 > - [Author](#author)
 > - [License](#license)
 
@@ -289,7 +287,8 @@ Websnap supports optionally specifying the minimum download size (in kilobytes) 
 - Configured minimum download size must be a non-negative integer.
 - If the content from the URL is less than the configured size:
   - An error will be logged and the program continues to the next config section.
-  - If the CLI option `--early_exit` (or function argument `early_exit=True)`is enabled 
+  - If the CLI option `--early_exit` (or function argument `early_exit=True`) is 
+    enabled 
     then the program will terminate early.
 
 ### Configuration
@@ -306,38 +305,6 @@ min_size_kb=1
 |---------------|---------|-------------------------------------------------------------------|
 | `min_size_kb` | `0`     | Minimum download size in kilobytes (must be non-negative integer) |
 
-
-## Scheduled Pipelines Automation
-
-A CI/CD pipeline is currently used to automate execution of websnap using a GitLab pipeline schedule. 
-
-#### Pipeline script specifications:
-- For details see `.gitlab-ci.yml`
-- Uploads objects to a S3 bucket
-- Backs up S3 objects
-- Early exit is enabled, this causes pipeline failure if an error occurs
-
-#### Pipeline required CI/CD variables:
-- CONFIG_INI - text with required S3 config values, for example see 
-  `src/websnap/config_templates/s3_config_template.ini`
-- BACKUP_S3_COUNT - number of S3 objects to back up for each configured URL
-
-
-## Pre-commit Hooks
-
-Pre-commit hooks ensure that the application uses stylistic conventions before code changes can be commited.
-
-Pre-commit hooks are specified in `.pre-commit-config.yaml`.
-
-To install pre-commit hooks for use during development execute:
- ```bash
-  pdm run pre-commit install
-  ```
-
-To run pre-commit hooks manually on all files execute:
-  ```bash
-  pre-commit run --all-files
-  ```
 
 ## Author
 [Rebecca Kurup Buchholz](https://www.linkedin.com/in/rebeccakurupbuchholz/), Swiss Federal Institute for Forest, Snow and Landscape Research WSL 
