@@ -19,8 +19,6 @@ publish-package:
   image: python:3.11-slim-bookworm
   rules:
     - if: $CI_COMMIT_TAG
-  dependencies:
-    - deploy-backup
   before_script:
     - pip install pdm
   script:
