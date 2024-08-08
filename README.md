@@ -5,21 +5,7 @@
 Also supports writing files downloaded from URLs to a local machine.
 
 
-## Documentation Topics
-
-> - [Purpose](#purposea-idpurposea)
-> - [Installation](#installationa-idinstallationa)
-> - [Quickstart](#quickstarta-idquickstarta)
-> - [Function Parameters / CLI Options](#function-parameters--cli-optionsa-idparams_optionsa)
-> - [Usage: S3 Bucket](#usage-s3-bucketa-idusage_s3a)
-> - [Usage: Local Machine](#usage-local-machinea-idusage_locala)
-> - [Logs](#logsa-idlogsa)
-> - [Minimum Download Size](#minimum-download-sizea-idmin_downloada)
-> - [Author](#authora-idauthora)
-> - [License](#licensea-idlicensea)
-
-
-## Purpose<a id="purpose"></a>
+## Purpose
 
 This project was developed to facilitate EnviDat resiliency and support continuous operation during server maintenance.
 
@@ -27,14 +13,14 @@ This project was developed to facilitate EnviDat resiliency and support continuo
 portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 
-## Installation<a id="installation"></a>
+## Installation
 
    ```bash
   pip install websnap
    ```
 
 
-## Quickstart<a id="quickstart"></a>
+## Quickstart
 
 ### Websnap can be used as a function or as a CLI. 
 
@@ -66,7 +52,7 @@ To access CLI documentation in terminal execute:
    ```
 
 
-## Function Parameters / CLI Options<a id="params_options"></a>
+## Function Parameters / CLI Options
 
 ### Function Parameters
 | Parameter         | Type          | Default        |
@@ -104,7 +90,7 @@ To access CLI documentation in terminal execute:
 | `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
 
 
-## Usage: S3 Bucket<a id="usage_s3"></a>
+## Usage: S3 Bucket
 
 **Copy files from URLs and upload them to a S3 bucket.**
 
@@ -194,7 +180,7 @@ key=project.json
 | `key`    | File name with extension, can optionally include prefix |
 
 
-## Usage: Local Machine<a id="usage_local"></a>
+## Usage: Local Machine
 
 **Download files from URLs and write files to local machine.** 
 
@@ -253,7 +239,7 @@ directory=projectdata
 
 ---
 
-## Logs<a id="logs"></a>
+## Logs
 
 Websnap supports optional rotating file logs.
 
@@ -284,7 +270,7 @@ log_backup_count=7
 | `log_backup_count` | `0`     | If nonzero then at most <`log_backup_count`> files will be kept, oldest log file is deleted (must be non-negative integer) |
 
 
-## Minimum Download Size<a id="min_download"></a>
+## Minimum Download Size
 
 Websnap supports optionally specifying the minimum download size (in kilobytes) a file must be to download it from the configured URL.
 
@@ -312,11 +298,11 @@ min_size_kb=1
 | `min_size_kb` | `0`     | Minimum download size in kilobytes (must be non-negative integer) |
 
 
-## Author<a id="author"></a>
+## Author
 
 <a href="https://www.linkedin.com/in/rebeccakurupbuchholz/" target="_blank">Rebecca Kurup Buchholz</a>
 
 
-## License<a id="license"></a>
+## License 
 
 <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/LICENSE" target="_blank">MIT License</a>
