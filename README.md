@@ -4,7 +4,6 @@
 
 Also supports writing files downloaded from URLs to a local machine.
 
----
 
 ## Documentation Topics
 
@@ -19,7 +18,6 @@ Also supports writing files downloaded from URLs to a local machine.
 > - [Author](#authora-idauthora)
 > - [License](#licensea-idlicensea)
 
----
 
 ## Purpose<a id="purpose"></a>
 
@@ -28,7 +26,6 @@ This project was developed to facilitate EnviDat resiliency and support continuo
 <a href="https://www.envidat.ch" target="_blank">EnviDat</a> is the environmental data 
 portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
----
 
 ## Installation<a id="installation"></a>
 
@@ -36,7 +33,6 @@ portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WS
   pip install websnap
    ```
 
----
 
 ## Quickstart<a id="quickstart"></a>
 
@@ -69,7 +65,6 @@ To access CLI documentation in terminal execute:
   websnap_cli --help
    ```
 
----
 
 ## Function Parameters / CLI Options<a id="params_options"></a>
 
@@ -107,9 +102,7 @@ To access CLI documentation in terminal execute:
 | `backup_s3_count`                    | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
 | `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs URL processing errors but continues program execution.                                                                                                                                                                                           |
 | `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
-                                                                                                                                                                                                                        
 
----
 
 ## Usage: S3 Bucket<a id="usage_s3"></a>
 
@@ -200,7 +193,6 @@ key=project.json
 | `bucket` | Bucket that file will be written in                     |
 | `key`    | File name with extension, can optionally include prefix |
 
----
 
 ## Usage: Local Machine<a id="usage_local"></a>
 
@@ -291,7 +283,6 @@ log_backup_count=7
 | `log_interval`     | `1`     | Duration of interval (must be positive integer)                                                                            |
 | `log_backup_count` | `0`     | If nonzero then at most <`log_backup_count`> files will be kept, oldest log file is deleted (must be non-negative integer) |
 
----
 
 ## Minimum Download Size<a id="min_download"></a>
 
@@ -320,13 +311,11 @@ min_size_kb=1
 |---------------|---------|-------------------------------------------------------------------|
 | `min_size_kb` | `0`     | Minimum download size in kilobytes (must be non-negative integer) |
 
----
 
 ## Author<a id="author"></a>
 
 <a href="https://www.linkedin.com/in/rebeccakurupbuchholz/" target="_blank">Rebecca Kurup Buchholz</a>
 
----
 
 ## License<a id="license"></a>
 
