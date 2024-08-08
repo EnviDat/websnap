@@ -2,42 +2,51 @@
 
 #### Copies files from URLs and uploads them to a S3 bucket. 
 
-Also supports writing files downloaded from URLs to a local machine. 
+Also supports writing files downloaded from URLs to a local machine.
 
+---
 
 ## Documentation Topics
 
-> - [Purpose](#purpose)
-> - [Installation](#installation)
-> - [Quickstart](#quickstart)
-> - [Function Parameters / CLI Options](#function-parameters--cli-options)
-> - [Usage: S3 Bucket](#usage-s3-bucket)
-> - [Usage: Local Machine](#usage-local-machine)
-> - [Log Support](#log-support)
-> - [Minimum Download Size](#minimum-download-size)
-> - [Author](#author)
-> - [License](#license)
+> - [Purpose](#purposea-idpurposea)
+> - [Installation](#installationa-idinstallationa)
+> - [Quickstart](#quickstarta-idquickstarta)
+> - [Function Parameters / CLI Options](#function-parameters--cli-optionsa-idparams_optionsa)
+> - [Usage: S3 Bucket](#usage-s3-bucketa-idusage_s3a)
+> - [Usage: Local Machine](#usage-local-machinea-idusage_locala)
+> - [Logs](#logsa-idlogsa)
+> - [Minimum Download Size](#minimum-download-sizea-idmin_downloada)
+> - [Author](#authora-idauthora)
+> - [License](#licensea-idlicensea)
 
+---
 
-## Purpose
+## Purpose<a id="purpose"></a>
 
 This project was developed to facilitate EnviDat resiliency and support continuous operation during server maintenance.
 
-[EnviDat](https://www.envidat.ch) is the environmental data portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
+<a href="https://www.envidat.ch" target="_blank">EnviDat</a> is the environmental data 
+portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
+---
 
-## Installation
-
+## Installation<a id="installation"></a>
 
    ```bash
   pip install websnap
    ```
 
-## Quickstart
+---
 
-### Websnap can be used as a function or as a CLI 
+## Quickstart<a id="quickstart"></a>
 
-#### [Click here to view a websnap overview diagram](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png?ref_type=heads)
+### Websnap can be used as a function or as a CLI. 
+
+<h4>
+<a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png" 
+target="_blank">Click here to view a websnap overview diagram.</a>
+</h4>
+
 
 ###
 #### Function
@@ -60,7 +69,9 @@ To access CLI documentation in terminal execute:
   websnap_cli --help
    ```
 
-## Function Parameters / CLI Options
+---
+
+## Function Parameters / CLI Options<a id="params_options"></a>
 
 ### Function Parameters
 | Parameter         | Type          | Default        |
@@ -87,24 +98,24 @@ To access CLI documentation in terminal execute:
 
 ### Description
 
-| Function parameter / CLI option | Description                                                                                                                                                                                                                                                                                                               |
-|---------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `config`                        | Path to configuration `.ini` file.<br/> Default value expects file called `config.ini` in same directory as websnap package is being executed from.                                                                                                                                                                       |
-| `log_level`                     | Level to use for logging. Default value is `INFO`.<br/>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.<br/>[Click here to learn more about logging levels.](https://docs.python.org/3/library/logging.html#levels)                                                                           |
-| `file_logs`                     | Enable rotating file logs.                                                                                                                                                                                                                                                                                                |
-| `s3_uploader`                   | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                   |
-| `backup_s3_count`               | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
-| `early_exit`                    | Enable early program termination after error occurs.<br/>If omitted logs URL processing errors but continues program execution.                                                                                                                                                                                           |
-| `repeat_minutes`                | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
+| Function parameter /<br/> CLI option | Description                                                                                                                                                                                                                                                                                                               |
+|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `config`                             | Path to configuration `.ini` file.<br/> Default value expects file called `config.ini` in same directory as websnap package is being executed from.                                                                                                                                                                       |
+| `log_level`                          | Level to use for logging. Default value is `INFO`.<br/>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.<br/> <a href="https://docs.python.org/3/library/logging.html#levels" target="_blank">Click here to learn more about logging levels.</a>                                               |
+| `file_logs`                          | Enable rotating file logs.                                                                                                                                                                                                                                                                                                |
+| `s3_uploader`                        | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                   |
+| `backup_s3_count`                    | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
+| `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs URL processing errors but continues program execution.                                                                                                                                                                                           |
+| `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
                                                                                                                                                                                                                         
 
+---
 
-## Usage: S3 Bucket
+## Usage: S3 Bucket<a id="usage_s3"></a>
 
 **Copy files from URLs and upload them to a S3 bucket.**
 
 ### Examples
-
 
 #### Function
 ```python
@@ -138,7 +149,8 @@ websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minu
   package is being executed from.
   - However, this can be changed using the `config` function argument (or CLI 
    `--config` option).  
-- S3 config example file: [src/websnap/config_templates/s3_config_template.ini](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config/s3.config.example.ini?ref_type=heads)
+- S3 config example file:
+  <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.ini" target="_blank">src/websnap/config_templates/s3_config_template.ini</a>
 - All keys in tables below are **mandatory**.
 
 #### `[DEFAULT]` Section
@@ -188,9 +200,9 @@ key=project.json
 | `bucket` | Bucket that file will be written in                     |
 | `key`    | File name with extension, can optionally include prefix |
 
+---
 
-
-## Usage: Local Machine
+## Usage: Local Machine<a id="usage_local"></a>
 
 **Download files from URLs and write files to local machine.** 
 
@@ -225,7 +237,8 @@ websnap.websnap(file_logs=True, repeat_minutes=60)
   package is being executed from.
   - However, this can be changed using the `config` function argument (or CLI 
    `--config` option).  
-- Local machine config example file: [src/websnap/config_templates/config_template.ini](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config/config.example.ini?ref_type=heads)
+- Local machine config example file:
+  <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>
 - Each URL file that will be downloaded requires its _own section_. 
 - If the optional `directory` key/value pair is omitted then the file will be written in the directory that the program is executed from.
 
@@ -246,8 +259,9 @@ directory=projectdata
 | `file_name`              | File name with extension                    |
 | `directory` (_optional_) | Directory name that file will be written in |
 
+---
 
-## Log Support
+## Logs<a id="logs"></a>
 
 Websnap supports optional rotating file logs.
 
@@ -256,7 +270,7 @@ Websnap supports optional rotating file logs.
     logs: `file_logs=True`
 - If log keys are not specified in the configuration `[DEFAULT]` section then default values in the table below will be used. 
 - `log_when` expects a value used by logging module TimedRotatingFileHandler.
-- For more details about how to use TimedRotatingFileHandler please [click here](https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler)
+- <a href="https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler" target="_blank">Click here for more information about how to use TimedRotatingFileHandler.</a>
 - The default values result in the file logs being rotated once every day and no removal of backup log files. 
 
 ### Configuration
@@ -277,8 +291,9 @@ log_backup_count=7
 | `log_interval`     | `1`     | Duration of interval (must be positive integer)                                                                            |
 | `log_backup_count` | `0`     | If nonzero then at most <`log_backup_count`> files will be kept, oldest log file is deleted (must be non-negative integer) |
 
+---
 
-## Minimum Download Size
+## Minimum Download Size<a id="min_download"></a>
 
 Websnap supports optionally specifying the minimum download size (in kilobytes) a file must be to download it from the configured URL.
 
@@ -305,12 +320,14 @@ min_size_kb=1
 |---------------|---------|-------------------------------------------------------------------|
 | `min_size_kb` | `0`     | Minimum download size in kilobytes (must be non-negative integer) |
 
+---
 
-## Author
-[Rebecca Kurup Buchholz](https://www.linkedin.com/in/rebeccakurupbuchholz/), Swiss Federal Institute for Forest, Snow and Landscape Research WSL 
+## Author<a id="author"></a>
 
+<a href="https://www.linkedin.com/in/rebeccakurupbuchholz/" target="_blank">Rebecca Kurup Buchholz</a>
 
-## License
+---
 
-[MIT License](https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/LICENSE?ref_type=heads)
+## License<a id="license"></a>
 
+<a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/LICENSE" target="_blank">MIT License</a>
