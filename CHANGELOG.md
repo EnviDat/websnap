@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.8 (2024-08-08)
+### Docs
+- remove internal README links that are not supported by PyPI
+
 ## 1.1.7 (2024-08-08)
 ### Docs
 - add hyperlinks to README
