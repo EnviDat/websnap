@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.11 (2024-08-12)
+### Fix
+- remove invalid classifier
+
 ## 1.1.10 (2024-08-12)
 ### Docs
 - add additional classifiers
