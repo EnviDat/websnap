@@ -1,13 +1,12 @@
 # websnap
 
-#### Copies files from URLs and uploads them to a S3 bucket. 
-
-Also supports writing files downloaded from URLs to a local machine.
+### Copies API JSON files to a S3 bucket or a local machine.
 
 
 ## Purpose
 
-This project was developed to facilitate EnviDat resiliency and support continuous operation during server maintenance.
+This project was developed to facilitate EnviDat resiliency and support continuous 
+operation during server maintenance.
 
 <a href="https://www.envidat.ch" target="_blank">EnviDat</a> is the environmental data 
 portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
@@ -86,13 +85,13 @@ To access CLI documentation in terminal execute:
 | `file_logs`                          | Enable rotating file logs.                                                                                                                                                                                                                                                                                                |
 | `s3_uploader`                        | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                   |
 | `backup_s3_count`                    | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
-| `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs URL processing errors but continues program execution.                                                                                                                                                                                           |
+| `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs errors but continues program execution.                                                                                                                                                                                                          |
 | `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
 
 
 ## Usage: S3 Bucket
 
-**Copy files from URLs and upload them to a S3 bucket.**
+**Copies API JSON files to a S3 bucket.**
 
 ### Examples
 
@@ -143,15 +142,15 @@ aws_access_key_id=1234567abcdefg
 aws_secret_access_key=hijklmn1234567
 ```
 
-| Key                     | Value Description                            |
-|-------------------------|----------------------------------------------|
-| `endpoint_url`          | The URL to use for the constructed S3 client |
-| `aws_secret_key_id`     | AWS access key ID                            |
-| `aws_secret_access_key` | AWS secret access key                        |
+| Key                     | Value Description                        |
+|-------------------------|------------------------------------------|
+| `endpoint_url`          | URL to use for the constructed S3 client |
+| `aws_secret_key_id`     | AWS access key ID                        |
+| `aws_secret_access_key` | AWS secret access key                    |
 
-#### Other Sections (one per URL)
+#### Other Sections (one per API URL endpoint)
 
-- _Each URL file that will be downloaded requires its **own config section!**_
+- _Each API JSON file that will be downloaded requires its **own config section!**_
 - The section name be anything, it is suggested to have a name that relates to the downloaded file.
 
 Example S3 config section configuration with key prefix:
@@ -175,14 +174,14 @@ key=project.json
 
 | Key      | Value Description                                       |
 |----------|---------------------------------------------------------|
-| `url`    | URL that file will be downloaded from                   |
-| `bucket` | Bucket that file will be written in                     |
+| `url`    | API URL endpoint that JSON file will be downloaded from |
+| `bucket` | Bucket that JSON file will be written in                |
 | `key`    | File name with extension, can optionally include prefix |
 
 
 ## Usage: Local Machine
 
-**Download files from URLs and write files to local machine.** 
+**Copies API JSON files to a local machine.** 
 
 ### Examples
 
@@ -217,7 +216,7 @@ websnap.websnap(file_logs=True, repeat_minutes=60)
    `--config` option).  
 - Local machine config example file:
   <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>
-- Each URL file that will be downloaded requires its _own section_. 
+- Each API URL JSON file that will be downloaded requires its _own section_. 
 - If the optional `directory` key/value pair is omitted then the file will be written in the directory that the program is executed from.
 
 Example local machine configuration section:
@@ -229,13 +228,13 @@ file_name=project.json
 directory=projectdata
 ```
 
-#### Sections (one per URL)
+#### Sections (one per API URL endpoint)
 
-| Key                      | Value Description                           |
-|--------------------------|---------------------------------------------|
-| `url`                    | URL that file will be downloaded from       |
-| `file_name`              | File name with extension                    |
-| `directory` (_optional_) | Directory name that file will be written in |
+| Key                      | Value Description                                       |
+|--------------------------|---------------------------------------------------------|
+| `url`                    | API URL endpoint that JSON file will be downloaded from |
+| `file_name`              | File name with extension                                |
+| `directory` (_optional_) | Directory name that JSON file will be written in        |
 
 ---
 
@@ -272,12 +271,13 @@ log_backup_count=7
 
 ## Minimum Download Size
 
-Websnap supports optionally specifying the minimum download size (in kilobytes) a file must be to download it from the configured URL.
+Websnap supports optionally specifying the minimum download size (in kilobytes) a 
+JSON file must be to download it from the configured API URL endpoint.
 
 - **By default the minimum default minimum size is 0 kb.**
   - Unless specified in the configuration this means that a file of any size can be downloaded by websnap.
 - Configured minimum download size must be a non-negative integer.
-- If the content from the URL is less than the configured size:
+- If the content from the API URL endpoint is less than the configured size:
   - An error will be logged and the program continues to the next config section.
   - If the CLI option `--early_exit` (or function argument `early_exit=True`) is 
     enabled 
