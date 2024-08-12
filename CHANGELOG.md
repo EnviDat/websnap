@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.9 (2024-08-12)
+### Docs
+- improve project description and README
+
 ## 1.1.8 (2024-08-08)
 ### Docs
 - remove internal README links that are not supported by PyPI
