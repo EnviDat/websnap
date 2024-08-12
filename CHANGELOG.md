@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.10 (2024-08-12)
+### Docs
+- add additional classifiers
+
 ## 1.1.9 (2024-08-12)
 ### Docs
 - improve project description and README
