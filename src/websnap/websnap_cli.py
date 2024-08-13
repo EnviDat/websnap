@@ -1,5 +1,5 @@
 """
-CLI that supports copying files hosted at URLs in config_templates and then uploading
+CLI that supports copying files hosted at URLs in config and then uploading
 them to S3 bucket or local machine.
 
 Example pdm command without flags (uses default argument values):
@@ -62,7 +62,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-b",
         "--backup_s3_count",
         type=int,
-        help="Copy and backup S3 objects in each config_templates section"
+        help="Copy and backup S3 objects in each config section"
         "<backup_s3_count> times, "
         "remove object with the oldest last modified timestamp. "
         "If omitted then objects are not copied or removed.",

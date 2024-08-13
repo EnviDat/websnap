@@ -80,7 +80,7 @@ def get_custom_logger(
         name: Name of logger.
         level: Logging level represented as string.
         file_logs: If True then implements rotating file logs.
-        config: Validated log config_templates.
+        config: Validated log config.
     """
     try:
         _loglevel = level.upper()

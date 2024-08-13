@@ -1,4 +1,4 @@
-"""Config utilities, parses and validates config_templates .ini files."""
+"""Config utilities, parses and validates config .ini files."""
 
 import configparser
 from pathlib import Path
@@ -22,7 +22,7 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception
     Returns Exception if fails.
 
     Args:
-        config_path (str): Path to config_templates.ini file.
+        config_path (str): Path to config.ini file.
     """
     try:
         config_file = Path(config_path)
@@ -34,8 +34,7 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception
 
         if len(config.sections()) < 1:
             return Exception(
-                f"File '{config_path}' not valid config_templates, "
-                f"does not have any sections"
+                f"File '{config_path}' not valid config, " f"does not have any sections"
             )
 
         return config
@@ -46,7 +45,7 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception
 
 class LogConfigModel(BaseModel):
     """
-    Class with required log config_templates values and their types.
+    Class with required log config values and their types.
     """
 
     log_when: str
@@ -78,18 +77,16 @@ def validate_log_config(
         }
         return LogConfigModel(**log)
     except ValidationError as e:
-        return Exception(f"Failed to validate config_templates, error(s): {e}")
+        return Exception(f"Failed to validate config, error(s): {e}")
     except ValueError as e:
-        return Exception(
-            f"Incorrect log related value in config_templates, error(s): {e}"
-        )
+        return Exception(f"Incorrect log related value in config, error(s): {e}")
     except Exception as e:
         return Exception(f"{e}")
 
 
 def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exception:
     """
-    Return min_size_kb from config_templates as integer.
+    Return min_size_kb from config as integer.
     Returns Exception if validation fails.
 
     Args:
@@ -103,15 +100,13 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exce
             return min_size_kb
         else:
             raise ValueError(
-                "Value for config_templates value 'min_size_kb' must be greater than 0"
+                "Value for config value 'min_size_kb' must be greater than 0"
             )
     except ValidationError as e:
-        return Exception(
-            f"Failed to validate config_templates value 'min_size_kb, error(s): {e}"
-        )
+        return Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
     except ValueError as e:
         return Exception(
-            f"Incorrect value for config_templates value 'min_size_kb', error(s): {e}"
+            f"Incorrect value for config value 'min_size_kb', error(s): {e}"
         )
     except Exception as e:
         return Exception(f"{e}")
@@ -119,7 +114,7 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exce
 
 class ConfigSectionModel(BaseModel):
     """
-    Class with required config_templates section values (for writing to local machine).
+    Class with required config section values (for writing to local machine).
     """
 
     url: AnyHttpUrl
@@ -148,11 +143,11 @@ def validate_config_section(
         return ConfigSectionModel(**conf_section)
     except ValidationError as e:
         return Exception(
-            f"Failed to validate config_templates section '{section}', error(s): {e}"
+            f"Failed to validate config section '{section}', error(s): {e}"
         )
     except ValueError as e:
         return Exception(
-            f"Incorrect value in config_templates section '{section}', error(s): {e}"
+            f"Incorrect value in config section '{section}', error(s): {e}"
         )
     except Exception as e:
         return Exception(f"{e}")
@@ -160,7 +155,7 @@ def validate_config_section(
 
 class S3ConfigModel(BaseModel):
     """
-    Class with required S3 config_templates values and their types.
+    Class with required S3 config values and their types.
     """
 
     endpoint_url: AnyUrl
@@ -188,16 +183,16 @@ def validate_s3_config(
         }
         return S3ConfigModel(**s3_conf)
     except ValidationError as e:
-        return Exception(f"Failed to validate S3 config_templates, error(s): {e}")
+        return Exception(f"Failed to validate S3 config, error(s): {e}")
     except ValueError as e:
-        return Exception(f"Incorrect value in S3 config_templates, error(s): {e}")
+        return Exception(f"Incorrect value in S3 config, error(s): {e}")
     except Exception as e:
         return Exception(e)
 
 
 class S3ConfigSectionModel(BaseModel):
     """
-    Class with required config_templates section values (for writing to S3 bucket).
+    Class with required config section values (for writing to S3 bucket).
     """
 
     url: AnyUrl
@@ -240,11 +235,11 @@ def validate_s3_config_section(
         return S3ConfigSectionModel(**conf_section)
     except ValidationError as e:
         return Exception(
-            f"Failed to validate config_templates section '{section}', error(s): {e}"
+            f"Failed to validate config section '{section}', error(s): {e}"
         )
     except ValueError as e:
         return Exception(
-            f"Incorrect value in config_templates section '{section}', error(s): {e}"
+            f"Incorrect value in config section '{section}', error(s): {e}"
         )
     except Exception as e:
         return Exception(f"{e}")

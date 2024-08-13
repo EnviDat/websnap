@@ -35,7 +35,7 @@ def websnap(
     repeat_minutes: int | None = None,
 ) -> None | Exception:
     """
-    Copies files hosted at URLs in config_templates and then uploads them
+    Copies files hosted at URLs in config and then uploads them
     to S3 bucket or local machine.
     Optionally customize rotating logs.
     Optionally repeat websnap file processing iteration.
@@ -45,7 +45,7 @@ def websnap(
         log_level: Level to use for logging.
         file_logs: If True then implements rotating file logs.
         s3_uploader: If True then uploads files to S3 bucket.
-        backup_s3_count: Copy and backup S3 objects in each config_templates section
+        backup_s3_count: Copy and backup S3 objects in each config section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied.
@@ -56,7 +56,7 @@ def websnap(
         repeat_minutes: Run websnap continuously every <repeat> minutes, if omitted
             then default value is None and websnap will not repeat.
     """
-    # Validate log settings in config_templates and setup log
+    # Validate log settings in config and setup log
     try:
         conf_parser = get_config_parser(config)
         if not isinstance(conf_parser, configparser.ConfigParser):
@@ -75,7 +75,7 @@ def websnap(
     except Exception as e:
         raise Exception(e)
 
-    # Validate min_size_kb in config_templates
+    # Validate min_size_kb in config
     min_size_kb = validate_min_size_kb(conf_parser)
     if not isinstance(min_size_kb, int):
         raise Exception(min_size_kb)
@@ -91,7 +91,7 @@ def websnap(
 
         log.info("******* STARTED WEBSNAP ITERATION *******")
         log.info(
-            f"Read config_templates file: '{config}', it has sections: "
+            f"Read config file: '{config}', it has sections: "
             f"{conf_parser.sections()}"
         )
 

@@ -42,7 +42,7 @@ def get_url_content(
 
     Args:
         url: URL to download.
-        section: Name of config_templates section being processed.
+        section: Name of config section being processed.
         log: Logger object created with customized configuration file.
         timeout: Number of seconds to wait for response.
         early_exit: If True then terminates program immediately after error occurs.
@@ -88,7 +88,7 @@ def is_min_size_kb(
         url_content: Content of response from HTTP request.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             write or upload file.
-        section: Name of config_templates section being processed.
+        section: Name of config section being processed.
         log: Logger object created with customized configuration file.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
@@ -99,8 +99,8 @@ def is_min_size_kb(
     if data_kb < min_size_kb:
         log.error(
             f"Config section '{section}': "
-            f"URL response content in config_templates section {section} is less than "
-            f"config_templates value 'min_size_kb' {min_size_kb}"
+            f"URL response content in config section {section} is less than "
+            f"config value 'min_size_kb' {min_size_kb}"
         )
         terminate_program(early_exit)
         return False
@@ -114,10 +114,9 @@ def write_urls_locally(
     min_size_kb: int,
     timeout: int = 32,
     early_exit: bool = False,
-):
+) -> None:
     """
-    Download files hosted at URLS in config_templates and then write them to local
-    machine.
+    Download files hosted at URLS in config and then write them to local machine.
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
@@ -167,12 +166,45 @@ def write_urls_locally(
                 f.write(url_content)
                 log.info(
                     f"Successfully downloaded URL content and wrote file locally in "
-                    f"config_templates section: {section}"
+                    f"config section: {section}"
                 )
 
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
             terminate_program(early_exit)
+
+    return
+
+
+def handle_s3_client_error(
+    err: ClientError, log: logging.getLogger, section: str, early_exit: bool
+) -> None:
+    """
+    Handles and logs botocore.exceptions.ClientError returned by failed S3 client
+    method call.
+
+    Note: If HTTP status code 404 is returned with ClientError then logs warning but
+    continues execution.
+
+    Args:
+        err: Client error returned from S3 client.
+        log: Logger object created with customized configuration file.
+        section: Name of config section being processed.
+        early_exit: If True then terminates program immediately after error occurs.
+            If False then only logs error and continues execution.
+    """
+    err_status_code = err.response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+    if err_status_code == 404:
+        log.warning(f"Config section '{section}': Object not found")
+    elif err_status_code == 403:
+        log.error(
+            f"Config section '{section}': Forbidden, check access credentials in config"
+        )
+        terminate_program(early_exit)
+    else:
+        log.error(err)
+        terminate_program(early_exit)
 
     return
 
@@ -185,7 +217,7 @@ def copy_s3_object(
     early_exit: bool = False,
 ):
     """
-    Copy an object using S3 object config_templates.
+    Copy an object using S3 object config.
 
     New object's name is constructed using the 'LastModified' timestamp of original
     object.
@@ -195,16 +227,16 @@ def copy_s3_object(
         conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
-        section: Name of config_templates section being processed.
+        section: Name of config section being processed.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
 
     try:
-        obj = client.head_object(Bucket=conf.bucket, Key=conf.key)
+        head_resp = client.head_object(Bucket=conf.bucket, Key=conf.key)
 
-        last_modified = obj.get("LastModified")
+        last_modified = head_resp.get("LastModified")
         format_date = "%Y-%m-%d_%H-%M-%S"
         datetime_str = last_modified.strftime(format_date)
         key_split = conf.key.rpartition(".")
@@ -220,20 +252,18 @@ def copy_s3_object(
 
         if status_code == 200:
             log.info(
-                f"S3 config_templates section '{section}': "
-                f"Created new backup file '{key_copy}'"
+                f"Config section '{section}': " f"Created new backup file '{key_copy}'"
             )
         else:
             log.error(
-                f"S3 config_templates section '{section}': "
+                f"Config section '{section}': "
                 f"Object backup attempt returned "
                 f"unexpected HTTP response {status_code}"
             )
             terminate_program(early_exit)
 
-    except ClientError as e:
-        log.error(e)
-        terminate_program(early_exit)
+    except ClientError as err:
+        handle_s3_client_error(err, log, section, early_exit)
 
     return
 
@@ -247,7 +277,7 @@ def delete_s3_backup_object(
     early_exit: bool = False,
 ):
     """
-    Delete a S3 backup object using S3 object config_templates.
+    Delete a S3 backup object using S3 object config.
     Only deletes object if backup objects exceed backup_s3_count.
 
     Only deletes object that corresponds to the file name in the configured key,
@@ -258,8 +288,8 @@ def delete_s3_backup_object(
         conf: S3ConfigSectionModel object created from validated
             section of configuration file.
         log: Logger object created with customized configuration file.
-        section: Name of config_templates section being processed.
-        backup_s3_count: Copy and backup S3 objects in config_templates
+        section: Name of config section being processed.
+        backup_s3_count: Copy and backup S3 objects in config
             <backup_s3_count> times, remove object with the oldest last modified
             timestamp.
         early_exit: If True then terminates program immediately after error occurs.
@@ -306,25 +336,24 @@ def delete_s3_backup_object(
 
             if status_code == 204:
                 log.info(
-                    f"S3 config_templates section '{section}': "
+                    f"Config section '{section}': "
                     f"Deleted backup file '{delete_key}'"
                 )
             else:
                 log.error(
-                    f"S3 config_templates section '{section}': Backup file delete "
+                    f"Config section '{section}': Backup file delete "
                     f"attempt returned unexpected HTTP response {status_code}"
                 )
                 terminate_program(early_exit)
 
         else:
             log.info(
-                f"S3 config_templates section '{section}': Current number of backup "
+                f"Config section '{section}': Current number of backup "
                 f"files does not exceed backup S3 count {backup_s3_count}"
             )
 
-    except ClientError as e:
-        log.error(e)
-        terminate_program(early_exit)
+    except ClientError as err:
+        handle_s3_client_error(err, log, section, early_exit)
 
     return
 
@@ -339,7 +368,7 @@ def write_urls_to_s3(
     early_exit: bool = False,
 ):
     """
-    Download files hosted at URLS in config_templates and then upload them to S3 bucket.
+    Download files hosted at URLS in config and then upload them to S3 bucket.
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
@@ -347,7 +376,7 @@ def write_urls_to_s3(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             upload file to S3 bucket.
-        backup_s3_count: Copy and backup S3 objects in each config_templates section
+        backup_s3_count: Copy and backup S3 objects in each config section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied or removed.
@@ -386,7 +415,9 @@ def write_urls_to_s3(
 
             if backup_s3_count:
                 copy_s3_object(client, conf, log, section, early_exit)
-                delete_s3_backup_object(client, conf, log, section, backup_s3_count)
+                delete_s3_backup_object(
+                    client, conf, log, section, backup_s3_count, early_exit
+                )
 
             response_s3 = client.put_object(
                 Body=url_content, Bucket=conf.bucket, Key=conf.key
@@ -395,15 +426,18 @@ def write_urls_to_s3(
 
             if status_code == 200:
                 log.info(
-                    f"Config section '{section}': Successfully downloaded URL "
-                    f"content and uploaded content to S3 object '{conf.key}'"
+                    f"***CONFIG SECTION '{section}'***: SUCCESSFULLY copied URL "
+                    f"content to S3 object '{conf.key}'"
                 )
             else:
                 log.error(
-                    f"Config section '{section}': S3 returned unexpected "
+                    f"Config section '{section}': S3 client returned unexpected "
                     f"HTTP response {status_code}"
                 )
                 terminate_program(early_exit)
+
+        except ClientError as err:
+            handle_s3_client_error(err, log, section, early_exit)
 
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
