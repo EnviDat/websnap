@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.2.2 (2024-08-14)
+## 1.2.2 (2024-08-13)
 ### Refactor
 - update dev-dependencies
 - improve README descriptions and usage instructions
