@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.2.3 (2024-08-13)
+### Docs
+- update overview diagram
+- correct CHANGELOG date
+
 ## 1.2.2 (2024-08-13)
 ### Refactor
 - update dev-dependencies
