@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.1 (2024-08-13)
+### Refactor
+- improve boto3 S3 ClientError handling 
+
 ## 1.2.0 (2024-08-13)
 ### Feat
 - implement `timeout` argument that is the number of seconds to wait for response for 
