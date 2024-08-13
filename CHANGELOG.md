@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.2.2 (2024-08-14)
+### Refactor
+- update dev-dependencies
+- improve README descriptions and usage instructions
+
 ## 1.2.1 (2024-08-13)
 ### Refactor
 - improve boto3 S3 ClientError handling 
