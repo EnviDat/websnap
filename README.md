@@ -61,6 +61,7 @@ To access CLI documentation in terminal execute:
 | `file_logs`       | `bool`        | `False`        |
 | `s3_uploader`     | `bool`        | `False`        |
 | `backup_s3_count` | `int \| None` | `None`         |
+| `timeout`         | `int`         | `32`           |
 | `early_exit`      | `bool`        | `False`        |
 | `repeat_minutes`  | `int \| None` | `None`         |
 
@@ -72,6 +73,7 @@ To access CLI documentation in terminal execute:
 | `--file_logs`       | `-f`     | `False`      |
 | `--s3_uploader`     | `-s`     | `False`      |
 | `--backup_s3_count` | `-b`     | `None`       |
+| `--timeout`         | `-t`     | `32`         |
 | `--early_exit`      | `-e`     | `False`      |
 | `--repeat_minutes`  | `-r`     | `None`       |
 
@@ -85,6 +87,7 @@ To access CLI documentation in terminal execute:
 | `file_logs`                          | Enable rotating file logs.                                                                                                                                                                                                                                                                                                |
 | `s3_uploader`                        | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                   |
 | `backup_s3_count`                    | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
+| `timeout`                            | Number of seconds to wait for response for each HTTP request before timing out.<br/>Default value is 32 seconds.                                                                                                                                                                                                          |
 | `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs errors but continues program execution.                                                                                                                                                                                                          |
 | `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
 
@@ -300,7 +303,7 @@ min_size_kb=1
 
 ## Author
 
-<a href="https://www.linkedin.com/in/rebeccakurupbuchholz/" target="_blank">Rebecca Kurup Buchholz</a>
+Rebecca Kurup Buchholz
 
 
 ## License 

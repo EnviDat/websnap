@@ -69,6 +69,14 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
+        "-t",
+        "--timeout",
+        type=int,
+        default=32,
+        help="Number of seconds to wait for response for each HTTP request.",
+    )
+
+    parser.add_argument(
         "-e",
         "--early_exit",
         action="store_true",
@@ -104,6 +112,7 @@ def main():
         file_logs=kwargs["file_logs"],
         s3_uploader=kwargs["s3_uploader"],
         backup_s3_count=kwargs["backup_s3_count"],
+        timeout=kwargs["timeout"],
         early_exit=kwargs["early_exit"],
         repeat_minutes=kwargs["repeat_minutes"],
     )
