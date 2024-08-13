@@ -29,33 +29,48 @@ def terminate_program(early_exit: bool):
 
 
 def get_url_content(
-    url: str, section: str, log: logging.getLogger, early_exit: bool = False
+    url: str,
+    section: str,
+    log: logging.getLogger,
+    timeout: int = 32,
+    early_exit: bool = False,
 ) -> bytes | None:
     """
     Return content of response from HTTP GET request.
-    If response status code is >= 400 then terminate program if argument early_exit
-    is True, else return None.
+    If response times out or response status code is >= 400 then terminate program if
+    argument early_exit is True, else return None.
 
     Args:
         url: URL to download.
         section: Name of config_templates section being processed.
         log: Logger object created with customized configuration file.
+        timeout: Number of seconds to wait for response.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
     """
-    response = requests.get(url)
+    try:
 
-    if not response.ok:
+        response = requests.get(url, timeout=timeout)
+
+        if not response.ok:
+            log.error(
+                f"Config section '{section}': "
+                f"URL returned unsuccessful HTTP response "
+                f"status code {response.status_code}"
+            )
+            terminate_program(early_exit)
+            return None
+
+        return response.content
+
+    except requests.exceptions.Timeout:
         log.error(
             f"Config section '{section}': "
-            f"URL returned unsuccessful HTTP response "
-            f"status code {response.status_code}"
+            f"URL timed out while waiting {timeout} seconds for response"
         )
         terminate_program(early_exit)
         return None
-
-    return response.content
 
 
 def is_min_size_kb(
@@ -97,6 +112,7 @@ def write_urls_locally(
     conf_parser: configparser.ConfigParser,
     log: logging.getLogger,
     min_size_kb: int,
+    timeout: int = 32,
     early_exit: bool = False,
 ):
     """
@@ -108,6 +124,7 @@ def write_urls_locally(
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             write file.
+        timeout: Number of seconds to wait for response.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
@@ -129,7 +146,9 @@ def write_urls_locally(
                 terminate_program(early_exit)
                 continue
 
-            url_content = get_url_content(str(conf.url), section, log, early_exit)
+            url_content = get_url_content(
+                str(conf.url), section, log, timeout, early_exit
+            )
             if not url_content:
                 continue
 
@@ -316,6 +335,7 @@ def write_urls_to_s3(
     log: logging.getLogger,
     min_size_kb: int,
     backup_s3_count: int | None = None,
+    timeout: int = 32,
     early_exit: bool = False,
 ):
     """
@@ -331,6 +351,7 @@ def write_urls_to_s3(
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied or removed.
+        timeout: Number of seconds to wait for response.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
@@ -351,7 +372,9 @@ def write_urls_to_s3(
                 terminate_program(early_exit)
                 continue
 
-            url_content = get_url_content(str(conf.url), section, log, early_exit)
+            url_content = get_url_content(
+                str(conf.url), section, log, timeout, early_exit
+            )
             if not url_content:
                 continue
 

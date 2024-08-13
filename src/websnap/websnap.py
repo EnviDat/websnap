@@ -30,6 +30,7 @@ def websnap(
     file_logs: bool = False,
     s3_uploader: bool = False,
     backup_s3_count: int | None = None,
+    timeout: int = 32,
     early_exit: bool = False,
     repeat_minutes: int | None = None,
 ) -> None | Exception:
@@ -48,6 +49,7 @@ def websnap(
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
             If omitted then default value is None and objects are not copied.
+        timeout: Number of seconds to wait for response for each HTTP request.
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
@@ -98,10 +100,16 @@ def websnap(
             if not isinstance(conf_s3, S3ConfigModel):
                 raise Exception(conf_s3)
             write_urls_to_s3(
-                conf_parser, conf_s3, log, min_size_kb, backup_s3_count, early_exit
+                conf_parser,
+                conf_s3,
+                log,
+                min_size_kb,
+                backup_s3_count,
+                timeout,
+                early_exit,
             )
         else:
-            write_urls_locally(conf_parser, log, min_size_kb, early_exit)
+            write_urls_locally(conf_parser, log, min_size_kb, timeout, early_exit)
 
         log.info("Finished websnap iteration")
         exec_time = int(time.time() - start_time)
