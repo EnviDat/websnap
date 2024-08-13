@@ -1,13 +1,12 @@
 [project]
 name = "websnap"
 version = "1.2.1"
-description = "Copies API JSON files to a S3 bucket or a local machine."
+description = "Copies files retrieved from an API to a S3 bucket or a local machine."
 authors = [
     {name = "Rebecca Kurup Buchholz", email = "rebecca.kurup@wsl.ch"},
 ]
 dependencies = [
     "argparse>=1.4.0",
-    "pre-commit>=3.7.1",
     "black>=24.4.2",
     "pydantic>=2.7.4",
     "boto3>=1.34.132",
@@ -41,3 +40,8 @@ websnap_cli = "websnap.websnap_cli:main"
 
 [tool.pdm.scripts]
 websnap-cli = {call = "websnap.websnap_cli:main"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pre-commit>=3.8.0",
+]

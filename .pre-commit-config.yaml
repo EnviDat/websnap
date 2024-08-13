@@ -1,11 +1,4 @@
 repos:
-  # Versioning: Commit Messages & Changelog
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.27.1
-    hooks:
-      - id: commitizen
-        stages: [commit-msg]
-
   # Autoformat: Python code
   - repo: https://github.com/psf/black
     rev: 24.4.2

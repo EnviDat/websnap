@@ -1,15 +1,6 @@
 # websnap
 
-### Copies API JSON files to a S3 bucket or a local machine.
-
-
-## Purpose
-
-This project was developed to facilitate EnviDat resiliency and support continuous 
-operation during server maintenance.
-
-<a href="https://www.envidat.ch" target="_blank">EnviDat</a> is the environmental data 
-portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
+### Copies files retrieved from an API to a S3 bucket or a local machine.
 
 
 ## Installation
@@ -94,17 +85,17 @@ To access CLI documentation in terminal execute:
 
 ## Usage: S3 Bucket
 
-**Copies API JSON files to a S3 bucket.**
+**Copy files retrieved from an API to a S3 bucket.**
 
 ### Examples
 
 #### Function
 ```python
-# The s3_uploader argument must be passed as True to upload files to a S3 bucket
-# Uploads files to a S3 bucket using default argument values
+# The s3_uploader argument must be passed as True to copy files to a S3 bucket
+# Copies files to a S3 bucket using default argument values
 websnap.websnap(s3_uploader=True)
 
-# Uploads files to a S3 bucket and repeat every 1440 minutes (24 hours), 
+# Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), 
 # file logs are enabled and only 3 backup objects are allowed for each config section
 websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440)
 ```
@@ -112,13 +103,13 @@ websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minu
 #### CLI
 - The following CLI option **must** be used to enable websnap to upload files to a S3 bucket: `--s3_uploader`
 
-- Uploads files to a S3 bucket using default argument values:
+- Copies files to a S3 bucket using default argument values:
      ```bash
       websnap_cli --s3_uploader 
      ```
 
-- Uploads files to a S3 bucket and repeat every 1440 minutes (24 hours), file logs 
-  are enabled and only 3 backup objects are allowed for each config section:
+- Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), file 
+  logs are enabled and only 3 backup objects are allowed for each config section:
      ```bash
       websnap_cli --file_logs --s3_uploader --backup_s3_count 3 --repeat_minutes 1440
      ```
@@ -153,8 +144,9 @@ aws_secret_access_key=hijklmn1234567
 
 #### Other Sections (one per API URL endpoint)
 
-- _Each API JSON file that will be downloaded requires its **own config section!**_
-- The section name be anything, it is suggested to have a name that relates to the downloaded file.
+- _Each file retrieved from an API requires its **own config section!**_
+- The section name be anything, it is suggested to have a name that relates to the 
+  copied file.
 
 Example S3 config section configuration with key prefix:
 
@@ -177,34 +169,35 @@ key=project.json
 
 | Key      | Value Description                                       |
 |----------|---------------------------------------------------------|
-| `url`    | API URL endpoint that JSON file will be downloaded from |
-| `bucket` | Bucket that JSON file will be written in                |
+| `url`    | API URL endpoint that file will be retrieved from       |
+| `bucket` | Bucket that file will be written in                     |
 | `key`    | File name with extension, can optionally include prefix |
 
 
 ## Usage: Local Machine
 
-**Copies API JSON files to a local machine.** 
+**Copy files retrieved from an API to a local machine.** 
 
 ### Examples
 
 #### Function
 ```python
-# Write downloaded files to local machine using default argument values
+# Write files retrieved from an API to local machine using default argument values
 websnap.websnap()
 
-# Write downloaded files locally and repeats every 60 minutes (1 hour), file logs are enabled
+# Write files retrieved from an API locally and repeats every 60 minutes (1 hour), 
+# file logs are enabled
 websnap.websnap(file_logs=True, repeat_minutes=60)
 ```
 
 #### CLI 
 
-- Write downloaded files to local machine using default argument values:
+- Write copied files to local machine using default argument values:
      ```bash
       websnap_cli 
      ```
 
-- Write downloaded files locally and repeats every 60 minutes (1 hour), file logs 
+- Write copied files locally and repeats every 60 minutes (1 hour), file logs 
   are enabled:
      ```bash
       websnap_cli --file_logs --repeat_minutes 60
@@ -219,7 +212,7 @@ websnap.websnap(file_logs=True, repeat_minutes=60)
    `--config` option).  
 - Local machine config example file:
   <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>
-- Each API URL JSON file that will be downloaded requires its _own section_. 
+- Each file that will be retrieved from an API requires its _own section_. 
 - If the optional `directory` key/value pair is omitted then the file will be written in the directory that the program is executed from.
 
 Example local machine configuration section:
@@ -233,11 +226,11 @@ directory=projectdata
 
 #### Sections (one per API URL endpoint)
 
-| Key                      | Value Description                                       |
-|--------------------------|---------------------------------------------------------|
-| `url`                    | API URL endpoint that JSON file will be downloaded from |
-| `file_name`              | File name with extension                                |
-| `directory` (_optional_) | Directory name that JSON file will be written in        |
+| Key                      | Value Description                                 |
+|--------------------------|---------------------------------------------------|
+| `url`                    | API URL endpoint that file will be retrieved from |
+| `file_name`              | File name with extension                          |
+| `directory` (_optional_) | Local directory name that file will be written in |
 
 ---
 
@@ -275,7 +268,7 @@ log_backup_count=7
 ## Minimum Download Size
 
 Websnap supports optionally specifying the minimum download size (in kilobytes) a 
-JSON file must be to download it from the configured API URL endpoint.
+file must be to copy it from the configured API URL endpoint.
 
 - **By default the minimum default minimum size is 0 kb.**
   - Unless specified in the configuration this means that a file of any size can be downloaded by websnap.
@@ -304,6 +297,15 @@ min_size_kb=1
 ## Author
 
 Rebecca Kurup Buchholz
+
+
+## Purpose
+
+This project was developed to facilitate EnviDat resiliency and support continuous 
+operation during server maintenance.
+
+<a href="https://www.envidat.ch" target="_blank">EnviDat</a> is the environmental data 
+portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. 
 
 
 ## License 
