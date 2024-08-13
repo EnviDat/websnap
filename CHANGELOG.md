@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.2.0 (2024-08-13)
+### Feat
+- implement `timeout` argument that is the number of seconds to wait for response for 
+  each HTTP request before timing out
+### Docs
+- update README to include usage and default value for `timeout` argument
+
 ## 1.1.12 (2024-08-12)
 ### Fix
 - correct classifiers
