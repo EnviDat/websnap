@@ -85,7 +85,7 @@ To access CLI documentation in terminal execute:
 
 ## Usage: S3 Bucket
 
-**Copy files retrieved from an API to a S3 bucket.**
+### **Copy files retrieved from an API to a S3 bucket.**
 
 ### Examples
 
@@ -176,7 +176,7 @@ key=project.json
 
 ## Usage: Local Machine
 
-**Copy files retrieved from an API to a local machine.** 
+### **Copy files retrieved from an API to a local machine.** 
 
 ### Examples
 
