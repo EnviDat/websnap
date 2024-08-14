@@ -24,10 +24,10 @@
 
 ### Websnap can be used as a function or as a CLI. 
 
-<h4>
+<p>
 <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png" 
 target="_blank">Click here to view a websnap overview diagram.</a>
-</h4>
+</p>
 
 
 ###
