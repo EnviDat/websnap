@@ -1,11 +1,15 @@
 # CHANGELOG
 
+## 1.2.6 (2024-08-14)
+### Docs
+- update download badge link
+
 ## 1.2.5 (2024-08-14)
-## Docs
+### Docs
 - update badge formatting
 
 ## 1.2.4 (2024-08-14)
-## Docs
+### Docs
 - add version, download, and license badges
 - update config templates to show .xml examples
 
