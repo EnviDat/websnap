@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.2.4 (2024-08-14)
+## Docs
+- add version, download, and license badges
+- update config templates to show .xml examples
+
 ## 1.2.3 (2024-08-13)
 ### Docs
 - update overview diagram
