@@ -1,12 +1,14 @@
 # websnap
 
-<h3 style="text-align: center;">Copies files retrieved from an API to a S3 bucket or a local machine.</h3>
-
-<div style="text-align: center;">
+<div>
   <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap?color=%232780C1">
   <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/websnap?color=%232780C1">
   <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
 </div>
+
+### Copies files retrieved from an API to a S3 bucket or a local machine.</center>
+
+###
 
 ---
 
