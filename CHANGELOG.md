@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.8 (2024-08-15)
+### Docs
+- update pypi badge link
+
 ## 1.2.7 (2024-08-14)
 ### Docs
 - remove unused `black` dependency
