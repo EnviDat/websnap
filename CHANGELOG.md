@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.5 (2024-08-14)
+## Docs
+- update badge formatting
+
 ## 1.2.4 (2024-08-14)
 ## Docs
 - add version, download, and license badges
