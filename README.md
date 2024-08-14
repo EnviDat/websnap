@@ -6,7 +6,7 @@
   <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
 </div>
 
-### Copies files retrieved from an API to a S3 bucket or a local machine.</center>
+### Copies files retrieved from an API to a S3 bucket or a local machine.
 
 ###
 
