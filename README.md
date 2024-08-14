@@ -1,6 +1,7 @@
 # websnap
 
 <div>
+  <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap">
   <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
   <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
 </div>
