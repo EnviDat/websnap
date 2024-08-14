@@ -1,6 +1,14 @@
 # websnap
 
-### Copies files retrieved from an API to a S3 bucket or a local machine.
+<h3 style="text-align: center;">Copies files retrieved from an API to a S3 bucket or a local machine.</h3>
+
+<div style="text-align: center;">
+  <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap?color=%232780C1">
+  <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/websnap?color=%232780C1">
+  <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
+</div>
+
+---
 
 
 ## Installation
@@ -154,7 +162,7 @@ Example S3 config section configuration with key prefix:
 [resource]
 url=https://www.example.com/api/resource
 bucket=exampledata
-key=subdirectory_resource/resource.json
+key=subdirectory_resource/resource.xml
 ```
 
 Example S3 config section configuration without key prefix:
