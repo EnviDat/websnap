@@ -4,8 +4,6 @@ Also supports writing downloaded files to local machine.
 """
 
 import configparser
-
-from math import ceil
 import time
 
 from websnap.validators import (
@@ -17,7 +15,11 @@ from websnap.validators import (
     LogConfigModel,
 )
 from websnap.logger import get_custom_logger
-from websnap.logic import write_urls_locally, write_urls_to_s3
+from websnap.logic import (
+    write_urls_locally,
+    write_urls_to_s3,
+    sleep_until_next_iteration,
+)
 
 __all__ = ["websnap"]
 
@@ -80,7 +82,7 @@ def websnap(
     if not isinstance(min_size_kb, int):
         raise Exception(min_size_kb)
 
-    # Download and write URL files
+    # Copy URL files and write to S3 bucket or local machine
     is_repeat = True
     while is_repeat:
 
@@ -112,17 +114,8 @@ def websnap(
             write_urls_locally(conf_parser, log, min_size_kb, timeout, early_exit)
 
         log.info("Finished websnap iteration")
-        exec_time = int(time.time() - start_time)
 
         if is_repeat:
-            interval_seconds = int(repeat_minutes) * 60
-            if interval_seconds > exec_time:
-                wait_seconds = interval_seconds - exec_time
-                wait_minutes = wait_seconds / 60
-                log.info(
-                    f"Sleeping {wait_seconds} seconds (about {ceil(wait_minutes)} "
-                    f"minutes) before next iteration..."
-                )
-                time.sleep(wait_seconds)
+            sleep_until_next_iteration(repeat_minutes, start_time, log)
 
     return

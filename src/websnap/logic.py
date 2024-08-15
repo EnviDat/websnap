@@ -1,11 +1,13 @@
 """
-Supporting functions used to download and write files hosted
-at URLs to S3 bucket or local machine.
+Functions used to copy and write files retrieved from an API to a S3 bucket or a
+local machine.
 """
 
 import configparser
 import logging
 import os
+import time
+from math import ceil
 
 import requests
 import boto3
@@ -215,7 +217,7 @@ def copy_s3_object(
     log: logging.getLogger,
     section: str,
     early_exit: bool = False,
-):
+) -> None:
     """
     Copy an object using S3 object config.
 
@@ -275,7 +277,7 @@ def delete_s3_backup_object(
     section: str,
     backup_s3_count: int,
     early_exit: bool = False,
-):
+) -> None:
     """
     Delete a S3 backup object using S3 object config.
     Only deletes object if backup objects exceed backup_s3_count.
@@ -366,7 +368,7 @@ def write_urls_to_s3(
     backup_s3_count: int | None = None,
     timeout: int = 32,
     early_exit: bool = False,
-):
+) -> None:
     """
     Download files hosted at URLS in config and then upload them to S3 bucket.
 
@@ -442,5 +444,33 @@ def write_urls_to_s3(
         except Exception as e:
             log.error(f"Config section '{section}', error(s): {e}")
             terminate_program(early_exit)
+
+    return
+
+
+def sleep_until_next_iteration(
+    sleep_minutes: int, start_time: float, log: logging.getLogger
+) -> None:
+    """
+    Sleep (delay execution) <sleep_minutes> minutes until next websnap iteration.
+
+    Args:
+        sleep_minutes: Number of minutes to sleep until executing next websnap
+            iteration.
+        start_time: Start time at beginning of websnap iteration,
+            (time is specified as number of seconds since beginning of epoch.)
+        log: Logger object created with customized configuration file.
+    """
+    sleep_secs = sleep_minutes * 60
+    execution_secs = time.time() - start_time
+
+    if sleep_secs > execution_secs:
+        wait_seconds = int(sleep_secs - execution_secs)
+        wait_minutes = wait_seconds / 60
+        log.info(
+            f"Sleeping {wait_seconds} seconds (about {ceil(wait_minutes)} minutes)"
+            f" before next iteration..."
+        )
+        time.sleep(wait_seconds)
 
     return
