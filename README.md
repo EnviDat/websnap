@@ -81,21 +81,23 @@ To access CLI documentation in terminal execute:
 
 ### Description
 
-| Function parameter /<br/> CLI option | Description                                                                                                                                                                                                                                                                                                               |
-|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `config`                             | Path to configuration `.ini` file.<br/> Default value expects file called `config.ini` in same directory as websnap package is being executed from.                                                                                                                                                                       |
-| `log_level`                          | Level to use for logging. Default value is `INFO`.<br/>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.<br/> <a href="https://docs.python.org/3/library/logging.html#levels" target="_blank">Click here to learn more about logging levels.</a>                                               |
-| `file_logs`                          | Enable rotating file logs.                                                                                                                                                                                                                                                                                                |
-| `s3_uploader`                        | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                   |
-| `backup_s3_count`                    | Copy and backup S3 objects in each config section <backup_s3_count> times, remove object with the oldest last modified timestamp.<br/>If omitted then objects are not copied or removed.<br/>If enabled then backup objects are copied and assigned the original object's name with the last modified timestamp appended. |
-| `timeout`                            | Number of seconds to wait for response for each HTTP request before timing out.<br/>Default value is 32 seconds.                                                                                                                                                                                                          |
-| `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs errors but continues program execution.                                                                                                                                                                                                          |
-| `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                     |
+| Function parameter /<br/> CLI option | Description                                                                                                                                                                                                                                                                                                                                |
+|--------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `config`                             | Path to configuration `.ini` file.<br/> Default value expects file called `config.ini` in same directory as websnap package is being executed from.                                                                                                                                                                                        |
+| `log_level`                          | Level to use for logging. Default value is `INFO`.<br/>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.<br/> <a href="https://docs.python.org/3/library/logging.html#levels" target="_blank">Click here to learn more about logging levels.</a>                                                                |
+| `file_logs`                          | Enable rotating file logs.                                                                                                                                                                                                                                                                                                                 |
+| `s3_uploader`                        | Enable uploading of files to S3 bucket.                                                                                                                                                                                                                                                                                                    |
+| `backup_s3_count`                    | Copy and backup file in each config section to the configured S3 bucket `backup_s3_count` times and remove file with the oldest last modified timestamp.<br/>If omitted then files are not copied or removed.<br/>If enabled then backup files are copied and assigned the original file's name with the last modified timestamp appended. |
+| `timeout`                            | Number of seconds to wait for response for each HTTP request before timing out.<br/>Default value is 32 seconds.                                                                                                                                                                                                                           |
+| `early_exit`                         | Enable early program termination after error occurs.<br/>If omitted logs errors but continues program execution.                                                                                                                                                                                                                           |
+| `repeat_minutes`                     | Run websnap continuously every <repeat_minutes> minutes.<br/>If omitted then websnap does not repeat.                                                                                                                                                                                                                                      |
 
 
 ## Usage: S3 Bucket
 
 ### **Copy files retrieved from an API to a S3 bucket.**
+
+Uses the AWS SDK for Python (Boto3) to add and backup API files to a S3 bucket. 
 
 ### Examples
 
@@ -106,7 +108,7 @@ To access CLI documentation in terminal execute:
 websnap.websnap(s3_uploader=True)
 
 # Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), 
-# file logs are enabled and only 3 backup objects are allowed for each config section
+# file logs are enabled and only 3 backup files are allowed for each config section
 websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440)
 ```
 
@@ -119,7 +121,7 @@ websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minu
      ```
 
 - Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), file 
-  logs are enabled and only 3 backup objects are allowed for each config section:
+  logs are enabled and only 3 backup files are allowed for each config section:
      ```bash
       websnap_cli --file_logs --s3_uploader --backup_s3_count 3 --repeat_minutes 1440
      ```

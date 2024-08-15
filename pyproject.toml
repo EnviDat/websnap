@@ -5,6 +5,9 @@ description = "Copies files retrieved from an API to a S3 bucket or a local mach
 authors = [
     {name = "Rebecca Kurup Buchholz", email = "rebecca.kurup@wsl.ch"},
 ]
+maintainers = [
+    {name = "EnviDat", email="envidat@wsl.ch"}
+]
 dependencies = [
     "argparse>=1.4.0",
     "pydantic>=2.7.4",
@@ -23,10 +26,21 @@ classifiers = [
 ]
 readme = "README.md"
 license = {text = "MIT"}
+keywords = [
+    "S3",
+    "Boto3",
+    "boto3",
+    "API",
+    "backup",
+    "AWS",
+    "AWS SDK",
+    "AWS SDK for Python"
+]
 
 [project.urls]
 documentation = "https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/README.md"
 repository = "https://gitlabext.wsl.ch/EnviDat/websnap"
+changelog = "https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["pdm-backend"]
