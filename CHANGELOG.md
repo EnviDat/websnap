@@ -1,6 +1,13 @@
 # CHANGELOG
 
-## 1.2.8 (2024-08-15)
+## 1.2.9 (2024-08-15)
+### Refactor
+- extract repeat_minutes arg logic to helper function
+### Docs
+- reformat function parameters table
+- add keywords to project metadata in `pyproject.toml`
+
+## 1.2.8 (2024-08-14)
 ### Docs
 - update pypi badge link
 
