@@ -34,13 +34,13 @@ target="_blank">Click here to view a websnap overview diagram.</a>
 #### Function
 
 ```python
-import websnap
+from websnap import websnap
 
 # Execute websnap using default arguments
-websnap.websnap()
+websnap()
 
 # Execute websnap passing arguments
-websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=7, early_exit=True)
+websnap(file_logs=True, s3_uploader=True, backup_s3_count=7, early_exit=True)
 ```
 
 ###
@@ -105,11 +105,11 @@ Uses the AWS SDK for Python (Boto3) to add and backup API files to a S3 bucket.
 ```python
 # The s3_uploader argument must be passed as True to copy files to a S3 bucket
 # Copies files to a S3 bucket using default argument values
-websnap.websnap(s3_uploader=True)
+websnap(s3_uploader=True)
 
 # Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), 
 # file logs are enabled and only 3 backup files are allowed for each config section
-websnap.websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440)
+websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440)
 ```
 
 #### CLI
@@ -195,11 +195,11 @@ key=project.json
 #### Function
 ```python
 # Write files retrieved from an API to local machine using default argument values
-websnap.websnap()
+websnap()
 
 # Write files retrieved from an API locally and repeats every 60 minutes (1 hour), 
 # file logs are enabled
-websnap.websnap(file_logs=True, repeat_minutes=60)
+websnap(file_logs=True, repeat_minutes=60)
 ```
 
 #### CLI 
