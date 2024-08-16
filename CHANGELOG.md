@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.10 (2024-08-16)
+### Docs
+- update function code snippet examples
+
 ## 1.2.9 (2024-08-15)
 ### Refactor
 - extract repeat_minutes arg logic to helper function
