@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.2.11 (2024-08-20)
+### Refactor
+- improve validation for integer arguments
+### Docs
+- add parameter data types in description table
+
 ## 1.2.10 (2024-08-16)
 ### Docs
 - update function code snippet examples
