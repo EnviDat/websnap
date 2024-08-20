@@ -1,5 +1,6 @@
 """Config utilities, parses and validates config .ini files."""
 
+import argparse
 import configparser
 from pathlib import Path
 from pydantic import (
@@ -10,10 +11,30 @@ from pydantic import (
     AnyUrl,
     field_validator,
     NonNegativeInt,
+    TypeAdapter,
 )
-from typing import Optional
+from typing import Optional, Any
 
 from websnap.constants import LogRotation, MIN_SIZE_KB
+
+
+def validate_positive_integer(x: Any) -> int | Exception:
+    """
+    Return x if it is a positive integer.
+    Return Exception if x is not a positive integer.
+
+    Args:
+        x: The input value.
+    """
+    ta = TypeAdapter(PositiveInt)
+
+    try:
+        ta.validate_python(x)
+        return x
+    except ValidationError as e:
+        return Exception(
+            f"Invalid value {x} (it must be a positive integer), error: {e}"
+        )
 
 
 def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception:
