@@ -1,11 +1,12 @@
 image: python:latest
 
 stages:
-  - backup
+  - backup-internal
+  - backup-external
   - publish
 
 envidat:
-  stage: backup
+  stage: backup-internal
   before_script:
     - pip install pdm
     - pdm install
@@ -15,7 +16,7 @@ envidat:
      - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
 
 ods:
-  stage: backup
+  stage: backup-external
   before_script:
     - pip install pdm
     - pdm install
