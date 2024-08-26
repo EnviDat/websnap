@@ -17,6 +17,8 @@ envidat:
 ods:
   stage: backup
   before_script:
+    - pip install pdm
+    - pdm install
     - echo $CONFIG_ODS_INI > config_ci_ods.ini
     - scp config_ci_ods.ini "$CI_PROJECT_DIR/config_ods.ini"
   script:
