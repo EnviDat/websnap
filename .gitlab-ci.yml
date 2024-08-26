@@ -21,9 +21,9 @@ ods:
     - pip install pdm
     - pdm install
     - echo $CONFIG_ODS_INI > config_ci_ods.ini
-    - scp config_ci_ods.ini "$CI_PROJECT_DIR/config_ods.ini"
+    - scp config_ci_ods.ini "$CI_PROJECT_DIR/config.ini"
   script:
-    pdm run websnap-cli --s3_uploader --config config_ods.ini --early_exit
+    pdm run websnap-cli --s3_uploader --early_exit
 
 publish-package:
   stage: publish
