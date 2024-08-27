@@ -20,10 +20,10 @@ ods:
   before_script:
     - pip install pdm
     - pdm install
-    - echo $CONFIG_ODS_INI > config_ci_ods.ini
-    - scp config_ci_ods.ini "$CI_PROJECT_DIR/config_ods.ini"
+    - echo $CONFIG_ODS_JSON > config_ci_ods.json
+    - scp config_ci_ods.json "$CI_PROJECT_DIR/config_ods.json"
   script:
-    pdm run websnap-cli --s3_uploader --config config_ods.ini --early_exit
+    pdm run websnap-cli --s3_uploader --config config_ods.json --early_exit
 
 
 
