@@ -428,7 +428,7 @@ def write_urls_to_s3(
 
             if status_code == 200:
                 log.info(
-                    f"***CONFIG SECTION '{section}'***: SUCCESSFULLY copied URL "
+                    f"Config section '{section}': Successfully copied URL "
                     f"content to S3 object '{conf.key}'"
                 )
             else:
