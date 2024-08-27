@@ -2,7 +2,7 @@ image: python:latest
 
 stages:
   - backup-internal
-#  - backup-external
+  - backup-external
   - publish
 
 envidat:
@@ -15,16 +15,15 @@ envidat:
   script:
      - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
 
-#ods:
-#  stage: backup-external
-#  before_script:
-#    - pip install pdm
-#    - pdm install
-#    - echo $CONFIG_ODS_INI > config_ci_ods.ini
-#    - base64 config_ci_ods.ini > config_ci_ods.ini.b64
-#    - scp config_ci_ods.ini "$CI_PROJECT_DIR/config_ods.ini"
-#  script:
-#    pdm run websnap-cli --s3_uploader --config config_ods.ini --early_exit
+ods:
+  stage: backup-external
+  before_script:
+    - pip install pdm
+    - pdm install
+    - echo $CONFIG_ODS_INI > config_ci_ods.ini
+    - scp config_ci_ods.ini "$CI_PROJECT_DIR/config_ods.ini"
+  script:
+    pdm run websnap-cli --s3_uploader --config config_ods.ini --early_exit
 
 
 
