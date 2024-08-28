@@ -93,6 +93,14 @@ def parse_arguments() -> argparse.Namespace | None:
         "If omitted then websnap does not repeat.",
     )
 
+    parser.add_argument(
+        "-n",
+        "--section_config",
+        help="File or URL to obtain additional configuration sections. "
+        "Cannot be used to assign DEFAULT section in config. "
+        "Only currently supports JSON config.",
+    )
+
     try:
         return parser.parse_args()
     except (argparse.ArgumentTypeError, Exception) as e:
@@ -115,6 +123,7 @@ def main():
         timeout=kwargs["timeout"],
         early_exit=kwargs["early_exit"],
         repeat_minutes=kwargs["repeat_minutes"],
+        section_config=kwargs["section_config"],
     )
 
 

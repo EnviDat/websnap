@@ -28,6 +28,7 @@ __all__ = ["websnap"]
 LOGGER_NAME = "websnap"
 
 
+# TODO add section_config to README
 def websnap(
     config: str = "config.ini",
     log_level: str = "INFO",
@@ -37,6 +38,7 @@ def websnap(
     timeout: int = 32,
     early_exit: bool = False,
     repeat_minutes: int | None = None,
+    section_config: str | None = None,
 ) -> None:
     """
     Copies files hosted at URLs in config and then uploads them
@@ -62,6 +64,13 @@ def websnap(
         repeat_minutes: Run websnap continuously every <repeat> minutes
                If integer passed then it must be a positive integer.
                If omitted then default value is None and websnap will not repeat.
+        section_config: File or URL to obtain additional configuration sections.
+                If omitted then default value is None and only config specified in
+                'config' argument is used.
+                Cannot be used to assign DEFAULT section in config (that must be
+                assigned in config specified by 'config' argument).
+                Only currently supports JSON config and can only be used if 'config'
+                argument is also a JSON file.
     """
     # Validate integer arguments
     if backup_s3_count is not None:
@@ -83,7 +92,7 @@ def websnap(
             )
 
     # Validate log settings in config and setup log
-    conf_parser = get_config_parser(config)
+    conf_parser = get_config_parser(config, section_config)
     if not isinstance(conf_parser, configparser.ConfigParser):
         raise Exception(conf_parser)
 

@@ -38,37 +38,135 @@ def validate_positive_integer(x: Any) -> int | Exception:
         )
 
 
-def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception:
+# TODO test function
+def is_url(x: Any) -> bool:
     """
-    Return ConfigParser object.
+    Return True if x is a URL. Else return False.
+
+     Args:
+        x: The input value.
+    """
+    ta = TypeAdapter(AnyUrl)
+    try:
+        ta.validate_python(x)
+        return True
+    except ValidationError:
+        return False
+
+
+def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exception:
+    """
+    Returns ConfigParser instance with items read from JSON config file.
     Returns Exception if fails.
 
     Args:
-        config_path (str): Path to .ini or .json configuration file.
+        config_path: Path object to the .json config file.
     """
     try:
-        conf_path = Path(config_path)
-        config = configparser.ConfigParser()
+        with open(config_path, "r") as config_file:
+            data = json.load(config_file)
 
-        if conf_path.suffix == ".json":
-            with open(conf_path, "r") as config_file:
-                data = json.load(config_file)
-            for key, value in data.items():
-                config[key] = value
-        else:
-            conf = config.read(conf_path)
-            if not conf:
-                return Exception(f"File '{config_path}' not found")
+        config_parser = configparser.ConfigParser()
 
-        if len(config.sections()) < 1:
-            return Exception(f"File '{config_path}' does not have any sections")
+        for key, value in data.items():
+            config_parser[key] = value
 
-        return config
+        return config_parser
 
     except FileNotFoundError:
         return Exception(f"File '{config_path}' not found")
     except Exception as e:
-        return Exception(f"{e}")
+        return Exception(e)
+
+
+# TODO WIP start dev here
+# TODO handle URL to JSON config
+# TODO test, including with intentional errors (wrong file path)
+def get_json_section_config_parser(
+    section_config: str,
+) -> configparser.ConfigParser | Exception:
+    """
+    Returns ConfigParser instance with items read from JSON section config file.
+    Cannot be used to assign DEFAULT section in returned ConfigParser instance.
+    Returns Exception if fails.
+
+    Args:
+        section_config: File or URL to obtain additional configuration sections.
+    """
+    try:
+        # TODO call is_url() to see if section_config is URL
+        # TODO create section_parser from URL content
+
+        # TODO move this to an else block after handling URL
+        if (section_path := Path(section_config)).suffix == ".json":
+            section_parser = get_json_config_parser(section_path)
+            # TODO extract error handling to block below to handle URL errors as well
+            if not isinstance(section_parser, configparser.ConfigParser):
+                return Exception(section_parser)
+        else:
+            return Exception("Section config extension must be '.json'")
+
+        # TODO implement isinstance() error handling here
+
+        if section_parser.defaults():
+            return Exception(f"Section config cannot have a 'DEFAULT' section")
+
+        return section_parser
+
+    except FileNotFoundError:
+        return Exception(f"File '{section_config}' not found")
+    except Exception as e:
+        return Exception(e)
+
+
+def get_config_parser(
+    config: str, section_config: str | None
+) -> configparser.ConfigParser | Exception:
+    """
+    Return ConfigParser object.
+    Returns Exception if fails.
+    If section_config passed then merges config and section_config
+    into one ConfigParser instance.
+
+    Args:
+        config: Path to .ini or .json configuration file.
+        section_config (str): File or URL to obtain additional configuration sections.
+                              Default value is None.
+    """
+    try:
+        conf_path = Path(config)
+
+        if section_config and conf_path.suffix != ".json":
+            return Exception(
+                f"Config '{config}' extension must be '.json' to also use "
+                f"optional section config '{section_config}'"
+            )
+        elif conf_path.suffix == ".json":
+            config_parser = get_json_config_parser(conf_path)
+            if not isinstance(config_parser, configparser.ConfigParser):
+                return Exception(config_parser)
+            if section_config:
+                section_parser = get_json_section_config_parser(section_config)
+                if not isinstance(section_parser, configparser.ConfigParser):
+                    return Exception(section_parser)
+                # TODO merge config_parser and section_parser into assigned
+                #  combined_parser and then return combined_parser
+                pass
+        else:
+            config_parser = configparser.ConfigParser()
+            conf = config_parser.read(conf_path)
+            if not conf:
+                return Exception(f"File '{config}' not found")
+
+        if len(config_parser.sections()) < 1:
+            return Exception(f"File '{config}' does not have any sections")
+
+        return config_parser
+
+    except FileNotFoundError:
+        return Exception(f"File '{config}' not found")
+    except Exception as e:
+        return Exception(e)
 
 
 class LogConfigModel(BaseModel):
