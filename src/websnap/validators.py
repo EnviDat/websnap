@@ -2,6 +2,7 @@
 
 import argparse
 import configparser
+import json
 from pathlib import Path
 from pydantic import (
     BaseModel,
@@ -43,23 +44,29 @@ def get_config_parser(config_path: str) -> configparser.ConfigParser | Exception
     Returns Exception if fails.
 
     Args:
-        config_path (str): Path to config.ini file.
+        config_path (str): Path to .ini or .json configuration file.
     """
     try:
-        config_file = Path(config_path)
+        conf_path = Path(config_path)
         config = configparser.ConfigParser()
-        conf = config.read(config_file)
 
-        if not conf:
-            return Exception(f"File {config_path} not found")
+        if conf_path.suffix == ".json":
+            with open(conf_path, "r") as config_file:
+                data = json.load(config_file)
+            for key, value in data.items():
+                config[key] = value
+        else:
+            conf = config.read(conf_path)
+            if not conf:
+                return Exception(f"File '{config_path}' not found")
 
         if len(config.sections()) < 1:
-            return Exception(
-                f"File '{config_path}' not valid config, " f"does not have any sections"
-            )
+            return Exception(f"File '{config_path}' does not have any sections")
 
         return config
 
+    except FileNotFoundError:
+        return Exception(f"File '{config_path}' not found")
     except Exception as e:
         return Exception(f"{e}")
 

@@ -1,12 +1,12 @@
 image: python:latest
 
 stages:
-  - backup-internal
-  - backup-external
+  - backup
+  - nasa
   - publish
 
-envidat:
-  stage: backup-internal
+backup:
+  stage: backup
   before_script:
     - pip install pdm
     - pdm install
@@ -15,15 +15,15 @@ envidat:
   script:
      - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
 
-ods:
-  stage: backup-external
+nasa:
+  stage: nasa
   before_script:
     - pip install pdm
     - pdm install
-    - echo $CONFIG_ODS_INI > config_ci_ods.ini
-    - scp config_ci_ods.ini "$CI_PROJECT_DIR/config_ods.ini"
+    - echo $CONFIG_NASA_JSON > config_ci_nasa.json
+    - scp config_ci_nasa.json "$CI_PROJECT_DIR/config_nasa.json"
   script:
-    pdm run websnap-cli --s3_uploader --config config_ods.ini --early_exit
+    pdm run websnap-cli --s3_uploader --config config_nasa.json --early_exit
 
 
 

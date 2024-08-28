@@ -45,7 +45,7 @@ def websnap(
     Optionally repeat websnap file processing iteration.
 
     Args:
-        config: Path to ini config file.
+        config: Path to .ini or .json configuration file.
         log_level: Level to use for logging.
         file_logs: If True then implements rotating file logs.
         s3_uploader: If True then uploads files to S3 bucket.
