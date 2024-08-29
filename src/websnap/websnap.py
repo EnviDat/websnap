@@ -7,6 +7,7 @@ import configparser
 import logging
 import time
 
+from websnap.constants import TIMEOUT
 from websnap.validators import (
     get_config_parser,
     validate_log_config,
@@ -29,13 +30,14 @@ LOGGER_NAME = "websnap"
 
 
 # TODO add section_config to README
+# TODO mention URL must be quoted
 def websnap(
     config: str = "config.ini",
     log_level: str = "INFO",
     file_logs: bool = False,
     s3_uploader: bool = False,
     backup_s3_count: int | None = None,
-    timeout: int = 32,
+    timeout: int = TIMEOUT,
     early_exit: bool = False,
     repeat_minutes: int | None = None,
     section_config: str | None = None,
@@ -92,7 +94,7 @@ def websnap(
             )
 
     # Validate log settings in config and setup log
-    conf_parser = get_config_parser(config, section_config)
+    conf_parser = get_config_parser(config, section_config, timeout)
     if not isinstance(conf_parser, configparser.ConfigParser):
         raise Exception(conf_parser)
 

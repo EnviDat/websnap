@@ -1,9 +1,10 @@
 """Config utilities, parses and validates config .ini files."""
 
-import argparse
 import configparser
 import json
 from pathlib import Path
+
+import requests
 from pydantic import (
     BaseModel,
     ValidationError,
@@ -16,7 +17,7 @@ from pydantic import (
 )
 from typing import Optional, Any
 
-from websnap.constants import LogRotation, MIN_SIZE_KB
+from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
 
 def validate_positive_integer(x: Any) -> int | Exception:
@@ -53,6 +54,25 @@ def is_url(x: Any) -> bool:
         return False
 
 
+def merge_config_parsers(
+    config_1: configparser.ConfigParser, config_2: configparser.ConfigParser
+) -> configparser.ConfigParser:
+    """
+    Merges config_2 into config_1 and then return config_1.
+    If sections or keys in config_2 exist in config_1,
+    the values from config_2 will overwrite those in config_1.
+    """
+    for section in config_2.sections():
+
+        if not config_1.has_section(section):
+            config_1.add_section(section)
+
+        for option, value in config_2.items(section):
+            config_1.set(section, option, value)
+
+    return config_1
+
+
 def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exception:
     """
     Returns ConfigParser instance with items read from JSON config file.
@@ -76,11 +96,43 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exc
         return Exception(e)
 
 
-# TODO WIP start dev here
-# TODO handle URL to JSON config
-# TODO test, including with intentional errors (wrong file path)
+def get_url_json_config_parser(
+    config_url: str, timeout: int = TIMEOUT
+) -> configparser.ConfigParser | Exception:
+    """
+    Returns ConfigParser instance with items read from JSON config URL.
+    Returns Exception if fails.
+
+    Args:
+        config_url: URL with additional configuration sections.
+        timeout: Number of seconds to wait for response for each HTTP request.
+    """
+    try:
+        response = requests.get(config_url, timeout=timeout)
+
+        if not response.ok:
+            return Exception(
+                f"URL {config_url} returned unsuccessful "
+                f"status code {response.status_code}"
+            )
+
+        data = response.json()
+
+        config_parser = configparser.ConfigParser()
+        config_parser.read_dict(data)
+
+        return config_parser
+
+    except requests.exceptions.Timeout:
+        return Exception(
+            f"URL {config_url} timed out while waiting {timeout} seconds for response"
+        )
+    except Exception as e:
+        return Exception(e)
+
+
 def get_json_section_config_parser(
-    section_config: str,
+    section_config: str, timeout: int = TIMEOUT
 ) -> configparser.ConfigParser | Exception:
     """
     Returns ConfigParser instance with items read from JSON section config file.
@@ -88,24 +140,21 @@ def get_json_section_config_parser(
     Returns Exception if fails.
 
     Args:
-        section_config: File or URL to obtain additional configuration sections.
+        section_config: File or URL with additional configuration sections.
+        timeout: Number of seconds to wait for response for each HTTP request.
     """
     try:
-        # TODO call is_url() to see if section_config is URL
-        # TODO create section_parser from URL content
+
         if is_url(section_config):
-            pass
-
-        # TODO move this to an else block after handling URL
-        if (section_path := Path(section_config)).suffix == ".json":
-            section_parser = get_json_config_parser(section_path)
-            # TODO extract error handling to block below to handle URL errors as well
-            if not isinstance(section_parser, configparser.ConfigParser):
-                return Exception(section_parser)
+            section_parser = get_url_json_config_parser(section_config, timeout)
         else:
-            return Exception("Section config extension must be '.json'")
+            if (section_path := Path(section_config)).suffix == ".json":
+                section_parser = get_json_config_parser(section_path)
+            else:
+                return Exception("Section config extension must be '.json'")
 
-        # TODO implement isinstance() error handling here
+        if not isinstance(section_parser, configparser.ConfigParser):
+            return Exception(section_parser)
 
         if section_parser.defaults():
             return Exception(f"Section config cannot have a 'DEFAULT' section")
@@ -119,7 +168,7 @@ def get_json_section_config_parser(
 
 
 def get_config_parser(
-    config: str, section_config: str | None
+    config: str, section_config: str | None, timeout: int = TIMEOUT
 ) -> configparser.ConfigParser | Exception:
     """
     Return ConfigParser object.
@@ -131,6 +180,7 @@ def get_config_parser(
         config: Path to .ini or .json configuration file.
         section_config (str): File or URL to obtain additional configuration sections.
                               Default value is None.
+        timeout: Number of seconds to wait for response for each HTTP request.
     """
     try:
         conf_path = Path(config)
@@ -145,12 +195,10 @@ def get_config_parser(
             if not isinstance(config_parser, configparser.ConfigParser):
                 return Exception(config_parser)
             if section_config:
-                section_parser = get_json_section_config_parser(section_config)
+                section_parser = get_json_section_config_parser(section_config, timeout)
                 if not isinstance(section_parser, configparser.ConfigParser):
                     return Exception(section_parser)
-                # TODO merge config_parser and section_parser into assigned
-                #  combined_parser and then return combined_parser
-                pass
+                config_parser = merge_config_parsers(config_parser, section_parser)
         else:
             config_parser = configparser.ConfigParser()
             conf = config_parser.read(conf_path)

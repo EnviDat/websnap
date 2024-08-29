@@ -19,6 +19,7 @@ from project root directory without flags:
 
 import argparse
 import websnap
+from websnap.constants import TIMEOUT
 
 
 def parse_arguments() -> argparse.Namespace | None:
@@ -72,7 +73,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-t",
         "--timeout",
         type=int,
-        default=32,
+        default=TIMEOUT,
         help="Number of seconds to wait for response for each HTTP request.",
     )
 
