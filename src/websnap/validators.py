@@ -38,7 +38,6 @@ def validate_positive_integer(x: Any) -> int | Exception:
         )
 
 
-# TODO test function
 def is_url(x: Any) -> bool:
     """
     Return True if x is a URL. Else return False.
@@ -67,9 +66,7 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exc
             data = json.load(config_file)
 
         config_parser = configparser.ConfigParser()
-
-        for key, value in data.items():
-            config_parser[key] = value
+        config_parser.read_dict(data)
 
         return config_parser
 
@@ -96,6 +93,8 @@ def get_json_section_config_parser(
     try:
         # TODO call is_url() to see if section_config is URL
         # TODO create section_parser from URL content
+        if is_url(section_config):
+            pass
 
         # TODO move this to an else block after handling URL
         if (section_path := Path(section_config)).suffix == ".json":
