@@ -1,0 +1,17 @@
+{
+    "DEFAULT": {
+        "log_when": "midnight",
+        "log_interval": "1",
+        "log_backup_count": "7",
+        "min_size_kb": "1"
+    },
+    "project": {
+        "url": "https://www.example.com/api/project",
+        "file_name": "project.json",
+        "directory": "projectdata"
+    },
+    "resource": {
+        "url": "https://www.example.com/api/resource",
+        "file_name": "resource.xml"
+    }
+}

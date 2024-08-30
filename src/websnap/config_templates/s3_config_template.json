@@ -1,0 +1,21 @@
+{
+    "DEFAULT": {
+        "log_when": "midnight",
+        "log_interval": "1",
+        "log_backup_count": "7",
+        "min_size_kb": "1",
+        "endpoint_url": "https://dreamycloud.com",
+        "aws_access_key_id": "1234567abcdefg",
+        "aws_secret_access_key": "hijklmn1234567"
+    },
+    "project": {
+        "url": "https://www.example.com/api/project",
+        "bucket": "exampledata",
+        "key": "project.json"
+    },
+    "resource": {
+        "url": "https://www.example.com/api/resource",
+        "bucket": "exampledata",
+        "key": "subdirectory_resource/resource.xml"
+    }
+}
