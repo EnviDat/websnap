@@ -168,7 +168,7 @@ def get_json_section_config_parser(
 
 
 def get_config_parser(
-    config: str, section_config: str | None, timeout: int = TIMEOUT
+    config: str, section_config: str | None = None, timeout: int = TIMEOUT
 ) -> configparser.ConfigParser | Exception:
     """
     Return ConfigParser object.

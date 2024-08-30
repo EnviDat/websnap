@@ -69,7 +69,7 @@ def websnap(
                 'config' argument is used.
                 Cannot be used to assign DEFAULT section in config (that must be
                 assigned in config specified by 'config' argument).
-                Only currently supports JSON config and can only be used if 'config'
+                Currently only supports JSON config and can only be used if 'config'
                 argument is also a JSON file.
     """
     # Validate integer arguments
