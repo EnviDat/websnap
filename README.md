@@ -129,18 +129,25 @@ websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440
 
 ### Configuration
 
-- A valid `.ini` configuration file is **required** for both function and CLI usage.
+- A valid `.ini` or `.json `configuration file is **required** for both function and 
+  CLI usage.
 - Websnap expects the config to be `config.ini` in the same directory as websnap 
   package is being executed from.
   - However, this can be changed using the `config` function argument (or CLI 
-   `--config` option).  
-- S3 config example file:
-  <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.ini" target="_blank">src/websnap/config_templates/s3_config_template.ini</a>
+   `--config` option).
 - All keys in tables below are **mandatory**.
 
-#### `[DEFAULT]` Section
+#### S3 Configuration Example Files
 
-Example S3 configuration `[DEFAULT]` section:
+| Format  | Example Configuration File                                                                                                                                                                   |
+|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.ini`  | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.ini" target="_blank">src/websnap/config_templates/s3_config_template.ini</a>   |
+| `.json` | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.json" target="_blank">src/websnap/config_templates/s3_config_template.json</a> |
+
+
+#### Default Configuration
+
+Example default S3 configuration:
 
 ```
 [DEFAULT]
@@ -218,15 +225,25 @@ websnap(file_logs=True, repeat_minutes=60)
 
 ### Configuration
 
-- A valid `.ini` configuration file is **required** for both function and CLI usage.
+- A valid `.ini` or `.json` configuration file is **required** for both function and 
+  CLI usage.
 - Websnap expects the config to be `config.ini` in the same directory as websnap 
   package is being executed from.
   - However, this can be changed using the `config` function argument (or CLI 
-   `--config` option).  
-- Local machine config example file:
-  <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>
+   `--config` option).
 - Each file that will be retrieved from an API requires its _own section_. 
 - If the optional `directory` key/value pair is omitted then the file will be written in the directory that the program is executed from.
+
+
+#### Configuration Example Files
+
+| Format  | Example Configuration File                                                                                                                                                             |
+|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.ini`  | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>   |
+| `.json` | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.json" target="_blank">src/websnap/config_templates/config_template.json</a> |
+
+
+#### Sections (one per API URL endpoint)
 
 Example local machine configuration section:
 
@@ -236,8 +253,6 @@ url=https://www.example.com/api/project
 file_name=project.json
 directory=projectdata
 ```
-
-#### Sections (one per API URL endpoint)
 
 | Key                      | Value Description                                 |
 |--------------------------|---------------------------------------------------|
@@ -271,10 +286,10 @@ log_backup_count=7
 ```
 
 #### `[DEFAULT]` Section
-| Key                | Default | Value Description                                                                                                               |
-|--------------------|---------|---------------------------------------------------------------------------------------------------------------------------------|
-| `log_when`         | `D`     | Specifies type of interval                                                                                                      |
-| `log_interval`     | `1`     | Duration of interval (must be positive integer)                                                                                 |
+| Key                | Default | Value Description                                                                                                              |
+|--------------------|---------|--------------------------------------------------------------------------------------------------------------------------------|
+| `log_when`         | `D`     | Specifies type of interval                                                                                                     |
+| `log_interval`     | `1`     | Duration of interval (must be positive integer)                                                                                |
 | `log_backup_count` | `0`     | If nonzero then at most <`log_backup_count`> files will be kept,</br>oldest log file is deleted (must be non-negative integer) |
 
 
