@@ -3,6 +3,8 @@
 import logging
 from enum import Enum
 
+
+TIMEOUT: int = 32
 MIN_SIZE_KB: int = 0
 
 

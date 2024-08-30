@@ -19,6 +19,7 @@ from project root directory without flags:
 
 import argparse
 import websnap
+from websnap.constants import TIMEOUT
 
 
 def parse_arguments() -> argparse.Namespace | None:
@@ -72,7 +73,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-t",
         "--timeout",
         type=int,
-        default=32,
+        default=TIMEOUT,
         help="Number of seconds to wait for response for each HTTP request.",
     )
 
@@ -91,6 +92,14 @@ def parse_arguments() -> argparse.Namespace | None:
         type=int,
         help="Run websnap continuously every <repeat_minutes>. "
         "If omitted then websnap does not repeat.",
+    )
+
+    parser.add_argument(
+        "-n",
+        "--section_config",
+        help="File or URL to obtain additional configuration sections. "
+        "Cannot be used to assign DEFAULT section in config. "
+        "Only currently supports JSON config.",
     )
 
     try:
@@ -115,6 +124,7 @@ def main():
         timeout=kwargs["timeout"],
         early_exit=kwargs["early_exit"],
         repeat_minutes=kwargs["repeat_minutes"],
+        section_config=kwargs["section_config"],
     )
 
 

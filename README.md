@@ -65,6 +65,7 @@ To access CLI documentation in terminal execute:
 | `timeout`         | `int`         | `32`           |
 | `early_exit`      | `bool`        | `False`        |
 | `repeat_minutes`  | `int \| None` | `None`         |
+| `section_config`  | `str \| None` | `None`         |
 
 ### CLI Options
 | Option              | Shortcut | Default      |
