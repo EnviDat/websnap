@@ -67,10 +67,12 @@ def websnap(
         section_config: File or URL to obtain additional configuration sections.
                 If omitted then default value is None and only config specified in
                 'config' argument is used.
-                Cannot be used to assign DEFAULT section in config (that must be
-                assigned in config specified by 'config' argument).
+                Cannot be used to assign DEFAULT values in the config (DEFAULT
+                values must be assigned in config specified by 'config' argument).
                 Currently only supports JSON config and can only be used if 'config'
                 argument is also a JSON file.
+                Duplicate sections will overwrite values with the same section
+                passed in the `config` argument.
     """
     # Validate integer arguments
     if backup_s3_count is not None:
