@@ -1,11 +1,16 @@
 # CHANGELOG
 
+## 1.3.1 (2024-08-30)
+### Docs
+- add JSON config template files
+- add links to JSON config template files in README
+
 ## 1.3.0 (2024-08-30)
 ### Feat
 - add `section_config` argument that allows optional additional configuration sections
 - `section_config` can be a URL or a path to a JSON configuration file
 ### Docs
-- added `section_config` description and limitations to options table 
+- add `section_config` description and limitations to options table 
 
 
 ## 1.2.11 (2024-08-20)
