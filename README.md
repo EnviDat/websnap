@@ -78,7 +78,7 @@ To access CLI documentation in terminal execute:
 | `--timeout`         | `-t`     | `32`         |
 | `--early_exit`      | `-e`     | `False`      |
 | `--repeat_minutes`  | `-r`     | `None`       |
-
+| `--section_config`  | `-n`     | `None`       |
 
 ### Description
 
@@ -92,7 +92,7 @@ To access CLI documentation in terminal execute:
 | `timeout` _(int)_                    | <ul><li>Number of seconds to wait for response for each HTTP request before timing out</li><li>Default value is `32` seconds</li></ul>                                                                                                                                                                                                                                |
 | `early_exit` _(bool)_                | <ul><li>Enable early program termination after error occurs</li><li>If omitted logs errors but continues program execution</li></ul>                                                                                                                                                                                                                                  |
 | `repeat_minutes` _(int \| None)_     | <ul><li>Run websnap continuously every `repeat_minutes` minutes</li><li>If omitted then websnap does not repeat</li></ul>                                                                                                                                                                                                                                             |
-
+| `section_config` _(str \| None)_     | <ul><li>File or URL to obtain additional configuration sections</li><li>If omitted then default value is None and only config specified in `config` argument is used</li><li>Cannot be used to assign "DEFAULT" section in config</li><li>Currently only supports JSON config and can only be used if `config` argument is also a JSON file</li></ul>                 |                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Usage: S3 Bucket
 
