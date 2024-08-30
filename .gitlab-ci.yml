@@ -25,8 +25,6 @@ nasa:
   script:
     pdm run websnap-cli --s3_uploader --config config_nasa.json --section_config "$SECTION_CONFIG_NASA_JSON" --early_exit
 
-
-
 publish-package:
   stage: publish
   image: python:3.11-slim-bookworm

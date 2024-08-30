@@ -45,8 +45,6 @@ def websnap(
     """
     Copies files hosted at URLs in config and then uploads them
     to S3 bucket or local machine.
-    Optionally customize rotating logs.
-    Optionally repeat websnap file processing iteration.
 
     Args:
         config: Path to .ini or .json configuration file.
