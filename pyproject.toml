@@ -51,6 +51,7 @@ websnap_cli = "websnap.websnap_cli:main"
 
 [tool.pdm.scripts]
 websnap-cli = {call = "websnap.websnap_cli:main"}
+pytest = {call="pytest"}
 
 [tool.pdm.dev-dependencies]
 dev = [

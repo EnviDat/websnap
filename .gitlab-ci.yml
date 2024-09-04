@@ -13,7 +13,7 @@ test:
     - pip install pdm
     - pdm install --dev
   script:
-    - pytest
+    - pdm run pytest
 
 backup:
   stage: backup
