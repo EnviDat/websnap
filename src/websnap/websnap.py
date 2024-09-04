@@ -29,8 +29,6 @@ __all__ = ["websnap"]
 LOGGER_NAME = "websnap"
 
 
-# TODO add section_config to README
-# TODO mention URL must be quoted
 def websnap(
     config: str = "config.ini",
     log_level: str = "INFO",
