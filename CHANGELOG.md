@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.3.2 (2024-09-04)
+### Tests
+- implement pytest tests and fixtures
+- add automated test job to pipeline 
+
+
 ## 1.3.1 (2024-08-30)
 ### Docs
 - add JSON config template files
