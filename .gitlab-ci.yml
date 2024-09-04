@@ -1,9 +1,19 @@
 image: python:latest
 
 stages:
+  - test
   - backup
   - nasa
   - publish
+
+
+test:
+  stage: test
+  before_script:
+    - pip install pdm
+    - pip install --dev
+  script:
+    - pytest
 
 backup:
   stage: backup

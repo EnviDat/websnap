@@ -1,9 +1,9 @@
 {
     "DEFAULT": {
         "log_when": "midnight",
-        "log_interval": "1",
-        "log_backup_count": "7",
-        "min_size_kb": "1"
+        "log_interval": 1,
+        "log_backup_count": 7,
+        "min_size_kb": 1
     },
     "project": {
         "url": "https://www.example.com/api/project",

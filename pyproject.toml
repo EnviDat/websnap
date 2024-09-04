@@ -55,4 +55,5 @@ websnap-cli = {call = "websnap.websnap_cli:main"}
 [tool.pdm.dev-dependencies]
 dev = [
     "pre-commit>=3.8.0",
+    "pytest>=8.3.2",
 ]
