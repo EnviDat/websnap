@@ -11,7 +11,7 @@ test:
   stage: test
   before_script:
     - pip install pdm
-    - pip install --dev
+    - pdm install --dev
   script:
     - pytest
 
