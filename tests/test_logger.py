@@ -3,7 +3,6 @@
 import logging
 import pytest
 
-from tests.test_websnap import config_log
 from websnap.logger import get_custom_logger, get_log_level, get_console_handler
 from websnap.validators import get_config_parser, validate_log_config
 
@@ -19,7 +18,6 @@ def log_config_model(config_parser_log):
 
 
 def test_get_custom_logger(log_config_model):
-
     log = get_custom_logger(name="websnap", config=log_config_model, file_logs=True)
 
     assert isinstance(log, logging.Logger)
