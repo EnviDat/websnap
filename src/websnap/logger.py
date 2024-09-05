@@ -68,9 +68,9 @@ def get_file_handler(
 
 def get_custom_logger(
     name: str,
+    config: LogConfigModel,
     level: str = "INFO",
     file_logs: bool = False,
-    config: LogConfigModel | None = None,
 ) -> logging.getLogger:
     """
     Return logger with console handler and optional file handler.
@@ -78,9 +78,9 @@ def get_custom_logger(
 
     Args:
         name: Name of logger.
+        config: Validated log config.
         level: Logging level represented as string.
         file_logs: If True then implements rotating file logs.
-        config: Validated log config.
     """
     try:
         _loglevel = level.upper()
