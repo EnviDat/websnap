@@ -19,6 +19,11 @@ def config_basic(tmp_path):
 
 
 @pytest.fixture
+def config_parser_basic(config_basic):
+    return get_config_parser(config_basic[0])
+
+
+@pytest.fixture
 def config_log(tmp_path):
 
     log_config = {
