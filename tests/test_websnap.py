@@ -9,18 +9,6 @@ from websnap import websnap
 
 
 @pytest.fixture
-def config_basic(tmp_path):
-
-    file_name = "output_basic.json"
-    section_config = get_section_config(tmp_path, file_name)
-    config_path = f"{str(tmp_path)}/config_basic.json"
-
-    write_json_config(config_path, section_config)
-
-    return config_path, tmp_path, file_name
-
-
-@pytest.fixture
 def config_min_size_kb(tmp_path):
 
     default_config = {"DEFAULT": {"min_size_kb": 1}}

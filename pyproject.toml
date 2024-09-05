@@ -56,4 +56,5 @@ websnap-cli = {call = "websnap.websnap_cli:main"}
 dev = [
     "pre-commit>=3.8.0",
     "pytest>=8.3.2",
+    "pytest-cov>=5.0.0",
 ]

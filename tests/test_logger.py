@@ -3,22 +3,18 @@
 import logging
 import pytest
 
-from websnap.logger import get_custom_logger, get_log_level, get_console_handler
-from websnap.validators import get_config_parser, validate_log_config
-
-
-@pytest.fixture
-def config_parser_log(config_log):
-    return get_config_parser(config_log[0])
-
-
-@pytest.fixture
-def log_config_model(config_parser_log):
-    return validate_log_config(config_parser_log)
+from websnap.logger import (
+    get_custom_logger,
+    get_log_level,
+    get_console_handler,
+    get_file_handler,
+)
 
 
 def test_get_custom_logger(log_config_model):
-    log = get_custom_logger(name="websnap", config=log_config_model, file_logs=True)
+    log = get_custom_logger(
+        name="websnap_logger", config=log_config_model, file_logs=True
+    )
 
     assert isinstance(log, logging.Logger)
 
@@ -36,3 +32,12 @@ def test_get_log_level():
 
 def test_get_console_handler():
     assert isinstance(get_console_handler(), logging.StreamHandler)
+
+
+@pytest.mark.parametrize(
+    "filename, when, interval, backup",
+    [("websnap1.log", "D", 1, 1), ("websnap2.log", "midnight", 2, 3)],
+)
+def test_get_log_config(filename, when, interval, backup):
+    file_handler = get_file_handler(filename, when, interval, backup)
+    assert isinstance(file_handler, logging.FileHandler)
