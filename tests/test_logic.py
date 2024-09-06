@@ -8,27 +8,6 @@ from websnap.logic import terminate_program, get_url_content, is_min_size_kb
 
 
 @pytest.fixture
-def config_logic(tmp_path):
-
-    error_config = {
-        "error-response": {
-            "directory": str(tmp_path),
-            "file_name": "error_response.json",
-            "url": "https://httpbin.org/status/400",
-        },
-    }
-
-    file_name = "output_logic_valid.json"
-    section_config = get_section_config(tmp_path, file_name)
-    conf_dict = error_config | section_config
-
-    config_path = f"{str(tmp_path)}/config_logic.json"
-    write_json_config(config_path, conf_dict)
-
-    return config_path, tmp_path, file_name
-
-
-@pytest.fixture
 def log_logic(log_config_model):
     return get_custom_logger(name="websnap_logic", config=log_config_model)
 
@@ -79,3 +58,8 @@ def test_is_min_size_kb(
 
 def test_terminate_program():
     assert terminate_program(False) is None
+
+
+def test_terminate_program_exit():
+    with pytest.raises(SystemExit):
+        terminate_program(True)

@@ -25,9 +25,33 @@ def get_s3_config():
             "aws_access_key_id": "1234567abcdefg",
             "aws_secret_access_key": "hijklmn1234567",
         },
-        "pypi-websnap": {
+        "pypi-websnap-s3": {
             "url": "https://pypi.org/pypi/websnap/json",
             "bucket": "pypi",
             "key": "output_s3.json",
+        },
+    }
+
+
+def get_s3_config_invalid():
+    return {
+        "DEFAULT": {
+            "endpoint_url": "not a real URL",
+            "aws_access_key_id": "1234567abcdefg",
+            "aws_secret_access_key": "hijklmn1234567",
+        },
+        "pypi-websnap-s3_invalid_key": {
+            "url": "https://pypi.org/pypi/websnap/json",
+            "bucket": "pypi",
+            "key": "/output_s3.json",
+        },
+        "pypi-websnap-s3_invalid_key2": {
+            "url": "https://pypi.org/pypi/websnap/json",
+            "bucket": "pypi",
+            "key": "output_s3json",
+        },
+        "no-bucket": {
+            "url": "https://pypi.org/pypi/websnap/json",
+            "key": "output_s3json",
         },
     }

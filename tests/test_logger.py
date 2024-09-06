@@ -22,6 +22,7 @@ def test_get_custom_logger(log_config_model):
     for handler in log.handlers:
         if isinstance(handler, logging.FileHandler):
             file_handler_exists = True
+
     assert file_handler_exists
 
 
