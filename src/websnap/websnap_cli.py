@@ -102,11 +102,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "Only currently supports JSON config.",
     )
 
-    try:
-        return parser.parse_args()
-    except (argparse.ArgumentTypeError, Exception) as e:
-        print(f"Exception: {e} ")
-        return None
+    return parser.parse_args()
 
 
 def main():
@@ -126,7 +122,3 @@ def main():
         repeat_minutes=kwargs["repeat_minutes"],
         section_config=kwargs["section_config"],
     )
-
-
-if __name__ == "__main__":
-    main()
