@@ -84,7 +84,7 @@ def get_custom_logger(
     """
     try:
         _loglevel = level.upper()
-    except AttributeError:
+    except AttributeError:  # pragma: no cover
         raise Exception("Argument loglevel must be a string")
 
     logger = logging.getLogger(name)

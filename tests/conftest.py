@@ -2,7 +2,7 @@
 
 import pytest
 
-from tests.helpers import get_section_config, write_json_config
+from tests.helpers import get_section_config, write_json_config, get_s3_config
 from websnap.validators import get_config_parser, validate_log_config
 
 
@@ -51,3 +51,16 @@ def config_parser_log(config_log):
 @pytest.fixture
 def log_config_model(config_parser_log):
     return validate_log_config(config_parser_log)
+
+
+@pytest.fixture
+def config_s3(tmp_path):
+    s3_config = get_s3_config()
+    config_path = f"{str(tmp_path)}/config_s3.json"
+    write_json_config(config_path, s3_config)
+    return config_path, tmp_path
+
+
+@pytest.fixture
+def config_parser_s3(config_s3):
+    return get_config_parser(config_s3[0])
