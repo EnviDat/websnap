@@ -77,18 +77,18 @@ def websnap(
         valid_backup_s3_count = validate_positive_integer(backup_s3_count)
         if not isinstance(valid_backup_s3_count, int):
             raise Exception(
-                f"Invalid argument for backup_s3_count. {valid_backup_s3_count}"
+                f"Invalid argument for backup_s3_count: {valid_backup_s3_count}"
             )
 
     valid_timeout = validate_positive_integer(timeout)
     if not isinstance(valid_timeout, int):
-        raise Exception(f"Invalid argument for timeout. {valid_timeout}")
+        raise Exception(f"Invalid argument for timeout: {valid_timeout}")
 
     if repeat_minutes is not None:
         valid_repeat_minutes = validate_positive_integer(repeat_minutes)
         if not isinstance(valid_repeat_minutes, int):
             raise Exception(
-                f"Invalid argument for repeat_minutes. {valid_repeat_minutes}"
+                f"Invalid argument for repeat_minutes: {valid_repeat_minutes}"
             )
 
     # Validate log settings in config and setup log

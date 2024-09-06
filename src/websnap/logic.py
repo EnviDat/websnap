@@ -66,7 +66,7 @@ def get_url_content(
 
         return response.content
 
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout:  # pragma: no cover
         log.error(
             f"Config section '{section}': "
             f"URL timed out while waiting {timeout} seconds for response"
@@ -180,7 +180,7 @@ def write_urls_locally(
 
 def handle_s3_client_error(
     err: ClientError, log: logging.getLogger, section: str, early_exit: bool
-) -> None:
+) -> None:  # pragma: no cover
     """
     Handles and logs botocore.exceptions.ClientError returned by failed S3 client
     method call.
@@ -450,7 +450,7 @@ def write_urls_to_s3(
 
 def sleep_until_next_iteration(
     sleep_minutes: int, start_time: float, log: logging.getLogger
-) -> None:
+) -> None:  # pragma: no cover
     """
     Sleep (delay execution) <sleep_minutes> minutes until next websnap iteration.
 

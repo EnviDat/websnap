@@ -92,7 +92,7 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exc
 
     except FileNotFoundError:
         return Exception(f"File '{config_path}' not found")
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return Exception(e)
 
 
@@ -123,11 +123,11 @@ def get_url_json_config_parser(
 
         return config_parser
 
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout:  # pragma: no cover
         return Exception(
             f"URL {config_url} timed out while waiting {timeout} seconds for response"
         )
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return Exception(e)
 
 
@@ -161,9 +161,7 @@ def get_json_section_config_parser(
 
         return section_parser
 
-    except FileNotFoundError:
-        return Exception(f"File '{section_config}' not found")
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return Exception(e)
 
 
@@ -210,9 +208,7 @@ def get_config_parser(
 
         return config_parser
 
-    except FileNotFoundError:
-        return Exception(f"File '{config}' not found")
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return Exception(e)
 
 
@@ -273,7 +269,8 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exce
             return min_size_kb
         else:
             raise ValueError(
-                "Value for config value 'min_size_kb' must be greater than 0"
+                "Value for config value 'min_size_kb' must be greater than or equal "
+                "to 0"
             )
     except ValidationError as e:
         return Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
@@ -357,9 +354,7 @@ def validate_s3_config(
         return S3ConfigModel(**s3_conf)
     except ValidationError as e:
         return Exception(f"Failed to validate S3 config, error(s): {e}")
-    except ValueError as e:
-        return Exception(f"Incorrect value in S3 config, error(s): {e}")
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return Exception(e)
 
 
@@ -409,10 +404,6 @@ def validate_s3_config_section(
     except ValidationError as e:
         return Exception(
             f"Failed to validate config section '{section}', error(s): {e}"
-        )
-    except ValueError as e:
-        return Exception(
-            f"Incorrect value in config section '{section}', error(s): {e}"
         )
     except Exception as e:
         return Exception(f"{e}")
