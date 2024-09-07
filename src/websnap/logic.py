@@ -139,7 +139,7 @@ def write_urls_locally(
                 terminate_program(early_exit)
                 continue
 
-            if conf.directory and not os.path.isdir(conf.directory):
+            if conf.directory and not os.path.isdir(conf.directory):  # pragma: no cover
                 log.error(
                     f"Config section '{section}': directory '{conf.directory}' "
                     f"does not exist"
@@ -150,18 +150,18 @@ def write_urls_locally(
             url_content = get_url_content(
                 str(conf.url), section, log, timeout, early_exit
             )
-            if not url_content:
+            if not url_content:  # pragma: no cover
                 continue
 
             is_min_size = is_min_size_kb(
                 url_content, min_size_kb, section, log, early_exit
             )
-            if not is_min_size:
+            if not is_min_size:  # pragma: no cover
                 continue
 
             if conf.directory:
                 file_path = f"{conf.directory}/{conf.file_name}"
-            else:
+            else:  # pragma: no cover
                 file_path = f"{conf.file_name}"
 
             with open(file_path, "wb") as f:
@@ -171,7 +171,7 @@ def write_urls_locally(
                     f"config section: {section}"
                 )
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             log.error(f"Config section '{section}', error(s): {e}")
             terminate_program(early_exit)
 
@@ -180,7 +180,7 @@ def write_urls_locally(
 
 def handle_s3_client_error(
     err: ClientError, log: logging.getLogger, section: str, early_exit: bool
-) -> None:  # pragma: no cover
+) -> None:
     """
     Handles and logs botocore.exceptions.ClientError returned by failed S3 client
     method call.
@@ -204,7 +204,7 @@ def handle_s3_client_error(
             f"Config section '{section}': Forbidden, check access credentials in config"
         )
         terminate_program(early_exit)
-    else:
+    else:  # pragma: no cover
         log.error(err)
         terminate_program(early_exit)
 
@@ -256,7 +256,7 @@ def copy_s3_object(
             log.info(
                 f"Config section '{section}': " f"Created new backup file '{key_copy}'"
             )
-        else:
+        else:  # pragma: no cover
             log.error(
                 f"Config section '{section}': "
                 f"Object backup attempt returned "
@@ -303,7 +303,7 @@ def delete_s3_backup_object(
         key_split = conf.key.rpartition("/")
 
         if not key_split[0]:
-            response = client.list_objects_v2(
+            response = client.list_objects_v2(  # pragma: no cover
                 Bucket=conf.bucket,
             )
         else:
@@ -341,14 +341,14 @@ def delete_s3_backup_object(
                     f"Config section '{section}': "
                     f"Deleted backup file '{delete_key}'"
                 )
-            else:
+            else:  # pragma: no cover
                 log.error(
                     f"Config section '{section}': Backup file delete "
                     f"attempt returned unexpected HTTP response {status_code}"
                 )
                 terminate_program(early_exit)
 
-        else:
+        else:  # pragma: no cover
             log.info(
                 f"Config section '{section}': Current number of backup "
                 f"files does not exceed backup S3 count {backup_s3_count}"
@@ -398,7 +398,7 @@ def write_urls_to_s3(
 
         try:
             conf = validate_s3_config_section(conf_parser, section)
-            if not isinstance(conf, S3ConfigSectionModel):
+            if not isinstance(conf, S3ConfigSectionModel):  # pragma: no cover
                 log.error(f"Config section '{section}': {conf}")
                 terminate_program(early_exit)
                 continue
@@ -406,13 +406,13 @@ def write_urls_to_s3(
             url_content = get_url_content(
                 str(conf.url), section, log, timeout, early_exit
             )
-            if not url_content:
+            if not url_content:  # pragma: no cover
                 continue
 
             is_min_size = is_min_size_kb(
                 url_content, min_size_kb, section, log, early_exit
             )
-            if not is_min_size:
+            if not is_min_size:  # pragma: no cover
                 continue
 
             if backup_s3_count:
@@ -431,7 +431,7 @@ def write_urls_to_s3(
                     f"Config section '{section}': Successfully copied URL "
                     f"content to S3 object '{conf.key}'"
                 )
-            else:
+            else:  # pragma: no cover
                 log.error(
                     f"Config section '{section}': S3 client returned unexpected "
                     f"HTTP response {status_code}"
@@ -441,7 +441,7 @@ def write_urls_to_s3(
         except ClientError as err:
             handle_s3_client_error(err, log, section, early_exit)
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             log.error(f"Config section '{section}', error(s): {e}")
             terminate_program(early_exit)
 

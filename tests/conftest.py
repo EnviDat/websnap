@@ -1,4 +1,7 @@
-"""Tests configuration with shared websnap config fixtures."""
+"""Tests configuration with custom argument and shared websnap config fixtures."""
+
+import json
+import os
 
 import pytest
 
@@ -11,9 +14,63 @@ from tests.helpers import (
 from websnap.validators import get_config_parser, validate_log_config
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--s3-config",
+        action="store",
+        default=None,
+        help="Optional configuration file used to test websnap S3 functionality",
+    )
+
+
+def pytest_configure(config):
+
+    s3_config = config.getoption("--s3-config")
+
+    if s3_config is None:
+        return
+
+    if not os.path.exists(s3_config):
+        raise pytest.UsageError(f"S3 config '{s3_config}' does not exist")
+
+    with open(s3_config) as config_file:
+        s3_config_dict = json.load(config_file)
+
+    if "DEFAULT" not in s3_config_dict:
+        raise pytest.UsageError(
+            f"S3 config '{s3_config}' is missing 'DEFAULT' configuration"
+        )
+
+    for ky in ["endpoint_url", "aws_access_key_id", "aws_secret_access_key"]:
+        if ky not in s3_config_dict["DEFAULT"]:
+            raise pytest.UsageError(
+                f"S3 config '{s3_config}' is missing required 'DEFAULT' setting '{ky}'"
+            )
+
+    for section in s3_config_dict:
+        if section == "DEFAULT":
+            continue
+        for setting in ["url", "bucket", "key"]:
+            if setting not in s3_config_dict[section]:
+                raise pytest.UsageError(
+                    f"S3 config '{s3_config}' section '{section}' is missing required "
+                    f"setting '{setting}'"
+                )
+
+
+@pytest.fixture
+def s3_config(request):
+
+    s3_config_path = request.config.getoption("--s3-config")
+
+    if not s3_config_path:
+        return None
+
+    return s3_config_path
+
+
 @pytest.fixture
 def config_basic(tmp_path):
-
     file_name = "output_basic.json"
     section_config = get_section_config(tmp_path, file_name)
     config_path = f"{str(tmp_path)}/config_basic.json"
@@ -30,7 +87,6 @@ def config_parser_basic(config_basic):
 
 @pytest.fixture
 def config_min_size_kb(tmp_path):
-
     default_config = {"DEFAULT": {"min_size_kb": 1}}
     file_name = "output_min_size_kb.json"
     section_config = get_section_config(tmp_path, file_name)
@@ -44,7 +100,6 @@ def config_min_size_kb(tmp_path):
 
 @pytest.fixture
 def config_log(tmp_path):
-
     log_config = {
         "DEFAULT": {
             "log_when": "midnight",

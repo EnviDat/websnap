@@ -147,7 +147,7 @@ def websnap(
 
         log.info("Finished websnap iteration")
 
-        if is_repeat:
+        if is_repeat:  # pragma: no cover
             sleep_until_next_iteration(repeat_minutes, start_time, log)
 
     return

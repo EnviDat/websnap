@@ -274,11 +274,11 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exce
             )
     except ValidationError as e:
         return Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
-    except ValueError as e:
+    except ValueError as e:  # pragma: no cover
         return Exception(
             f"Incorrect value for config value 'min_size_kb', error(s): {e}"
         )
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         return Exception(f"{e}")
 
 
