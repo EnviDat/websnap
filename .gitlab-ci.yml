@@ -14,8 +14,10 @@ test:
   before_script:
     - pip install pdm
     - pdm install --dev
+    - echo "$TEST_CONFIG_JSON" > config_test.json
+    - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
-    - pdm run pytest --cov=websnap --cov-report=term --no-cov-on-fail
+    - pdm run pytest --cov=websnap --cov-report=term --no-cov-on-fail --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
 
 backup:
