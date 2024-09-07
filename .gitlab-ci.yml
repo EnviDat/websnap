@@ -15,10 +15,7 @@ test:
     - pip install pdm
     - pdm install --dev
   script:
-    - pdm run pytest --cov=websnap --cov-report=xml
-  artifacts:
-    paths:
-      - coverage.xml
+    - pdm run pytest --cov=websnap --cov-report=term --no-cov-on-fail
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
 
 backup:
