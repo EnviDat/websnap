@@ -19,7 +19,7 @@ test:
   artifacts:
     paths:
       - coverage.xml
-  coverage: "/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/"
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
 
 backup:
   stage: backup
