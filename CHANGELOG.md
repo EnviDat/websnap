@@ -1,10 +1,12 @@
 # CHANGELOG
 
+## 1.3.3 (2024-09-08)
+### Tests
+- increase test coverage 
+
 ## 1.3.2 (2024-09-04)
 ### Tests
 - implement pytest tests and fixtures
-- add automated test job to pipeline 
-
 
 ## 1.3.1 (2024-08-30)
 ### Docs
@@ -17,7 +19,6 @@
 - `section_config` can be a URL or a path to a JSON configuration file
 ### Docs
 - add `section_config` description and limitations to options table 
-
 
 ## 1.2.11 (2024-08-20)
 ### Refactor
