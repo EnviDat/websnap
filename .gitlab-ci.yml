@@ -9,8 +9,6 @@ stages:
 
 test:
   stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
   before_script:
     - pip install pdm
     - pdm install --dev
