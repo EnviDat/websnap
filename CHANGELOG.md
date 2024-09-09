@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.3.4 (2024-09-09)
+### Docs
+- add black badge
+- implement collapsible sections to improve readability of README
+
 ## 1.3.3 (2024-09-08)
 ### Tests
 - increase test coverage 
