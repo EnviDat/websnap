@@ -16,7 +16,7 @@ test:
     - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
     - pdm run pytest --cov=websnap --cov-report=term --no-cov-on-fail --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
-  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  coverage: '/TOTAL.*\s+(\d+)%/'
 
 backup:
   stage: backup

@@ -5,6 +5,7 @@
   <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
   <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
   <img alt="Coverage" src="https://gitlabext.wsl.ch/EnviDat/websnap/badges/main/coverage.svg?job=test&min_good=90">
+  <img alt="Code Style - Black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
 </div>
 
 ### Copies files retrieved from an API to a S3 bucket or a local machine.
@@ -55,6 +56,11 @@ To access CLI documentation in terminal execute:
 
 ## Function Parameters / CLI Options
 
+<details>
+  <summary>
+  Click to unfold function parameters / CLI options
+  </summary>
+
 ### Function Parameters
 | Parameter         | Type          | Default        |
 |-------------------|---------------|----------------|
@@ -95,7 +101,16 @@ To access CLI documentation in terminal execute:
 | `repeat_minutes` _(int \| None)_     | <ul><li>Run websnap continuously every `repeat_minutes` minutes</li><li>If omitted then websnap does not repeat</li></ul>                                                                                                                                                                                                                                                                                                                                     |
 | `section_config` _(str \| None)_     | <ul><li>File or URL to obtain additional configuration sections</li><li>If omitted then default value is `None` and only config specified in `config` argument is used</li><li>Cannot be used to assign "DEFAULT" values in config</li><li>Currently only supports JSON config and can only be used if `config` argument is also a JSON file</li><li>Duplicate sections will overwrite values with the same section passed in the `config` argument</li></ul> |                                                                                                                                                                                                                                                                                                                                                                      |
 
+
+</details>
+
 ## Usage: S3 Bucket
+
+<details>
+  <summary>
+  Click to unfold S3 bucket usage
+  </summary>
+
 
 ### **Copy files retrieved from an API to a S3 bucket.**
 
@@ -187,7 +202,6 @@ bucket=exampledata
 key=project.json
 ```
 
-
 | Key      | Value Description                                       |
 |----------|---------------------------------------------------------|
 | `url`    | API URL endpoint that file will be retrieved from       |
@@ -195,7 +209,15 @@ key=project.json
 | `key`    | File name with extension, can optionally include prefix |
 
 
+</details>
+
+
 ## Usage: Local Machine
+
+<details>
+  <summary>
+  Click to unfold local machine usage
+  </summary>
 
 ### **Copy files retrieved from an API to a local machine.** 
 
@@ -261,9 +283,15 @@ directory=projectdata
 | `file_name`              | File name with extension                          |
 | `directory` (_optional_) | Local directory name that file will be written in |
 
----
+</details>
+
 
 ## Logs
+
+<details>
+  <summary>
+  Click to unfold logs
+  </summary>
 
 Websnap supports optional rotating file logs.
 
@@ -294,7 +322,15 @@ log_backup_count=7
 | `log_backup_count` | `0`     | If nonzero then at most <`log_backup_count`> files will be kept,</br>oldest log file is deleted (must be non-negative integer) |
 
 
+</details>
+
+
 ## Minimum Download Size
+
+<details>
+  <summary>
+  Click to unfold minimum download size
+  </summary>
 
 Websnap supports optionally specifying the minimum download size (in kilobytes) a 
 file must be to copy it from the configured API URL endpoint.
@@ -321,6 +357,9 @@ min_size_kb=1
 | Key           | Default | Value Description                                                 |
 |---------------|---------|-------------------------------------------------------------------|
 | `min_size_kb` | `0`     | Minimum download size in kilobytes (must be non-negative integer) |
+
+
+</details>
 
 
 ## Author
