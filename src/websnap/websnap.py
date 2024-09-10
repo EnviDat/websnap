@@ -3,7 +3,6 @@ Function websnap() downloads files from URLs and uploads them to S3 bucket.
 Also supports writing downloaded files to local machine.
 """
 
-import configparser
 import logging
 import time
 
@@ -13,8 +12,6 @@ from websnap.validators import (
     validate_log_config,
     validate_s3_config,
     validate_min_size_kb,
-    S3ConfigModel,
-    LogConfigModel,
     validate_positive_integer,
 )
 from websnap.logger import get_custom_logger

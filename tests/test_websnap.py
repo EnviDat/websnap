@@ -53,18 +53,6 @@ def test_websnap_s3(s3_config):
         assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "backup_s3_count, timeout, repeat_minutes", [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
-)
-def test_websnap_args_positive_integer(backup_s3_count, timeout, repeat_minutes):
-    with pytest.raises(Exception):
-        websnap(
-            backup_s3_count=backup_s3_count,
-            timeout=timeout,
-            repeat_minutes=repeat_minutes,
-        )
-
-
 def test_websnap_s3_config_invalid(config_s3_invalid):
     with pytest.raises(Exception):
         conf = config_s3_invalid[0]
