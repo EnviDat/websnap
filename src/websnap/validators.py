@@ -36,6 +36,44 @@ def validate_positive_integer(x: Any) -> int:
         raise Exception(f"{x} is not a a positive integer")
 
 
+def validate_positive_integer_arguments(
+    timeout: int, backup_s3_count: int | None = None, repeat_minutes: int | None = None
+) -> None:
+    """
+    Return None is validation passes: arguments are positive integers.
+    If validation fails then raises Exception.
+    None values are allowed for arguments backup_s3_count and repeat_minutes
+    (validation still passes).
+
+    Args:
+        timeout: Number of seconds to wait for response for each HTTP request.
+            If integer passed then it must be a positive integer.
+        backup_s3_count: Copy and backup S3 objects in each config section
+            <backup_s3_count> times,
+            remove object with the oldest last modified timestamp.
+            If integer passed then it must be a positive integer.
+        repeat_minutes: Run websnap continuously every <repeat> minutes
+               If integer passed then it must be a positive integer.
+    """
+    param_arg_dict = {
+        "timeout": timeout,
+        "backup_s3_count": backup_s3_count,
+        "repeat_minutes": repeat_minutes,
+    }
+
+    key = None
+    try:
+        for key, value in param_arg_dict.items():
+            if key == "timeout":
+                validate_positive_integer(value)
+            elif value is not None:
+                validate_positive_integer(value)
+    except Exception as e:
+        raise Exception(f"Invalid argument passed for parameter {key}: {e}")
+
+    return
+
+
 def is_url(x: Any) -> bool:
     """
     Return True if x is a URL. Else return False.

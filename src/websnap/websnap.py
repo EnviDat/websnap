@@ -13,6 +13,7 @@ from websnap.validators import (
     validate_s3_config,
     validate_min_size_kb,
     validate_positive_integer,
+    validate_positive_integer_arguments,
 )
 from websnap.logger import get_custom_logger
 from websnap.logic import (
@@ -69,20 +70,15 @@ def websnap(
                 Duplicate sections will overwrite values with the same section
                 passed in the `config` argument.
     """
-    # Validate arguments that are required to be positive integers
-    arg = None
+    # Validate integer arguments
     try:
-        if backup_s3_count is not None:
-            arg = "backup_s3_count"
-            validate_positive_integer(backup_s3_count)
-        if timeout:
-            arg = "timeout"
-            validate_positive_integer(timeout)
-        if repeat_minutes is not None:
-            arg = "repeat_minutes"
-            validate_positive_integer(repeat_minutes)
+        validate_positive_integer_arguments(
+            timeout=timeout,
+            backup_s3_count=backup_s3_count,
+            repeat_minutes=repeat_minutes,
+        )
     except Exception as e:
-        raise Exception(f"Invalid argument passed for '{arg}': {e}")
+        raise e
 
     # Validate configuration
     try:
