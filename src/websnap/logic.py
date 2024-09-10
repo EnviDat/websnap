@@ -180,7 +180,7 @@ def write_urls_locally(
 
 def handle_s3_client_error(
     err: ClientError, log: logging.getLogger, section: str, early_exit: bool
-) -> None:
+) -> None:  # pragma: no cover
     """
     Handles and logs botocore.exceptions.ClientError returned by failed S3 client
     method call.
@@ -204,7 +204,7 @@ def handle_s3_client_error(
             f"Config section '{section}': Forbidden, check access credentials in config"
         )
         terminate_program(early_exit)
-    else:  # pragma: no cover
+    else:
         log.error(err)
         terminate_program(early_exit)
 

@@ -20,10 +20,9 @@ from typing import Optional, Any
 from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
 
-def validate_positive_integer(x: Any) -> int | Exception:
+def validate_positive_integer(x: Any) -> int:
     """
     Return x if it is a positive integer.
-    Return Exception if x is not a positive integer.
 
     Args:
         x: The input value.
@@ -33,10 +32,8 @@ def validate_positive_integer(x: Any) -> int | Exception:
     try:
         ta.validate_python(x)
         return x
-    except ValidationError as e:
-        return Exception(
-            f"Invalid value {x} (it must be a positive integer), error: {e}"
-        )
+    except ValidationError:
+        raise Exception(f"{x} is not a a positive integer")
 
 
 def is_url(x: Any) -> bool:
@@ -73,10 +70,9 @@ def merge_config_parsers(
     return config_1
 
 
-def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exception:
+def get_json_config_parser(config_path: Path) -> configparser.ConfigParser:
     """
     Returns ConfigParser instance with items read from JSON config file.
-    Returns Exception if fails.
 
     Args:
         config_path: Path object to the .json config file.
@@ -91,17 +87,16 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser | Exc
         return config_parser
 
     except FileNotFoundError:
-        return Exception(f"File '{config_path}' not found")
+        raise Exception(f"File '{config_path}' not found")
     except Exception as e:  # pragma: no cover
-        return Exception(e)
+        raise Exception(e)
 
 
 def get_url_json_config_parser(
     config_url: str, timeout: int = TIMEOUT
-) -> configparser.ConfigParser | Exception:
+) -> configparser.ConfigParser:
     """
     Returns ConfigParser instance with items read from JSON config URL.
-    Returns Exception if fails.
 
     Args:
         config_url: URL with additional configuration sections.
@@ -111,7 +106,7 @@ def get_url_json_config_parser(
         response = requests.get(config_url, timeout=timeout)
 
         if not response.ok:
-            return Exception(
+            raise Exception(
                 f"URL {config_url} returned unsuccessful "
                 f"status code {response.status_code}"
             )
@@ -124,20 +119,19 @@ def get_url_json_config_parser(
         return config_parser
 
     except requests.exceptions.Timeout:  # pragma: no cover
-        return Exception(
+        raise Exception(
             f"URL {config_url} timed out while waiting {timeout} seconds for response"
         )
     except Exception as e:  # pragma: no cover
-        return Exception(e)
+        raise Exception(e)
 
 
 def get_json_section_config_parser(
     section_config: str, timeout: int = TIMEOUT
-) -> configparser.ConfigParser | Exception:
+) -> configparser.ConfigParser:
     """
     Returns ConfigParser instance with items read from JSON section config file.
     Cannot be used to assign DEFAULT section in returned ConfigParser instance.
-    Returns Exception if fails.
 
     Args:
         section_config: File or URL with additional configuration sections.
@@ -151,26 +145,25 @@ def get_json_section_config_parser(
             if (section_path := Path(section_config)).suffix == ".json":
                 section_parser = get_json_config_parser(section_path)
             else:
-                return Exception("Section config extension must be '.json'")
+                raise Exception("Section config extension must be '.json'")
 
         if not isinstance(section_parser, configparser.ConfigParser):
-            return Exception(section_parser)
+            raise Exception(section_parser)
 
         if section_parser.defaults():
-            return Exception(f"Section config cannot have a 'DEFAULT' section")
+            raise Exception(f"Section config cannot have a 'DEFAULT' section")
 
         return section_parser
 
     except Exception as e:  # pragma: no cover
-        return Exception(e)
+        raise Exception(e)
 
 
 def get_config_parser(
     config: str, section_config: str | None = None, timeout: int = TIMEOUT
-) -> configparser.ConfigParser | Exception:
+) -> configparser.ConfigParser:
     """
     Return ConfigParser object.
-    Returns Exception if fails.
     If section_config passed then merges config and section_config
     into one ConfigParser instance.
 
@@ -184,32 +177,28 @@ def get_config_parser(
         conf_path = Path(config)
 
         if section_config and conf_path.suffix != ".json":
-            return Exception(
+            raise Exception(
                 f"Config '{config}' extension must be '.json' to also use "
                 f"optional section config '{section_config}'"
             )
         elif conf_path.suffix == ".json":
             config_parser = get_json_config_parser(conf_path)
-            if not isinstance(config_parser, configparser.ConfigParser):
-                return Exception(config_parser)
             if section_config:
                 section_parser = get_json_section_config_parser(section_config, timeout)
-                if not isinstance(section_parser, configparser.ConfigParser):
-                    return Exception(section_parser)
                 config_parser = merge_config_parsers(config_parser, section_parser)
-        else:
+        else:  # pragma: no cover
             config_parser = configparser.ConfigParser()
             conf = config_parser.read(conf_path)
             if not conf:
-                return Exception(f"File '{config}' not found")
+                raise Exception(f"File '{config}' not found")
 
-        if len(config_parser.sections()) < 1:
-            return Exception(f"File '{config}' does not have any sections")
+        if len(config_parser.sections()) < 1:  # pragma: no cover
+            raise Exception(f"File '{config}' does not have any sections")
 
         return config_parser
 
     except Exception as e:  # pragma: no cover
-        return Exception(e)
+        raise Exception(e)
 
 
 class LogConfigModel(BaseModel):
@@ -224,7 +213,7 @@ class LogConfigModel(BaseModel):
 
 def validate_log_config(
     config_parser: configparser.ConfigParser,
-) -> LogConfigModel | Exception:
+) -> LogConfigModel:
     """
     Return LogConfigModel object.
     Returns Exception if parsing fails.
@@ -237,7 +226,7 @@ def validate_log_config(
             "log_when": config_parser.get(
                 "DEFAULT", "log_when", fallback=LogRotation.WHEN.value
             ),
-            "log_interval": config_parser.get(
+            "log_interval": config_parser.getint(
                 "DEFAULT", "log_interval", fallback=LogRotation.INTERVAL.value
             ),
             "log_backup_count": config_parser.getint(
@@ -246,17 +235,16 @@ def validate_log_config(
         }
         return LogConfigModel(**log)
     except ValidationError as e:
-        return Exception(f"Failed to validate config, error(s): {e}")
+        raise Exception(f"Failed to validate config, error(s): {e}")
     except ValueError as e:
-        return Exception(f"Incorrect log related value in config, error(s): {e}")
+        raise Exception(f"Incorrect log related value in config, error(s): {e}")
     except Exception as e:
-        return Exception(f"{e}")
+        raise Exception(f"{e}")
 
 
-def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exception:
+def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
     """
     Return min_size_kb from config as integer.
-    Returns Exception if validation fails.
 
     Args:
         config_parser: ConfigParser object
@@ -273,13 +261,13 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int | Exce
                 "to 0"
             )
     except ValidationError as e:
-        return Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
+        raise Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
     except ValueError as e:  # pragma: no cover
-        return Exception(
+        raise Exception(
             f"Incorrect value for config value 'min_size_kb', error(s): {e}"
         )
     except Exception as e:  # pragma: no cover
-        return Exception(f"{e}")
+        raise Exception(f"{e}")
 
 
 class ConfigSectionModel(BaseModel):
@@ -335,10 +323,9 @@ class S3ConfigModel(BaseModel):
 
 def validate_s3_config(
     config_parser: configparser.ConfigParser,
-) -> S3ConfigModel | Exception:
+) -> S3ConfigModel:
     """
     Return S3ConfigModel object.
-    Returns Exception if parsing fails.
 
     Args:
         config_parser (configparser.ConfigParser): ConfigParser object
@@ -353,9 +340,9 @@ def validate_s3_config(
         }
         return S3ConfigModel(**s3_conf)
     except ValidationError as e:
-        return Exception(f"Failed to validate S3 config, error(s): {e}")
+        raise Exception(f"Failed to validate S3 config, error(s): {e}")
     except Exception as e:  # pragma: no cover
-        return Exception(e)
+        raise Exception(e)
 
 
 class S3ConfigSectionModel(BaseModel):
