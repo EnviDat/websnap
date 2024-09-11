@@ -36,7 +36,7 @@ def validate_positive_integer(x: Any) -> int:
         raise Exception(f"{x} is not a a positive integer")
 
 
-def validate_positive_integer_arguments(
+def validate_positive_int_args(
     timeout: int, backup_s3_count: int | None = None, repeat_minutes: int | None = None
 ) -> None:
     """

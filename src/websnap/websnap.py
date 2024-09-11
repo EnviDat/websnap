@@ -12,7 +12,7 @@ from websnap.validators import (
     validate_log_config,
     validate_s3_config,
     validate_min_size_kb,
-    validate_positive_integer_arguments,
+    validate_positive_int_args,
 )
 from websnap.logger import get_custom_logger
 from websnap.logic import (
@@ -71,7 +71,7 @@ def websnap(
     """
     # Validate integer arguments
     try:
-        validate_positive_integer_arguments(timeout, backup_s3_count, repeat_minutes)
+        validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
     except Exception as e:
         raise e
 
