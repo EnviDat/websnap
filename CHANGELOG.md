@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.7 (2024-09-11)
+### Refactor
+- update dependencies
+
 ## 1.3.6 (2024-09-11)
 ### Refactor
 - improve arguments validation call
