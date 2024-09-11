@@ -71,11 +71,7 @@ def websnap(
     """
     # Validate integer arguments
     try:
-        validate_positive_integer_arguments(
-            timeout=timeout,
-            backup_s3_count=backup_s3_count,
-            repeat_minutes=repeat_minutes,
-        )
+        validate_positive_integer_arguments(timeout, backup_s3_count, repeat_minutes)
     except Exception as e:
         raise e
 
