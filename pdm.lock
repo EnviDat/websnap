@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:7e46db80da912fc0b21398b3ea1896cabc18783f5cb0f4728f4cf07d54d83ac4"
+content_hash = "sha256:e8cf4c205df7a22763d3633b04d9a14ddb08b1db1a2d97abe56310480005f48a"
 
 [[package]]
 name = "annotated-types"
@@ -15,15 +15,6 @@ summary = "Reusable constraint types to use with typing.Annotated"
 files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
-]
-
-[[package]]
-name = "argparse"
-version = "1.4.0"
-summary = "Python command-line parsing library"
-files = [
-    {file = "argparse-1.4.0-py2.py3-none-any.whl", hash = "sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314"},
-    {file = "argparse-1.4.0.tar.gz", hash = "sha256:62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4"},
 ]
 
 [[package]]
