@@ -40,7 +40,7 @@ def validate_positive_integer_arguments(
     timeout: int, backup_s3_count: int | None = None, repeat_minutes: int | None = None
 ) -> None:
     """
-    Return None is validation passes: arguments are positive integers.
+    Return None if validation passes (arguments are positive integers).
     If validation fails then raises Exception.
     None values are allowed for arguments backup_s3_count and repeat_minutes
     (validation still passes).
@@ -61,15 +61,15 @@ def validate_positive_integer_arguments(
         "repeat_minutes": repeat_minutes,
     }
 
-    key = None
+    param = None
     try:
-        for key, value in param_arg_dict.items():
-            if key == "timeout":
-                validate_positive_integer(value)
-            elif value is not None:
-                validate_positive_integer(value)
+        for param, arg in param_arg_dict.items():
+            if param == "timeout":
+                validate_positive_integer(arg)
+            elif arg is not None:
+                validate_positive_integer(arg)
     except Exception as e:
-        raise Exception(f"Invalid argument passed for parameter {key}: {e}")
+        raise Exception(f"Invalid argument passed for parameter {param}: {e}")
 
     return
 

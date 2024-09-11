@@ -12,7 +12,6 @@ from websnap.validators import (
     validate_log_config,
     validate_s3_config,
     validate_min_size_kb,
-    validate_positive_integer,
     validate_positive_integer_arguments,
 )
 from websnap.logger import get_custom_logger
