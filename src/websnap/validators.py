@@ -2,6 +2,7 @@
 
 import configparser
 import json
+import os
 from pathlib import Path
 
 import requests
@@ -16,6 +17,7 @@ from pydantic import (
     TypeAdapter,
 )
 from typing import Optional, Any
+from dotenv import load_dotenv
 
 from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
@@ -359,26 +361,22 @@ class S3ConfigModel(BaseModel):
     aws_secret_access_key: str
 
 
-def validate_s3_config(
-    config_parser: configparser.ConfigParser,
-) -> S3ConfigModel:
+def validate_s3_config() -> S3ConfigModel:
     """
-    Return S3ConfigModel object.
-
-    Args:
-        config_parser (configparser.ConfigParser): ConfigParser object
+    Return S3ConfigModel object after validating required environment variables.
     """
     try:
+        load_dotenv()
         s3_conf = {
-            "endpoint_url": config_parser.get("DEFAULT", "endpoint_url"),
-            "aws_access_key_id": config_parser.get("DEFAULT", "aws_access_key_id"),
-            "aws_secret_access_key": config_parser.get(
-                "DEFAULT", "aws_secret_access_key"
-            ),
+            "endpoint_url": os.getenv("ENDPOINT_URL"),
+            "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
+            "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
         }
         return S3ConfigModel(**s3_conf)
     except ValidationError as e:
-        raise Exception(f"Failed to validate S3 config, error(s): {e}")
+        raise Exception(
+            f"Failed to validate S3 config environment variables, error(s): {e}"
+        )
     except Exception as e:  # pragma: no cover
         raise Exception(e)
 

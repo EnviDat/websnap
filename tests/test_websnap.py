@@ -4,6 +4,7 @@ import json
 import os
 import pytest
 import requests
+from dotenv import load_dotenv
 
 from websnap import websnap
 
@@ -37,7 +38,8 @@ def test_websnap_s3(s3_config):
     with open(s3_config, "r") as f:
         s3_config_dict = json.load(f)
 
-    endpoint_url = s3_config_dict["DEFAULT"]["endpoint_url"]
+    load_dotenv()
+    endpoint_url = os.getenv("ENDPOINT_URL")
 
     for section in s3_config_dict:
 
@@ -51,9 +53,3 @@ def test_websnap_s3(s3_config):
 
         response = requests.get(output_url, timeout=30)
         assert response.status_code == 200
-
-
-def test_websnap_s3_config_invalid(config_s3_invalid):
-    with pytest.raises(Exception):
-        conf = config_s3_invalid[0]
-        websnap(config=conf, s3_uploader=True)
