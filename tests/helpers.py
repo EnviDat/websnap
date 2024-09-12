@@ -20,11 +20,6 @@ def get_section_config(tmp_path, file_name: str):
 
 def get_s3_config():
     return {
-        "DEFAULT": {
-            "endpoint_url": "https://dreamycloud.com",
-            "aws_access_key_id": "1234567abcdefg",
-            "aws_secret_access_key": "hijklmn1234567",
-        },
         "pypi-websnap-s3": {
             "url": "https://pypi.org/pypi/websnap/json",
             "bucket": "pypi",
@@ -35,11 +30,6 @@ def get_s3_config():
 
 def get_s3_config_invalid():
     return {
-        "DEFAULT": {
-            "endpoint_url": "not a real URL",
-            "aws_access_key_id": "1234567abcdefg",
-            "aws_secret_access_key": "hijklmn1234567",
-        },
         "pypi-websnap-s3_invalid_key": {
             "url": "https://pypi.org/pypi/websnap/json",
             "bucket": "pypi",

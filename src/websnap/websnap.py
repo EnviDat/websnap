@@ -110,7 +110,7 @@ def websnap(
 
         if s3_uploader:
             try:
-                conf_s3 = validate_s3_config(conf_parser)
+                conf_s3 = validate_s3_config()
             except Exception as e:
                 raise e
             write_urls_to_s3(

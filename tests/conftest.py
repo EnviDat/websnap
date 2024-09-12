@@ -36,17 +36,6 @@ def pytest_configure(config):
     with open(s3_config) as config_file:
         s3_config_dict = json.load(config_file)
 
-    if "DEFAULT" not in s3_config_dict:
-        raise pytest.UsageError(
-            f"S3 config '{s3_config}' is missing 'DEFAULT' configuration"
-        )
-
-    for ky in ["endpoint_url", "aws_access_key_id", "aws_secret_access_key"]:
-        if ky not in s3_config_dict["DEFAULT"]:
-            raise pytest.UsageError(
-                f"S3 config '{s3_config}' is missing required 'DEFAULT' setting '{ky}'"
-            )
-
     for section in s3_config_dict:
         if section == "DEFAULT":
             continue
@@ -142,9 +131,9 @@ def config_parser_s3(config_s3):
 
 @pytest.fixture
 def config_s3_invalid(tmp_path):
-    s3_config = get_s3_config_invalid()
+    s3_conf = get_s3_config_invalid()
     config_path = f"{str(tmp_path)}/config_s3_invalid.json"
-    write_json_config(config_path, s3_config)
+    write_json_config(config_path, s3_conf)
     return config_path, tmp_path
 
 

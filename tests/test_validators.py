@@ -4,7 +4,6 @@ import configparser
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
 
 from websnap.validators import (
     is_url,
@@ -14,8 +13,6 @@ from websnap.validators import (
     get_json_section_config_parser,
     get_config_parser,
     validate_positive_integer,
-    validate_s3_config,
-    S3ConfigModel,
     validate_s3_config_section,
     S3ConfigSectionModel,
 )
@@ -115,16 +112,6 @@ def test_get_config_parser_invalid_section_config(config_basic):
         get_config_parser(
             config=config_basic[0], section_config="non-existent.json", timeout=30
         )
-
-
-def test_validate_s3_config(config_parser_s3):
-    result = validate_s3_config(config_parser_s3)
-    assert isinstance(result, S3ConfigModel)
-
-
-def test_validate_s3_config_invalid(config_parser_s3_invalid):
-    with pytest.raises(Exception):
-        validate_s3_config(config_parser_s3_invalid)
 
 
 def test_validate_s3_config_section(config_parser_s3):
