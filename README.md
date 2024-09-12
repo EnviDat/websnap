@@ -145,8 +145,9 @@ websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440
 
 ### Configuration
 
-- A valid `.ini` or `.json `configuration file is **required** for both function and 
-  CLI usage.
+- The following environment variables are **required**: `ENDPOINT_URL`, 
+  `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+- A valid `.ini` or `.json `configuration file is **required**.
 - Websnap expects the config to be `config.ini` in the same directory as websnap 
   package is being executed from.
   - However, this can be changed using the `config` function argument (or CLI 
@@ -161,22 +162,23 @@ websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440
 | `.json` | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.json" target="_blank">src/websnap/config_templates/s3_config_template.json</a> |
 
 
-#### Default Configuration
+#### Environment Variables
 
-Example default S3 configuration:
+Supports setting environment variables in a `.env` file.
+
+Example `.env` file:
 
 ```
-[DEFAULT]
-endpoint_url=https://dreamycloud.com
-aws_access_key_id=1234567abcdefg
-aws_secret_access_key=hijklmn1234567
+ENDPOINT_URL=https://dreamycloud.com
+AWS_ACCESS_KEY_ID=1234567abcdefg
+AWS_SECRET_ACCESS_KEY=hijklmn1234567
 ```
 
-| Key                     | Value Description                        |
+| Environment Variable    | Description                              |
 |-------------------------|------------------------------------------|
-| `endpoint_url`          | URL to use for the constructed S3 client |
-| `aws_secret_key_id`     | AWS access key ID                        |
-| `aws_secret_access_key` | AWS secret access key                    |
+| `ENDPOINT_URL`          | URL to use for the constructed S3 client |
+| `AWS_ACCESS_KEY_ID`     | AWS access key ID                        |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret access key                    |
 
 #### Other Sections (one per API URL endpoint)
 
