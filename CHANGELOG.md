@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.0.0 (2024-09-12)
+### Refactor
+- process S3 credentials with environment variables rather than in a configuration file
+### Docs
+- update README to include S3 environment variables explanation
+
+
 ## 1.3.7 (2024-09-11)
 ### Refactor
 - update dependencies
