@@ -1,4 +1,4 @@
-image: python:latest
+image: python:3.12.7
 
 stages:
   - test
@@ -15,7 +15,7 @@ test:
   stage: test
   before_script:
     - pip install pdm
-    - pdm install --dev
+    - pdm sync --dev
     - echo "$TEST_CONFIG_JSON" > config_test.json
     - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
@@ -26,7 +26,7 @@ backup:
   stage: backup
   before_script:
     - pip install pdm
-    - pdm install
+    - pdm sync
     - echo "$CONFIG_INI" > config_ci.ini
     - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
   script:
@@ -36,7 +36,7 @@ nasa:
   stage: nasa
   before_script:
     - pip install pdm
-    - pdm install
+    - pdm sync
     - echo $CONFIG_NASA_JSON > config_ci_nasa.json
     - scp config_ci_nasa.json "$CI_PROJECT_DIR/config_nasa.json"
   script:
