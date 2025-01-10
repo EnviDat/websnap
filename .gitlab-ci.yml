@@ -40,7 +40,7 @@ nasa:
     - echo $CONFIG_NASA_JSON > config_ci_nasa.json
     - scp config_ci_nasa.json "$CI_PROJECT_DIR/config_nasa.json"
   script:
-    pdm run websnap-cli --s3_uploader --config config_nasa.json --section_config "$SECTION_CONFIG_NASA_JSON" --early_exit
+    pdm run websnap-cli --s3_uploader --config config_nasa.json --section_config "$SECTION_CONFIG_NASA_JSON"
   allow_failure: true
 
 publish-package:
