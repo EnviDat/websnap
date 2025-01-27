@@ -1,11 +1,19 @@
 # websnap
 
 <div>
-  <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap">
-  <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
-  <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
-  <img alt="Coverage" src="https://gitlabext.wsl.ch/EnviDat/websnap/badges/main/coverage.svg?job=test&min_good=90">
-  <img alt="Code Style - Black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
+  <a href="https://pypi.org/project/websnap" target="_blank">
+    <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap">
+  </a>
+  <a href="https://pepy.tech/projects/websnap" target="_blank">
+    <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
+  </a>
+  <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/LICENSE" target="_blank">
+    <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
+  </a>
+    <img alt="Coverage" src="https://gitlabext.wsl.ch/EnviDat/websnap/badges/main/coverage.svg?job=test&min_good=90">
+  <a href="https://black.readthedocs.io" target="_blank">
+    <img alt="Code Style - Black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
+  </a>
 </div>
 
 ### Copies files retrieved from an API to a S3 bucket or a local machine.
@@ -180,7 +188,7 @@ AWS_SECRET_ACCESS_KEY=hijklmn1234567
 | `AWS_ACCESS_KEY_ID`     | AWS access key ID                        |
 | `AWS_SECRET_ACCESS_KEY` | AWS secret access key                    |
 
-#### Other Sections (one per API URL endpoint)
+#### Sections (one per API URL endpoint)
 
 - _Each file retrieved from an API requires its **own config section!**_
 - The section name be anything, it is suggested to have a name that relates to the 
