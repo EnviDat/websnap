@@ -21,9 +21,15 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
+    "Topic :: Internet",
     "Topic :: System",
+    "Topic :: System :: Archiving",
     "Topic :: System :: Archiving :: Backup",
-    "Topic :: System :: Systems Administration"
+    "Topic :: System :: Archiving :: Mirroring",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators"
 ]
 readme = "README.md"
 license = {text = "MIT"}
