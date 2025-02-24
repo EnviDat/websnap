@@ -28,6 +28,7 @@ backup:
   before_script:
     - pip install pdm
     - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
     - echo "$CONFIG_INI" > config_ci.ini
     - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
   script:
@@ -38,6 +39,7 @@ nasa:
   before_script:
     - pip install pdm
     - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
     - echo $CONFIG_NASA_JSON > config_ci_nasa.json
     - scp config_ci_nasa.json "$CI_PROJECT_DIR/config_nasa.json"
   script:
