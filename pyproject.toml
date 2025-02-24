@@ -52,16 +52,18 @@ websnap_cli = "websnap.websnap_cli:main"
 [tool.pdm.scripts]
 websnap-cli = {call = "websnap.websnap_cli:main"}
 
-[tool.pdm.dev-dependencies]
-dev = [
-    "pre-commit>=3.8.0",
-    "pytest>=8.3.2",
-    "pytest-cov>=5.0.0",
-    "pip-audit>=2.7.3",
-]
-
 [tool.coverage.run]
 omit = [
     "*/tests/*"
 ]
 
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3.8.0",
+    "pytest>=8.3.2",
+    "pytest-cov>=5.0.0",
+    "pip-audit>=2.7.3",
+    "tox>=4.24.1",
+    "tox-pdm>=0.7.2",
+]
