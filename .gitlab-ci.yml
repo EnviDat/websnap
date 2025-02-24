@@ -29,6 +29,8 @@ test-tox:
     - pip install pdm
     - pdm sync --dev
     - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - apt-get install python3.11 && rm -rf /var/lib/apt/lists/*
+    - apt-get install python3.12 && rm -rf /var/lib/apt/lists/*
     - echo "$TEST_CONFIG_JSON" > config_test.json
     - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
