@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.2 (2025-02-24)
+### Docs
+- update metadata classifiers
+
 ## 2.0.1 (2025-02-24)
 ### Tests
 - implement automated tox tests for the following Python versions: 3.11, 3.12, 3.13
