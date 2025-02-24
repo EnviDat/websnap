@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.0.1 (2025-02-24)
+### Tests
+- implement automated tox tests for the following Python versions: 3.11, 3.12, 3.13
+### Docs
+- add supported versions badge to README 
+- add Python 3.13 to metadata classifiers
+
 ## 2.0.0 (2024-09-12)
 ### Refactor
 - process S3 credentials with environment variables rather than in a configuration file
