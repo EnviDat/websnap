@@ -3,6 +3,7 @@ image: python:3.13-slim-bookworm
 stages:
   - test
   - backup
+  - opendata-swiss
   - nasa
   - publish
 
@@ -49,6 +50,17 @@ backup:
     - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
   script:
      - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
+
+opendata-swiss:
+  stage: opendata-swiss
+  before_script:
+    - pip install pdm
+    - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - echo "$CONFIG_OPENDATA_SWISS_INI" > config_opendata_swiss.ini
+    - scp config_ci.ini "$CI_PROJECT_DIR/config_opendata_swiss.ini"
+  script:
+     - pdm run websnap-cli --s3_uploader --config config_opendata_swiss.ini --early_exit
 
 nasa:
   stage: nasa
