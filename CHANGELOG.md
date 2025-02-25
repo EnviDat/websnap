@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.3 (2025-02-25)
+### Docs
+- update README and metadata reference links 
+
 ## 2.0.2 (2025-02-24)
 ### Docs
 - update metadata classifiers
