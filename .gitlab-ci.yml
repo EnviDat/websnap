@@ -60,7 +60,7 @@ opendata-swiss:
     - echo "$CONFIG_OPENDATA_SWISS_INI" > config_ci_opendata_swiss.ini
     - scp config_ci_opendata_swiss.ini "$CI_PROJECT_DIR/config_opendata_swiss.ini"
   script:
-     - pdm run websnap-cli --s3_uploader --config config_opendata_swiss.ini --early_exit
+     - pdm run websnap-cli --s3_uploader --config config_opendata_swiss.ini --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
 
 nasa:
   stage: nasa
