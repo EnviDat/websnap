@@ -58,7 +58,7 @@ opendata-swiss:
     - pdm sync
     - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
     - echo "$CONFIG_OPENDATA_SWISS_INI" > config_opendata_swiss.ini
-    - scp config_ci.ini "$CI_PROJECT_DIR/config_opendata_swiss.ini"
+    - scp config_opendata_swiss.ini "$CI_PROJECT_DIR/config_opendata_swiss.ini"
   script:
      - pdm run websnap-cli --s3_uploader --config config_opendata_swiss.ini --early_exit
 
