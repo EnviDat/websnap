@@ -8,7 +8,7 @@
   <a href="https://pepy.tech/projects/websnap" target="_blank">
     <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
   </a>
-  <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/LICENSE" target="_blank">
+  <a href="https://github.com/EnviDat/websnap/blob/main/LICENSE" target="_blank">
     <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
   </a>
   <img alt="Coverage" src="https://gitlabext.wsl.ch/EnviDat/websnap/badges/main/coverage.svg?job=test&min_good=90">
@@ -36,7 +36,7 @@
 ### Websnap can be used as a function or as a CLI. 
 
 <p>
-<a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/overview_diagram.png" 
+<a href="https://github.com/EnviDat/websnap/blob/main/overview_diagram.png" 
 target="_blank">Click here to view a websnap overview diagram.</a>
 </p>
 
@@ -165,10 +165,10 @@ websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440
 
 #### S3 Configuration Example Files
 
-| Format  | Example Configuration File                                                                                                                                                                   |
-|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `.ini`  | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.ini" target="_blank">src/websnap/config_templates/s3_config_template.ini</a>   |
-| `.json` | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/s3_config_template.json" target="_blank">src/websnap/config_templates/s3_config_template.json</a> |
+| Format  | Example Configuration File                                                                                                                                                           |
+|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.ini`  | <a href="https://github.com/EnviDat/websnap/blob/main/src/websnap/config_templates/s3_config_template.ini" target="_blank">src/websnap/config_templates/s3_config_template.ini</a>   |
+| `.json` | <a href="https://github.com/EnviDat/websnap/blob/main/src/websnap/config_templates/s3_config_template.json" target="_blank">src/websnap/config_templates/s3_config_template.json</a> |
 
 
 #### Environment Variables
@@ -271,10 +271,10 @@ websnap(file_logs=True, repeat_minutes=60)
 
 #### Configuration Example Files
 
-| Format  | Example Configuration File                                                                                                                                                             |
-|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `.ini`  | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>   |
-| `.json` | <a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/src/websnap/config_templates/config_template.json" target="_blank">src/websnap/config_templates/config_template.json</a> |
+| Format  | Example Configuration File                                                                                                                                                     |
+|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.ini`  | <a href="https://github.com/EnviDat/websnap/blob/main/src/websnap/config_templates/config_template.ini" target="_blank">src/websnap/config_templates/config_template.ini</a>   |
+| `.json` | <a href="https://github.com/EnviDat/websnap/blob/main/src/websnap/config_templates/config_template.json" target="_blank">src/websnap/config_templates/config_template.json</a> |
 
 
 #### Sections (one per API URL endpoint)
@@ -389,4 +389,4 @@ portal of the Swiss Federal Institute for Forest, Snow and Landscape Research WS
 
 ## License 
 
-<a href="https://gitlabext.wsl.ch/EnviDat/websnap/-/blob/main/LICENSE" target="_blank">MIT License</a>
+<a href="https://github.com/EnviDat/websnap/blob/main/LICENSE" target="_blank">MIT License</a>
