@@ -17,7 +17,7 @@
   </a>
 </div>
 
-### Copies files retrieved from an API to a S3 bucket or a local machine.
+### Copies files retrieved from an API to an S3 bucket or a local machine.
 
 ###
 
@@ -103,8 +103,8 @@ To access CLI documentation in terminal execute:
 | `config` _(str)_                     | <ul><li>Path to configuration `.ini` file</li><li>Default value expects file called `config.ini` in same directory as websnap package is being executed from</li></ul>                                                                                                                                                                                                                                                                                        |
 | `log_level` _(str)_                  | <ul><li>Level to use for logging</li><li>Default value is `INFO`</li><li>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`</li><li><a href="https://docs.python.org/3/library/logging.html#levels" target="_blank">Click here to learn more about logging levels</a></li></ul>                                                                                                                                                      |
 | `file_logs` _(bool)_                 | <ul><li>Enable rotating file logs</li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `s3_uploader` _(bool)_               | <ul><li>Enable uploading of files to S3 bucket</li><ul>                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `backup_s3_count` _(int \| None)_    | <ul><li>Copy and backup file in each config section to the configured S3 bucket `backup_s3_count` times</li><li>Remove file with the oldest last modified timestamp</li><li>If omitted then files are not copied or removed</li><li>If enabled then backup files are copied and assigned the original file's name with the last modified timestamp appended</li></ul>                                                                                         |
+| `s3_uploader` _(bool)_               | <ul><li>Enable uploading of files as objects to an S3 bucket</li><ul>                                                                                                                                                                                                                                                                                                                                                                                         |
+| `backup_s3_count` _(int \| None)_    | <ul><li>Copy and backup object in each config section to the configured S3 bucket **a maximum** of `backup_s3_count` times</li><li>Remove object with the oldest last modified timestamp</li><li>If omitted then objects are not copied or removed</li><li>If enabled then backup objects are copied and assigned the original object's key name with the last modified timestamp appended</li></ul>                                                          |
 | `timeout` _(int)_                    | <ul><li>Number of seconds to wait for response for each HTTP request before timing out</li><li>Default value is `32` seconds</li></ul>                                                                                                                                                                                                                                                                                                                        |
 | `early_exit` _(bool)_                | <ul><li>Enable early program termination after error occurs</li><li>If omitted logs errors but continues program execution</li></ul>                                                                                                                                                                                                                                                                                                                          |
 | `repeat_minutes` _(int \| None)_     | <ul><li>Run websnap continuously every `repeat_minutes` minutes</li><li>If omitted then websnap does not repeat</li></ul>                                                                                                                                                                                                                                                                                                                                     |
@@ -121,35 +121,37 @@ To access CLI documentation in terminal execute:
   </summary>
 
 
-### **Copy files retrieved from an API to a S3 bucket.**
+### **Copy files retrieved from an API to an S3 bucket.**
 
-Uses the AWS SDK for Python (Boto3) to add and backup API files to a S3 bucket. 
+Utilizes the AWS SDK for Python (Boto3) to add and backup API files as objects in an S3 bucket. 
 
 ### Examples
 
 #### Function
 ```python
-# The s3_uploader argument must be passed as True to copy files to a S3 bucket
-# Copies files to a S3 bucket using default argument values
+# The s3_uploader argument must be passed as True to copy files to an S3 bucket
+# Copies files to an S3 bucket using default argument values
 websnap(s3_uploader=True)
 
-# Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), 
-# file logs are enabled and only 3 backup files are allowed for each config section
-websnap(file_logs=True, s3_uploader=True, backup_s3_count=3, repeat_minutes=1440)
+# Copies files to an S3 bucket, repeats every 1440 minutes (24 hours),
+#   and at maximum 4 backup objects are allowed for each config section
+websnap(s3_uploader=True, repeat_minutes=1440, backup_s3_count=4)
+
+
 ```
 
 #### CLI
-- The following CLI option **must** be used to enable websnap to upload files to a S3 bucket: `--s3_uploader`
+- The following CLI option **must** be used to enable websnap to upload files as objects in an S3 bucket: `--s3_uploader`
 
-- Copies files to a S3 bucket using default argument values:
+- Copies objects to an S3 bucket using default argument values:
      ```bash
       websnap_cli --s3_uploader 
      ```
 
-- Copies files to a S3 bucket and repeat every 1440 minutes (24 hours), file 
-  logs are enabled and only 3 backup files are allowed for each config section:
+- Copies objects to an S3 bucket, repeats every 1440 minutes (24 hours),
+   and at maximum 4 backup objects are allowed for each config section:
      ```bash
-      websnap_cli --file_logs --s3_uploader --backup_s3_count 3 --repeat_minutes 1440
+      websnap_cli --s3_uploader --repeat_minutes 1440 --backup_s3_count 4 
      ```
 
 ### Configuration
@@ -213,11 +215,11 @@ bucket=exampledata
 key=project.json
 ```
 
-| Key      | Value Description                                       |
-|----------|---------------------------------------------------------|
-| `url`    | API URL endpoint that file will be retrieved from       |
-| `bucket` | Bucket that file will be written in                     |
-| `key`    | File name with extension, can optionally include prefix |
+| Key      | Value Description                                             |
+|----------|---------------------------------------------------------------|
+| `url`    | API URL endpoint that file will be retrieved from             |
+| `bucket` | Bucket that file (as an object) will be written in            |
+| `key`    | Object key name with extension, can optionally include prefix |
 
 
 </details>
