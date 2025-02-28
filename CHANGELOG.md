@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.4 (2025-02-28)
+### Docs
+- update README S3 usage examples 
+
 ## 2.0.3 (2025-02-25)
 ### Docs
 - update README and metadata reference links 
