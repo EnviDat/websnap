@@ -129,11 +129,11 @@ Utilizes the AWS SDK for Python (Boto3) to add and backup API files as objects i
 
 #### Function
 ```python
-# The s3_uploader argument must be passed as True to copy files to an S3 bucket
-# Copies files to an S3 bucket using default argument values
+# The s3_uploader argument must be passed as True to copy files as objects to an S3 bucket
+# Copies objects to an S3 bucket using default argument values
 websnap(s3_uploader=True)
 
-# Copies files to an S3 bucket, repeats every 1440 minutes (24 hours),
+# Copies objects to an S3 bucket, repeats every 1440 minutes (24 hours),
 #   and at maximum 4 backup objects are allowed for each config section
 websnap(s3_uploader=True, repeat_minutes=1440, backup_s3_count=4)
 
