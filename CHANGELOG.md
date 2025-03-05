@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.6 (2025-03-05)
+### Docs
+- update license copyright
+
 ## 2.0.5 (2025-03-05)
 ### Docs
 - update README badges
