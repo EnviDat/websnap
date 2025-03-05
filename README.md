@@ -8,6 +8,9 @@
   <a href="https://pepy.tech/projects/websnap" target="_blank">
     <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
   </a>
+  <a href="https://pepy.tech/projects/websnap" target="_blank">
+    <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap/month">
+  </a>
   <a href="https://github.com/EnviDat/websnap/blob/main/LICENSE" target="_blank">
     <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
   </a>
