@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.5 (2025-03-05)
+### Docs
+- update README badges
+
 ## 2.0.4 (2025-02-28)
 ### Docs
 - update README S3 usage examples 
