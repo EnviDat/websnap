@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.7 (2025-05-02)
+### Docs
+- reformat README summary messages 
+
 ## 2.0.6 (2025-03-05)
 ### Docs
 - update license copyright
