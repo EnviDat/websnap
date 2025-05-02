@@ -8,11 +8,8 @@
   <a href="https://pepy.tech/projects/websnap" target="_blank">
     <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap">
   </a>
-  <a href="https://pepy.tech/projects/websnap" target="_blank">
-    <img alt="PyPI - Downloads" src="https://static.pepy.tech/badge/websnap/month">
-  </a>
   <a href="https://github.com/EnviDat/websnap/blob/main/LICENSE" target="_blank">
-    <img alt="PyPI - License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
+    <img alt="License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
   </a>
   <img alt="Coverage" src="https://gitlabext.wsl.ch/EnviDat/websnap/badges/main/coverage.svg?job=test&min_good=90">
   <a href="https://black.readthedocs.io" target="_blank">
@@ -70,7 +67,7 @@ To access CLI documentation in terminal execute:
 
 <details>
   <summary>
-  Click to unfold function parameters / CLI options
+  Click to unfold 
   </summary>
 
 ### Function Parameters
@@ -120,7 +117,7 @@ To access CLI documentation in terminal execute:
 
 <details>
   <summary>
-  Click to unfold S3 bucket usage
+  Click to unfold 
   </summary>
 
 
@@ -232,7 +229,7 @@ key=project.json
 
 <details>
   <summary>
-  Click to unfold local machine usage
+  Click to unfold 
   </summary>
 
 ### **Copy files retrieved from an API to a local machine.** 
@@ -306,7 +303,7 @@ directory=projectdata
 
 <details>
   <summary>
-  Click to unfold logs
+  Click to unfold 
   </summary>
 
 Websnap supports optional rotating file logs.
@@ -345,7 +342,7 @@ log_backup_count=7
 
 <details>
   <summary>
-  Click to unfold minimum download size
+  Click to unfold 
   </summary>
 
 Websnap supports optionally specifying the minimum download size (in kilobytes) a 
@@ -380,7 +377,7 @@ min_size_kb=1
 
 ## Author
 
-Rebecca Kurup Buchholz
+Rebecca Buchholz, EnviDat Software Engineer
 
 
 ## Purpose
