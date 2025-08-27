@@ -11,7 +11,6 @@
   <a href="https://github.com/EnviDat/websnap/blob/main/LICENSE" target="_blank">
     <img alt="License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
   </a>
-  <img alt="Coverage" src="https://gitlabext.wsl.ch/EnviDat/websnap/badges/main/coverage.svg?job=test&min_good=90">
   <a href="https://black.readthedocs.io" target="_blank">
     <img alt="Code Style - Black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
   </a>
