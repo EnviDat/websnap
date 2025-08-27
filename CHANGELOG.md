@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.8 (2025-08-27)
+### Docs
+- update README badges
+
 ## 2.0.7 (2025-05-02)
 ### Docs
 - reformat README summary messages 
