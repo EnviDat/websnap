@@ -162,7 +162,6 @@ websnap(s3_uploader=True, repeat_minutes=1440, backup_s3_count=4)
   package is being executed from.
   - However, this can be changed using the `config` function argument (or CLI 
    `--config` option).
-- All keys in tables below are **mandatory**.
 
 #### S3 Configuration Example Files
 
