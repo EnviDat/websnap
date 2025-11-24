@@ -5,6 +5,7 @@ stages:
   - backup
   - opendata-swiss
   - nasa
+  - polder
   - publish
 
 variables:
@@ -68,7 +69,7 @@ nasa:
     - pip install pdm
     - pdm sync
     - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
-    - echo $CONFIG_NASA_JSON > config_ci_nasa.json
+    - echo $CONFIG_DEFAULT_JSON > config_ci_nasa.json
     - scp config_ci_nasa.json "$CI_PROJECT_DIR/config_nasa.json"
     - |
       if [ "$NASA_EARLY_EXIT" == "true" ]; then
@@ -80,9 +81,20 @@ nasa:
     pdm run websnap-cli --s3_uploader --config config_nasa.json --section_config "$SECTION_CONFIG_NASA_JSON" $EXIT
   allow_failure: true
 
+polder:
+  stage: polder
+  before_script:
+    - pip install pdm
+    - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - echo $CONFIG_DEFAULT_JSON > config_ci_polder.json
+    - scp config_ci_polder.json "$CI_PROJECT_DIR/config_polder.json"
+  script:
+    pdm run websnap-cli --s3_uploader --config config_polder.json --section_config "$SECTION_CONFIG_POLDER_JSON"
+
 publish-package:
   stage: publish
-  image: python:3.11-slim-bookworm
+  image: python:3.14-slim-bookworm
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
