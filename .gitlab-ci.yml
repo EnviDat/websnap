@@ -1,10 +1,11 @@
-image: python:3.13-slim-bookworm
+image: python:3.14-slim-bookworm
 
 stages:
   - test
   - backup
   - opendata-swiss
   - nasa
+  - polder
   - publish
 
 variables:
@@ -37,7 +38,7 @@ test-tox:
     - pdm run tox -e py${PYTHON_VERSION}  # Run tox for different versions
   parallel:
     matrix:
-      - PYTHON_VERSION: [ "3.11", "3.12", "3.13" ]
+      - PYTHON_VERSION: [ "3.11", "3.12", "3.13", "3.14" ]
   when: manual
 
 backup:
@@ -68,7 +69,7 @@ nasa:
     - pip install pdm
     - pdm sync
     - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
-    - echo $CONFIG_NASA_JSON > config_ci_nasa.json
+    - echo $CONFIG_DEFAULT_JSON > config_ci_nasa.json
     - scp config_ci_nasa.json "$CI_PROJECT_DIR/config_nasa.json"
     - |
       if [ "$NASA_EARLY_EXIT" == "true" ]; then
@@ -80,9 +81,22 @@ nasa:
     pdm run websnap-cli --s3_uploader --config config_nasa.json --section_config "$SECTION_CONFIG_NASA_JSON" $EXIT
   allow_failure: true
 
+polder:
+  stage: polder
+  before_script:
+    - pip install pdm
+    - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - echo $CONFIG_DEFAULT_JSON > config_ci_polder.json
+    - scp config_ci_polder.json "$CI_PROJECT_DIR/config_polder.json"
+  script:
+    pdm run websnap-cli --s3_uploader --config config_polder.json --section_config "$SECTION_CONFIG_POLDER_JSON"
+  only:
+    - dev
+
 publish-package:
   stage: publish
-  image: python:3.11-slim-bookworm
+  image: python:3.14-slim-bookworm
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
