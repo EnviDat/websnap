@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.9 (2025-11-24)
+### Docs 
+- update usage instructions
+
 ## 2.0.8 (2025-08-27)
 ### Docs
 - update README badges
