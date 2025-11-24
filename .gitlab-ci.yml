@@ -91,8 +91,6 @@ polder:
     - scp config_ci_polder.json "$CI_PROJECT_DIR/config_polder.json"
   script:
     pdm run websnap-cli --s3_uploader --config config_polder.json --section_config "$SECTION_CONFIG_POLDER_JSON"
-  only:
-    - dev
 
 publish-package:
   stage: publish
