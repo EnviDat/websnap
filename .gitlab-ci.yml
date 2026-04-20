@@ -34,11 +34,10 @@ test-tox:
     - echo "$TEST_CONFIG_JSON" > config_test.json
     - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
-    - pdm run tox -e py${PYTHON_VERSION_TOX}  # Run tox for different versions
+    - pdm run tox -e py${PYTHON_VERSION}  # Run tox for different versions
   parallel:
     matrix:
       - PYTHON_VERSION: [ "3.11", "3.12", "3.13", "3.14" ]
-      - PYTHON_VERSION_TOX: [ "311", "312", "313", "314"]
   when: manual
 
 backup:
