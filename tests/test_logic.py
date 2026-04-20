@@ -2,7 +2,6 @@
 
 import pytest
 
-from tests.helpers import get_section_config, write_json_config
 from websnap.logger import get_custom_logger
 from websnap.logic import terminate_program, get_url_content, is_min_size_kb
 

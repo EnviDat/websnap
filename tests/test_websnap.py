@@ -12,7 +12,6 @@ from websnap import websnap
 def test_websnap(config_basic, config_min_size_kb, config_log, tmp_path):
 
     for conf in [config_basic, config_min_size_kb, config_log]:
-
         config_path, tmp_path, file_name = conf
 
         websnap(config=config_path, early_exit=True)
@@ -42,7 +41,6 @@ def test_websnap_s3(s3_config):
     endpoint_url = os.getenv("ENDPOINT_URL")
 
     for section in s3_config_dict:
-
         if section == "DEFAULT":
             continue
 

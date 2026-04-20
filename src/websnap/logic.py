@@ -52,7 +52,6 @@ def get_url_content(
             If False then only logs error and continues execution.
     """
     try:
-
         response = requests.get(url, timeout=timeout)
 
         if not response.ok:
@@ -131,7 +130,6 @@ def write_urls_locally(
             If False then only logs error and continues execution.
     """
     for section in conf_parser.sections():
-
         try:
             conf = validate_config_section(conf_parser, section)
             if not isinstance(conf, ConfigSectionModel):
@@ -254,7 +252,7 @@ def copy_s3_object(
 
         if status_code == 200:
             log.info(
-                f"Config section '{section}': " f"Created new backup file '{key_copy}'"
+                f"Config section '{section}': Created new backup file '{key_copy}'"
             )
         else:  # pragma: no cover
             log.error(
@@ -328,7 +326,6 @@ def delete_s3_backup_object(
         sorted_objs = sorted(match_objs, key=lambda x: x["LastModified"])
 
         if len(sorted_objs) > backup_s3_count:
-
             obj_oldest = sorted_objs[0]
             delete_key = obj_oldest.get("Key")
 
@@ -338,8 +335,7 @@ def delete_s3_backup_object(
 
             if status_code == 204:
                 log.info(
-                    f"Config section '{section}': "
-                    f"Deleted backup file '{delete_key}'"
+                    f"Config section '{section}': Deleted backup file '{delete_key}'"
                 )
             else:  # pragma: no cover
                 log.error(
@@ -395,7 +391,6 @@ def write_urls_to_s3(
     client = session.client(service_name="s3", endpoint_url=str(conf_s3.endpoint_url))
 
     for section in conf_parser.sections():
-
         try:
             conf = validate_s3_config_section(conf_parser, section)
             if not isinstance(conf, S3ConfigSectionModel):  # pragma: no cover

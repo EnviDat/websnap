@@ -37,7 +37,7 @@ def parse_arguments() -> argparse.Namespace | None:
         "-c",
         "--config",
         default="config.ini",
-        help="Path to configuration file." "Default value is 'config.ini'.",
+        help="Path to configuration file.Default value is 'config.ini'.",
     )
 
     parser.add_argument(

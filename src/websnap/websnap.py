@@ -96,7 +96,6 @@ def websnap(
     # Copy URL files and write to S3 bucket or local machine
     is_repeat = True
     while is_repeat:
-
         # Do not repeat iteration if repeat_minutes is None
         is_repeat = repeat_minutes is not None
 
@@ -104,8 +103,7 @@ def websnap(
 
         log.info("******* START WEBSNAP ITERATION *******")
         log.info(
-            f"Read config file: '{config}', it has sections: "
-            f"{conf_parser.sections()}"
+            f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
         )
 
         if s3_uploader:

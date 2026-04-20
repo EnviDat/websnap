@@ -100,7 +100,6 @@ def merge_config_parsers(
     the values from config_2 will overwrite those in config_1.
     """
     for section in config_2.sections():
-
         if not config_1.has_section(section):
             config_1.add_section(section)
 
@@ -178,7 +177,6 @@ def get_json_section_config_parser(
         timeout: Number of seconds to wait for response for each HTTP request.
     """
     try:
-
         if is_url(section_config):
             section_parser = get_url_json_config_parser(section_config, timeout)
         else:
@@ -191,7 +189,7 @@ def get_json_section_config_parser(
             raise Exception(section_parser)
 
         if section_parser.defaults():
-            raise Exception(f"Section config cannot have a 'DEFAULT' section")
+            raise Exception("Section config cannot have a 'DEFAULT' section")
 
         return section_parser
 
