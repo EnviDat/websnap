@@ -22,8 +22,7 @@ test:
     - echo "$TEST_CONFIG_JSON" > config_test.json
     - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
-    - pdm run pytest --cov=websnap --cov-report=term --no-cov-on-fail --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
-  coverage: '/TOTAL.*\s+(\d+)%/'
+    - pdm run pytest --cov=websnap --cov-report=term --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
 
 test-tox:
   stage: test
@@ -38,7 +37,7 @@ test-tox:
     - pdm run tox -e py${PYTHON_VERSION}  # Run tox for different versions
   parallel:
     matrix:
-      - PYTHON_VERSION: [ "3.11", "3.12", "3.13" ]
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13", "3.14"]
   when: manual
 
 backup:
