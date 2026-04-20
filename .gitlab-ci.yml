@@ -49,7 +49,7 @@ backup:
     - echo "$CONFIG_INI" > config_ci.ini
     - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
   script:
-     - pdm run websnap-cli --s3_uploader --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
+     - pdm run websnap-cli --s3-uploader --backup-s3-count "$BACKUP_S3_COUNT" --early-exit
 
 opendata-swiss:
   stage: opendata-swiss
@@ -60,7 +60,7 @@ opendata-swiss:
     - echo "$CONFIG_OPENDATA_SWISS_INI" > config_ci_opendata_swiss.ini
     - scp config_ci_opendata_swiss.ini "$CI_PROJECT_DIR/config_opendata_swiss.ini"
   script:
-     - pdm run websnap-cli --s3_uploader --config config_opendata_swiss.ini --backup_s3_count "$BACKUP_S3_COUNT" --early_exit
+     - pdm run websnap-cli --s3-uploader --config config_opendata_swiss.ini --backup-s3-count "$BACKUP_S3_COUNT" --early-exit
 
 nasa:
   stage: nasa
@@ -77,7 +77,7 @@ nasa:
         export EXIT=""         
       fi
   script:
-    pdm run websnap-cli --s3_uploader --config config_nasa.json --section_config "$SECTION_CONFIG_NASA_JSON" $EXIT
+    pdm run websnap-cli --s3-uploader --config config_nasa.json --section-config "$SECTION_CONFIG_NASA_JSON" $EXIT
   allow_failure: true
 
 polder:
@@ -89,7 +89,7 @@ polder:
     - echo $CONFIG_DEFAULT_JSON > config_ci_polder.json
     - scp config_ci_polder.json "$CI_PROJECT_DIR/config_polder.json"
   script:
-    pdm run websnap-cli --s3_uploader --config config_polder.json --section_config "$SECTION_CONFIG_POLDER_JSON"
+    pdm run websnap-cli --s3-uploader --config config_polder.json --section-config "$SECTION_CONFIG_POLDER_JSON"
 
 publish-package:
   stage: publish
