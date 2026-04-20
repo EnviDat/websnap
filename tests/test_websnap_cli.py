@@ -9,10 +9,10 @@ def test_websnap_cli(config_basic):
         [
             "websnap_cli",
             f"--config={config_basic[0]}",
-            "--log_level=WARNING",
-            "--file_logs",
+            "--log-level=WARNING",
+            "--file-logs",
             "--timeout=30",
-            "--early_exit",
+            "--early-exit",
         ],
         capture_output=True,
         text=True,
