@@ -1,7 +1,7 @@
 # websnap
 
 <div>
-  <img alt="Supported Versions" src="https://img.shields.io/pypi/pyversions/websnap.svg"> 
+  <img alt="Supported Python Versions" src="https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13|%203.14-blue">
   <a href="https://pypi.org/project/websnap" target="_blank">
     <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap">
   </a>
