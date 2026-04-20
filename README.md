@@ -11,9 +11,7 @@
   <a href="https://github.com/EnviDat/websnap/blob/main/LICENSE" target="_blank">
     <img alt="License" src="https://img.shields.io/pypi/l/websnap?color=%232780C1">
   </a>
-  <a href="https://black.readthedocs.io" target="_blank">
-    <img alt="Code Style - Black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
-  </a>
+    <img alt="Code Style - ruff" src="https://img.shields.io/badge/style-ruff-41B5BE?style=flat">
 </div>
 
 ### Copies files retrieved from an API to an S3 bucket or a local machine.
