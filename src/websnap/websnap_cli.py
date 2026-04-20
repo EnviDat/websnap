@@ -66,6 +66,11 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
+        "--endpoint-url",
+        help="Complete URL to use for the constructed S3 client."
+    )
+
+    parser.add_argument(
         "-b",
         "--backup-s3-count",
         type=int,

@@ -32,6 +32,7 @@ def websnap(
     file_logs: bool = False,
     s3_uploader: bool = False,
     profile_name: str | None = None,
+    endpoint_url: str | None = None,
     backup_s3_count: int | None = None,
     timeout: int = TIMEOUT,
     early_exit: bool = False,
@@ -49,6 +50,7 @@ def websnap(
         s3_uploader: If True then uploads files to S3 bucket.
         profile_name: Name of a profile to use for S3 shared credentials file.
                       If omitted then the default profile is used.
+        endpoint_url: Complete URL to use for the constructed S3 client.
         backup_s3_count: Copy and backup S3 objects in each config section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
@@ -77,6 +79,11 @@ def websnap(
         validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
     except Exception as e:
         raise e
+
+    # TODO write endpoint_url validator
+    # Validate endpoint_url
+    if s3_uploader:
+        pass
 
     # Validate configuration
     try:
@@ -109,6 +116,7 @@ def websnap(
             f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
         )
 
+        # TODO refactor to use shared credentials file and common session
         if s3_uploader:
             try:
                 conf_s3 = validate_s3_config()
