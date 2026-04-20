@@ -31,6 +31,7 @@ def websnap(
     log_level: str = "INFO",
     file_logs: bool = False,
     s3_uploader: bool = False,
+    profile_name: str | None = None,
     backup_s3_count: int | None = None,
     timeout: int = TIMEOUT,
     early_exit: bool = False,
@@ -46,6 +47,8 @@ def websnap(
         log_level: Level to use for logging.
         file_logs: If True then implements rotating file logs.
         s3_uploader: If True then uploads files to S3 bucket.
+        profile_name: Name of a profile to use for S3 shared credentials file.
+                      If omitted then the default profile is used.
         backup_s3_count: Copy and backup S3 objects in each config section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
