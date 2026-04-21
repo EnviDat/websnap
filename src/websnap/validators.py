@@ -153,9 +153,9 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser:
         return config_parser
 
     except FileNotFoundError:
-        raise Exception(f"File '{config_path}' not found")
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+        sys.exit(f"ERROR: File '{config_path}' not found")
+    except json.JSONDecodeError as e:
+        sys.exit(f"ERROR: File '{config_path}' is not valid JSON: {e}")
 
 
 def get_url_json_config_parser(
@@ -203,25 +203,23 @@ def get_json_section_config_parser(
         section_config: File or URL with additional configuration sections.
         timeout: Number of seconds to wait for response for each HTTP request.
     """
-    try:
-        if is_url(section_config):
-            section_parser = get_url_json_config_parser(section_config, timeout)
+    if is_url(section_config):
+        section_parser = get_url_json_config_parser(section_config, timeout)
+    else:
+        if (section_path := Path(section_config)).suffix == ".json":
+            section_parser = get_json_config_parser(section_path)
         else:
-            if (section_path := Path(section_config)).suffix == ".json":
-                section_parser = get_json_config_parser(section_path)
-            else:
-                raise Exception("Section config extension must be '.json'")
+            sys.exit("ERROR: Section config extension must be '.json'")
 
-        if not isinstance(section_parser, configparser.ConfigParser):
-            raise Exception(section_parser)
+    if not isinstance(section_parser, configparser.ConfigParser):
+        sys.exit(
+            f"ERROR: Expected ConfigParser, got {type(section_parser).__name__}"
+        )
 
-        if section_parser.defaults():
-            raise Exception("Section config cannot have a 'DEFAULT' section")
+    if section_parser.defaults():
+        sys.exit("ERROR: Section config cannot have a 'DEFAULT' section")
 
-        return section_parser
-
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+    return section_parser
 
 
 def get_config_parser(
@@ -238,32 +236,28 @@ def get_config_parser(
                               Default value is None.
         timeout: Number of seconds to wait for response for each HTTP request.
     """
-    try:
-        conf_path = Path(config)
+    conf_path = Path(config)
 
-        if section_config and conf_path.suffix != ".json":
-            raise Exception(
-                f"Config '{config}' extension must be '.json' to also use "
-                f"optional section config '{section_config}'"
-            )
-        elif conf_path.suffix == ".json":
-            config_parser = get_json_config_parser(conf_path)
-            if section_config:
-                section_parser = get_json_section_config_parser(section_config, timeout)
-                config_parser = merge_config_parsers(config_parser, section_parser)
-        else:  # pragma: no cover
-            config_parser = configparser.ConfigParser()
-            conf = config_parser.read(conf_path)
-            if not conf:
-                raise Exception(f"File '{config}' not found")
+    if section_config and conf_path.suffix != ".json":
+        sys.exit(
+            f"ERROR: Config '{config}' extension must be '.json' to also use "
+            f"optional section config '{section_config}'"
+        )
+    elif conf_path.suffix == ".json":
+        config_parser = get_json_config_parser(conf_path)
+        if section_config:
+            section_parser = get_json_section_config_parser(section_config, timeout)
+            config_parser = merge_config_parsers(config_parser, section_parser)
+    else:
+        config_parser = configparser.ConfigParser()
+        conf = config_parser.read(conf_path)
+        if not conf:
+            sys.exit(f"ERROR: File '{config}' not found")
 
-        if len(config_parser.sections()) < 1:  # pragma: no cover
-            raise Exception(f"File '{config}' does not have any sections")
+    if len(config_parser.sections()) < 1:
+        sys.exit(f"ERROR: File '{config}' does not have any sections")
 
-        return config_parser
-
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+    return config_parser
 
 
 class LogConfigModel(BaseModel):
