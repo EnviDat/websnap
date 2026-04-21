@@ -1,6 +1,8 @@
 """Tests for src/websnap/logger.py"""
 
 import logging
+from unittest.mock import patch
+
 import pytest
 
 from websnap.logger import (
@@ -9,6 +11,7 @@ from websnap.logger import (
     get_console_handler,
     get_file_handler,
 )
+from websnap.validators import LogConfigModel
 
 
 def test_get_custom_logger(log_config_model):
@@ -52,3 +55,28 @@ def test_get_console_handler():
 def test_get_log_config(filename, when, interval, backup):
     file_handler = get_file_handler(filename, when, interval, backup)
     assert isinstance(file_handler, logging.FileHandler)
+
+
+@pytest.fixture
+def conf_log():
+    return LogConfigModel(log_when="D", log_interval=1, log_backup_count=7)
+
+
+def test_get_custom_logger_attribute_error(conf_log):
+    """Test sys.exit when 'level' is not a string (triggers AttributeError)."""
+    # Passing an integer instead of a string 'INFO'
+    invalid_level = 123
+
+    with pytest.raises(SystemExit):
+        get_custom_logger("test_logger", conf_log, level=invalid_level)
+
+
+@patch("websnap.logger.get_log_level")
+def test_get_custom_logger_value_error(mock_get_level, conf_log):
+    """Test sys.exit when get_log_level raises a ValueError."""
+    # Setup mock to raise ValueError
+    invalid_level = "NOT_A_LEVEL"
+    mock_get_level.side_effect = ValueError("Invalid level")
+
+    with pytest.raises(SystemExit):
+        get_custom_logger("test_logger", conf_log, level=invalid_level)
