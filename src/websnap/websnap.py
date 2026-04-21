@@ -13,6 +13,7 @@ from websnap.validators import (
     validate_s3_config,
     validate_min_size_kb,
     validate_positive_int_args,
+    validate_endpoint_url,
 )
 from websnap.logger import get_custom_logger
 from websnap.logic import (
@@ -74,23 +75,16 @@ def websnap(
                 Duplicate sections will overwrite values with the same section
                 passed in the `config` argument.
     """
-    # Validate integer arguments
-    try:
-        validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
-    except Exception as e:
-        raise e
-
-    # TODO write endpoint_url validator
-    # Validate endpoint_url
-    if s3_uploader:
-        pass
+    # Validate arguments
+    validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
+    validate_endpoint_url(endpoint_url, s3_uploader)
 
     # Validate configuration
     try:
         conf_parser = get_config_parser(config, section_config, timeout)
         conf_log = validate_log_config(conf_parser)
         min_size_kb = validate_min_size_kb(conf_parser)
-    except Exception as e:
+    except Exception as e:  # TODO refactor
         raise e
 
     # Validate custom log
@@ -101,7 +95,7 @@ def websnap(
         config=conf_log,
     )
     if not isinstance(log, logging.Logger):
-        raise Exception(log)
+        raise Exception(log)  # TODO refactor
 
     # Copy URL files and write to S3 bucket or local machine
     is_repeat = True

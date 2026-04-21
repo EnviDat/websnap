@@ -127,6 +127,8 @@ def main():
         log_level=kwargs["log_level"],
         file_logs=kwargs["file_logs"],
         s3_uploader=kwargs["s3_uploader"],
+        profile_name=kwargs["profile_name"],
+        endpoint_url=kwargs["endpoint_url"],
         backup_s3_count=kwargs["backup_s3_count"],
         timeout=kwargs["timeout"],
         early_exit=kwargs["early_exit"],

@@ -3,8 +3,8 @@
 import configparser
 import json
 import os
+import sys
 from pathlib import Path
-
 import requests
 from pydantic import (
     BaseModel,
@@ -18,7 +18,6 @@ from pydantic import (
 )
 from typing import Optional, Any
 from dotenv import load_dotenv
-
 from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
 
@@ -34,8 +33,8 @@ def validate_positive_integer(x: Any) -> int:
     try:
         ta.validate_python(x)
         return x
-    except ValidationError:
-        raise Exception(f"{x} is not a a positive integer")
+    except (ValueError, ValidationError):
+        raise ValueError(f"Argument is not a a positive integer: {x}")
 
 
 def validate_positive_int_args(
@@ -63,17 +62,45 @@ def validate_positive_int_args(
         "repeat_minutes": repeat_minutes,
     }
 
-    param = None
     try:
         for param, arg in param_arg_dict.items():
             if param == "timeout":
                 validate_positive_integer(arg)
             elif arg is not None:
                 validate_positive_integer(arg)
-    except Exception as e:
-        raise Exception(f"Invalid argument passed for parameter {param}: {e}")
+    except ValueError as e:
+        sys.exit(f"ERROR: {e}")
 
     return
+
+
+def validate_endpoint_url(endpoint_url: str| None, s3_uploader: bool) -> str:
+    """
+    Validate and return endpoint_url, it must be truthy and an http or https URL.
+    If validation fails then raises Exception.
+    """
+    if s3_uploader and not endpoint_url:
+        sys.exit(
+            "ERROR: '--endpoint-url' option (endpoint_url function argument) "
+            "must be provided when the "
+            "'--s3-uploader' option (s3_uploader function argument) "
+            "is enabled (set to True)"
+        )
+
+    if endpoint_url:
+        try:
+            ta = TypeAdapter(AnyHttpUrl)
+            validated = ta.validate_python(endpoint_url)
+            return str(validated)
+
+        except ValidationError:
+            sys.exit(
+                f"ERROR: '--endpoint-url' value (endpoint_url function argument) "
+                f"'{endpoint_url}' "
+                f"is not a valid HTTP/HTTPS URL"
+            )
+
+    return endpoint_url
 
 
 def is_url(x: Any) -> bool:
