@@ -1,12 +1,17 @@
 """Tests for src/websnap/logic.py"""
+
 import configparser
 from unittest.mock import patch, mock_open, MagicMock
 
 import pytest
 
 from websnap.logger import get_custom_logger
-from websnap.logic import terminate_program, get_url_content, is_min_size_kb, \
-    write_urls_locally
+from websnap.logic import (
+    terminate_program,
+    get_url_content,
+    is_min_size_kb,
+    write_urls_locally,
+)
 
 
 @pytest.fixture
@@ -70,19 +75,21 @@ def test_terminate_program_exit():
 @pytest.fixture
 def mock_deps():
     """Fixture to group all patches for cleaner tests."""
-    with patch("websnap.logic.validate_config_section") as v_section, \
-            patch("websnap.logic.os.path.isdir") as isdir, \
-            patch("websnap.logic.get_url_content") as get_content, \
-            patch("websnap.logic.is_min_size_kb") as min_size, \
-            patch("websnap.logic.terminate_program") as terminate, \
-            patch("builtins.open", mock_open()) as m_open:
+    with (
+        patch("websnap.logic.validate_config_section") as v_section,
+        patch("websnap.logic.os.path.isdir") as isdir,
+        patch("websnap.logic.get_url_content") as get_content,
+        patch("websnap.logic.is_min_size_kb") as min_size,
+        patch("websnap.logic.terminate_program") as terminate,
+        patch("builtins.open", mock_open()) as m_open,
+    ):
         yield {
             "validate": v_section,
             "isdir": isdir,
             "get_content": get_content,
             "min_size": min_size,
             "terminate": terminate,
-            "open": m_open
+            "open": m_open,
         }
 
 
@@ -92,8 +99,9 @@ def test_write_urls_locally_success(mock_deps):
     parser.add_section("Section1")
     parser.add_section("Section2")
 
-    mock_conf = MagicMock(url="http://test.com", file_name="file.txt",
-                          directory="downloads")
+    mock_conf = MagicMock(
+        url="http://test.com", file_name="file.txt", directory="downloads"
+    )
     mock_deps["validate"].return_value = mock_conf
     mock_deps["isdir"].return_value = True
     mock_deps["get_content"].return_value = b"test content"
@@ -159,8 +167,9 @@ def test_write_urls_locally_min_size_fail(mock_deps):
 @patch("websnap.logic.get_url_content")
 @patch("websnap.logic.validate_config_section")
 @patch("builtins.open", new_callable=mock_open)
-def test_write_urls_locally_skips_on_empty_content(mock_file, mock_validate,
-                                                   mock_get_url):
+def test_write_urls_locally_skips_on_empty_content(
+    mock_file, mock_validate, mock_get_url
+):
     """Test that the loop continues/skips if url_content is None."""
     parser = configparser.ConfigParser()
     parser.add_section("FailSection")
@@ -181,8 +190,9 @@ def test_write_urls_locally_skips_on_empty_content(mock_file, mock_validate,
 @patch("websnap.logic.get_url_content")
 @patch("websnap.logic.validate_config_section")
 @patch("builtins.open", new_callable=mock_open)
-def test_write_urls_locally_no_directory_path(mock_file, mock_validate, mock_get_url,
-                                              mock_min_size):
+def test_write_urls_locally_no_directory_path(
+    mock_file, mock_validate, mock_get_url, mock_min_size
+):
     """Test file path construction when directory is None."""
     parser = configparser.ConfigParser()
     parser.add_section("NoDirSection")
@@ -200,4 +210,3 @@ def test_write_urls_locally_no_directory_path(mock_file, mock_validate, mock_get
         "Successfully downloaded URL content and wrote file locally in "
         "config section: NoDirSection"
     )
-
