@@ -22,7 +22,7 @@ test:
     - echo "$TEST_CONFIG_JSON" > config_test.json
     - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
   script:
-    - pdm run pytest --cov=websnap --cov-report=term --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
+    - pdm run pytest --cov=websnap --cov-report=term-missing --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
 
 test-tox:
   stage: test
