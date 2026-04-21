@@ -3,7 +3,6 @@ Function websnap() downloads files from URLs and uploads them to S3 bucket.
 Also supports writing downloaded files to local machine.
 """
 
-import logging
 import time
 
 from websnap.constants import TIMEOUT
@@ -92,8 +91,6 @@ def websnap(
         file_logs=file_logs,
         config=conf_log,
     )
-    if not isinstance(log, logging.Logger):
-        raise Exception(log)  # TODO refactor
 
     # Copy URL files and write to S3 bucket or local machine
     is_repeat = True
@@ -112,6 +109,7 @@ def websnap(
         if s3_uploader:
             try:
                 conf_s3 = validate_s3_config()
+            # TODO refactor
             except Exception as e:
                 raise e
             write_urls_to_s3(
@@ -128,7 +126,7 @@ def websnap(
 
         log.info("Finished websnap iteration")
 
-        if is_repeat:  # pragma: no cover
+        if is_repeat:
             sleep_until_next_iteration(repeat_minutes, start_time, log)
 
     return

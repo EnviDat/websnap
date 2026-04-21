@@ -430,8 +430,10 @@ def validate_s3_config_section(
         }
         return S3ConfigSectionModel(**conf_section)
     except ValidationError as e:
+        # TODO refactor to raise error
         return Exception(
             f"Failed to validate config section '{section}', error(s): {e}"
         )
+    # TODO remove
     except Exception as e:
         return Exception(f"{e}")

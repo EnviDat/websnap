@@ -71,7 +71,7 @@ def get_custom_logger(
     config: LogConfigModel,
     level: str = "INFO",
     file_logs: bool = False,
-) -> logging.getLogger:
+) -> logging.Logger:
     """
     Return logger with console handler and optional file handler.
     Default logging level is 'INFO'.
@@ -83,24 +83,24 @@ def get_custom_logger(
         file_logs: If True then implements rotating file logs.
     """
     try:
-        _loglevel = level.upper()
-    except AttributeError:  # pragma: no cover
-        raise Exception("Argument loglevel must be a string")
+        logger = logging.getLogger(name)
+        logger.setLevel(get_log_level(level.upper()))
+        logger.addHandler(get_console_handler())
 
-    logger = logging.getLogger(name)
-    logger.setLevel(get_log_level(_loglevel))
-    logger.addHandler(get_console_handler())
-
-    if file_logs:
-        logger.addHandler(
-            get_file_handler(
-                filename=f"{name}.log",
-                when=config.log_when,
-                interval=config.log_interval,
-                backup_count=config.log_backup_count,
+        if file_logs:
+            logger.addHandler(
+                get_file_handler(
+                    filename=f"{name}.log",
+                    when=config.log_when,
+                    interval=config.log_interval,
+                    backup_count=config.log_backup_count,
+                )
             )
-        )
 
-    logger.propagate = False
+        logger.propagate = False
+        return logger
 
-    return logger
+    except AttributeError:
+        sys.exit(f"ERROR: Logging level must be a string, got {type(level).__name__}")
+    except ValueError as e:
+        sys.exit(f"ERROR: '{level}' is not a valid logging level: {e}")
