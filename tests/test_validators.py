@@ -15,6 +15,8 @@ from websnap.validators import (
     validate_positive_integer,
     validate_s3_config_section,
     S3ConfigSectionModel,
+    validate_endpoint_url,
+    validate_positive_int_args,
 )
 
 
@@ -23,9 +25,29 @@ def test_validate_positive_integer(x):
     try:
         result = validate_positive_integer(x)
         assert result == x
-    except Exception as e:
-        if e == f"{x} is not a positive integer":
+    except ValueError as e:
+        if e == f"Argument is not a a positive integer: {x}":
             assert True
+
+@pytest.mark.parametrize("timeout, backup_s3_count", [(-1, None), (2, -3)])
+def test_validate_positive_int_args(timeout, backup_s3_count):
+    with pytest.raises(SystemExit):
+        assert validate_positive_int_args(timeout, backup_s3_count)
+
+
+def test_validate_endpoint_url():
+    assert validate_endpoint_url("https://cloud.com/", True) == "https://cloud.com/"
+    assert validate_endpoint_url(None, False) is None
+
+
+def test_validate_endpoint_url_no_url():
+    with pytest.raises(SystemExit):
+        validate_endpoint_url(None, True)
+
+
+def test_validate_endpoint_url_invalid():
+    with pytest.raises(SystemExit):
+        validate_endpoint_url("abc", True)
 
 
 @pytest.mark.parametrize(
