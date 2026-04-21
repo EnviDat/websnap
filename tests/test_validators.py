@@ -4,6 +4,7 @@ import configparser
 from pathlib import Path
 
 import pytest
+from unittest.mock import patch, ANY
 
 from websnap.validators import (
     is_url,
@@ -79,8 +80,16 @@ def test_json_config_parser(config_basic):
 
 
 def test_json_config_parser_nonexistent_config():
-    with pytest.raises(Exception):
+    with pytest.raises(SystemExit):
         get_json_config_parser(Path("nonexistent_config.json"))
+
+
+def test_get_json_config_parser_invalid_json(tmp_path):
+    broken_file = tmp_path / "broken.json"
+    broken_file.write_text("{ 'invalid': json }")
+
+    with pytest.raises(SystemExit):
+        get_json_config_parser(broken_file)
 
 
 def test_get_url_json_config_parser():
@@ -108,8 +117,31 @@ def test_get_json_section_config_parser():
     "section_config", ["section_config.ini", "section_config.json"]
 )
 def test_get_json_section_config_parser_invalid_section_config(section_config):
-    with pytest.raises(Exception):
+    with pytest.raises(SystemExit):
         get_json_section_config_parser(section_config)
+
+
+@patch("websnap.validators.is_url")
+@patch("websnap.validators.get_json_config_parser")
+def test_get_json_section_config_parser_not_instance(mock_get_json, mock_is_url):
+    mock_is_url.return_value = False
+    mock_get_json.return_value = "I am a string, not a parser"
+
+    with pytest.raises(SystemExit):
+        get_json_section_config_parser("test.json")
+
+
+@patch("websnap.validators.is_url")
+@patch("websnap.validators.get_json_config_parser")
+def test_get_json_section_config_parser_has_defaults(mock_get_json, mock_is_url):
+    mock_is_url.return_value = False
+
+    parser_with_defaults = configparser.ConfigParser()
+    parser_with_defaults['DEFAULT'] = {'key': 'value'}
+    mock_get_json.return_value = parser_with_defaults
+
+    with pytest.raises(SystemExit):
+        get_json_section_config_parser("test.json")
 
 
 def test_get_config_parser(config_basic):
@@ -124,16 +156,75 @@ def test_get_config_parser(config_basic):
         ("config_2.json", "section_config.json", 30),
     ],
 )
+
+
 def test_get_config_parser_invalid_parameters(config, section_config, timeout):
-    with pytest.raises(Exception):
+    with pytest.raises(SystemExit):
         get_config_parser(config=config, section_config=section_config, timeout=timeout)
 
 
 def test_get_config_parser_invalid_section_config(config_basic):
-    with pytest.raises(Exception):
+    with pytest.raises(SystemExit):
         get_config_parser(
             config=config_basic[0], section_config="non-existent.json", timeout=30
         )
+
+
+def test_get_config_parser_ini_success(tmp_path):
+    ini_file = tmp_path / "settings.ini"
+    ini_content = "[Section1]\nkey1 = value1"
+    ini_file.write_text(ini_content)
+
+    parser = get_config_parser(str(ini_file))
+
+    assert isinstance(parser, configparser.ConfigParser)
+    assert parser.get("Section1", "key1") == "value1"
+
+
+@patch("websnap.validators.get_json_config_parser")
+@patch("websnap.validators.get_json_section_config_parser")
+@patch("websnap.validators.merge_config_parsers")
+def test_get_config_parser_merges_successfully(
+        mock_merge, mock_get_section, mock_get_main
+):
+    main_parser = configparser.ConfigParser()
+    main_parser.add_section("MainSection")
+
+    section_parser = configparser.ConfigParser()
+    section_parser.add_section("ExtraSection")
+
+    mock_get_main.return_value = main_parser
+    mock_get_section.return_value = section_parser
+
+    merged_parser = configparser.ConfigParser()
+    merged_parser.add_section("MainSection")
+    merged_parser.add_section("ExtraSection")
+    mock_merge.return_value = merged_parser
+
+    result = get_config_parser("base.json", section_config="extra.json")
+
+    mock_get_main.assert_called_once()
+    mock_get_section.assert_called_once_with("extra.json", ANY)
+
+    mock_merge.assert_called_once_with(main_parser, section_parser)
+
+    assert "MainSection" in result.sections()
+    assert "ExtraSection" in result.sections()
+
+
+def test_get_config_parser_ini_file_not_found(tmp_path):
+    missing_ini = tmp_path / "does_not_exist.ini"
+
+    with pytest.raises(SystemExit):
+        get_config_parser(str(missing_ini))
+
+
+def test_get_config_parser_no_sections_error(tmp_path):
+    empty_conf = tmp_path / "empty.ini"
+    empty_conf.write_text("# This file only has comments\n# No sections here.")
+
+    with pytest.raises(SystemExit):
+        get_config_parser(str(empty_conf))
 
 
 def test_validate_s3_config_section(config_parser_s3):
