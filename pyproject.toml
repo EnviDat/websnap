@@ -11,7 +11,6 @@ maintainers = [
 dependencies = [
     "pydantic>=2.13.2",
     "boto3>=1.42.91",
-    "python-dotenv>=1.2.2",  # TODO remove
     "requests>=2.33.1",
 ]
 requires-python = ">=3.11"

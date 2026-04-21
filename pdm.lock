@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.5.0"
-content_hash = "sha256:8e01108574e4036517f69167bc657b1c8a98ae60e3dcf384622d745a521ca6ad"
+content_hash = "sha256:ded0d92e3c0bab1a060d08f1d215ce3d741755b3b6bb2d392a94f8818437ed89"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -602,16 +602,6 @@ dependencies = [
 files = [
     {file = "python_discovery-1.2.2-py3-none-any.whl", hash = "sha256:e1ae95d9af875e78f15e19aed0c6137ab1bb49c200f21f5061786490c9585c7a"},
     {file = "python_discovery-1.2.2.tar.gz", hash = "sha256:876e9c57139eb757cb5878cbdd9ae5379e5d96266c99ef731119e04fffe533bb"},
-]
-
-[[package]]
-name = "python-dotenv"
-version = "1.2.2"
-requires_python = ">=3.10"
-summary = "Read key-value pairs from a .env file and set them as environment variables"
-files = [
-    {file = "python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a"},
-    {file = "python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3"},
 ]
 
 [[package]]
