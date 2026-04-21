@@ -95,9 +95,7 @@ def websnap(
     # Copy URL files and write to S3 bucket or local machine
     is_repeat = True
     while is_repeat:
-        # Do not repeat iteration if repeat_minutes is None
         is_repeat = repeat_minutes is not None
-
         start_time = time.time()
 
         log.info("******* START WEBSNAP ITERATION *******")

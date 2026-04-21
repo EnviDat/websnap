@@ -386,6 +386,7 @@ def validate_s3_config() -> S3ConfigModel:
         raise Exception(e)
 
 
+# TODO remove
 class S3ConfigSectionModel(BaseModel):
     """
     Class with required config section values (for writing to S3 bucket).
