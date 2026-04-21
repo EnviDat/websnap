@@ -4,7 +4,6 @@ import json
 import os
 import pytest
 import requests
-from dotenv import load_dotenv
 
 from websnap import websnap
 
@@ -26,20 +25,24 @@ def test_websnap(config_basic, config_min_size_kb, config_log, tmp_path):
             assert data["info"]["name"] == "websnap"
 
 
-# TODO refactor
 # This test only supports S3 configurations for buckets with public read access
 def test_websnap_s3(s3_config):
 
     if not s3_config:
         pytest.skip("Option '--s3-config' is not set")
 
-    websnap(config=s3_config, s3_uploader=True, backup_s3_count=1, early_exit=True)
+    endpoint_url = os.environ.get("ENDPOINT_URL")
+
+    websnap(
+        config=s3_config,
+        s3_uploader=True,
+        endpoint_url=endpoint_url,
+        backup_s3_count=1,
+        early_exit=True
+    )
 
     with open(s3_config, "r") as f:
         s3_config_dict = json.load(f)
-
-    load_dotenv()
-    endpoint_url = os.getenv("ENDPOINT_URL")
 
     for section in s3_config_dict:
         if section == "DEFAULT":

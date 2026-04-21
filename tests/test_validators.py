@@ -277,8 +277,8 @@ def test_validate_s3_config_section(config_parser_s3):
     ["pypi-websnap-s3_invalid_key", "pypi-websnap-s3_invalid_key2", "no-bucket"],
 )
 def test_validate_s3_config_section_invalid_section(section, config_parser_s3_invalid):
-    result = validate_s3_config_section(config_parser_s3_invalid, section)
-    assert not isinstance(result, S3ConfigSectionModel)
+    with pytest.raises(ValueError):
+        validate_s3_config_section(config_parser_s3_invalid, section)
 
 
 @patch("websnap.validators.LogConfigModel")
