@@ -18,7 +18,6 @@ from websnap.validators import (
     validate_config_section,
     S3ConfigModel,
     validate_s3_config_section,
-    ConfigSectionModel,
     S3ConfigSectionModel,
 )
 
@@ -132,46 +131,44 @@ def write_urls_locally(
     for section in conf_parser.sections():
         try:
             conf = validate_config_section(conf_parser, section)
-            if not isinstance(conf, ConfigSectionModel):
-                log.error(f"Config section '{section}': {conf}")
-                terminate_program(early_exit)
-                continue
-
-            if conf.directory and not os.path.isdir(conf.directory):  # pragma: no cover
-                log.error(
-                    f"Config section '{section}': directory '{conf.directory}' "
-                    f"does not exist"
-                )
-                terminate_program(early_exit)
-                continue
-
-            url_content = get_url_content(
-                str(conf.url), section, log, timeout, early_exit
-            )
-            if not url_content:  # pragma: no cover
-                continue
-
-            is_min_size = is_min_size_kb(
-                url_content, min_size_kb, section, log, early_exit
-            )
-            if not is_min_size:  # pragma: no cover
-                continue
-
-            if conf.directory:
-                file_path = f"{conf.directory}/{conf.file_name}"
-            else:  # pragma: no cover
-                file_path = f"{conf.file_name}"
-
-            with open(file_path, "wb") as f:
-                f.write(url_content)
-                log.info(
-                    f"Successfully downloaded URL content and wrote file locally in "
-                    f"config section: {section}"
-                )
-
-        except Exception as e:  # pragma: no cover
-            log.error(f"Config section '{section}', error(s): {e}")
+        except ValueError as e:
+            log.error(e)
             terminate_program(early_exit)
+            continue
+
+        # TODO look at error handling
+        if conf.directory and not os.path.isdir(conf.directory):  # pragma: no cover
+            log.error(
+                f"Config section '{section}': directory '{conf.directory}' "
+                f"does not exist"
+            )
+            terminate_program(early_exit)
+            continue
+
+        url_content = get_url_content(str(conf.url), section, log, timeout, early_exit)
+        if not url_content:  # pragma: no cover
+            continue
+
+        is_min_size = is_min_size_kb(url_content, min_size_kb, section, log, early_exit)
+        if not is_min_size:  # pragma: no cover
+            continue
+
+        if conf.directory:
+            file_path = f"{conf.directory}/{conf.file_name}"
+        else:  # pragma: no cover
+            file_path = f"{conf.file_name}"
+
+        with open(file_path, "wb") as f:
+            f.write(url_content)
+            log.info(
+                f"Successfully downloaded URL content and wrote file locally in "
+                f"config section: {section}"
+            )
+
+        # # TODO remove
+        # except Exception as e:  # pragma: no cover
+        #     log.error(f"Config section '{section}', error(s): {e}")
+        #     terminate_program(early_exit)
 
     return
 

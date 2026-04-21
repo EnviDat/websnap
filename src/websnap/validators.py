@@ -74,7 +74,7 @@ def validate_positive_int_args(
     return
 
 
-def validate_endpoint_url(endpoint_url: str| None, s3_uploader: bool) -> str:
+def validate_endpoint_url(endpoint_url: str | None, s3_uploader: bool) -> str:
     """
     Validate and return endpoint_url, it must be truthy and an http or https URL.
     If validation fails then raises Exception.
@@ -171,11 +171,7 @@ def get_url_json_config_parser(
     try:
         response = requests.get(config_url, timeout=timeout)
 
-        if not response.ok:
-            raise Exception(
-                f"URL {config_url} returned unsuccessful "
-                f"status code {response.status_code}"
-            )
+        response.raise_for_status()
 
         data = response.json()
 
@@ -184,12 +180,16 @@ def get_url_json_config_parser(
 
         return config_parser
 
-    except requests.exceptions.Timeout:  # pragma: no cover
-        raise Exception(
-            f"URL {config_url} timed out while waiting {timeout} seconds for response"
+    except requests.exceptions.Timeout:
+        sys.exit(f"ERROR: URL {config_url} timed out after {timeout}s")
+    except requests.exceptions.HTTPError as e:
+        sys.exit(
+            f"ERROR: URL {config_url} failed with status: {e.response.status_code}"
         )
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+    except json.JSONDecodeError:
+        sys.exit(f"ERROR: URL {config_url} did not return valid JSON")
+    except requests.exceptions.RequestException as e:
+        sys.exit(f"ERROR: A network error occurred: {e}")
 
 
 def get_json_section_config_parser(
@@ -212,9 +212,7 @@ def get_json_section_config_parser(
             sys.exit("ERROR: Section config extension must be '.json'")
 
     if not isinstance(section_parser, configparser.ConfigParser):
-        sys.exit(
-            f"ERROR: Expected ConfigParser, got {type(section_parser).__name__}"
-        )
+        sys.exit(f"ERROR: Expected ConfigParser, got {type(section_parser).__name__}")
 
     if section_parser.defaults():
         sys.exit("ERROR: Section config cannot have a 'DEFAULT' section")
@@ -294,11 +292,9 @@ def validate_log_config(
         }
         return LogConfigModel(**log)
     except ValidationError as e:
-        raise Exception(f"Failed to validate config, error(s): {e}")
+        sys.exit(f"ERROR: Log configuration is invalid: {e}")
     except ValueError as e:
-        raise Exception(f"Incorrect log related value in config, error(s): {e}")
-    except Exception as e:
-        raise Exception(f"{e}")
+        sys.exit(f"ERROR: Incorrect log related value in config: {e}")
 
 
 def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
@@ -319,14 +315,9 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
                 "Value for config value 'min_size_kb' must be greater than or equal "
                 "to 0"
             )
-    except ValidationError as e:
-        raise Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
-    except ValueError as e:  # pragma: no cover
-        raise Exception(
-            f"Incorrect value for config value 'min_size_kb', error(s): {e}"
-        )
-    except Exception as e:  # pragma: no cover
-        raise Exception(f"{e}")
+
+    except ValueError as e:
+        sys.exit(f"ERROR: Incorrect value for config value 'min_size_kb': {e}")
 
 
 class ConfigSectionModel(BaseModel):
@@ -358,16 +349,10 @@ def validate_config_section(
         if directory := config_parser.get(section, "directory", fallback=None):
             conf_section["directory"] = directory
         return ConfigSectionModel(**conf_section)
+    except (configparser.NoSectionError, configparser.NoOptionError) as e:
+        raise ValueError(f"Missing required key in section '{section}': {e}")
     except ValidationError as e:
-        return Exception(
-            f"Failed to validate config section '{section}', error(s): {e}"
-        )
-    except ValueError as e:
-        return Exception(
-            f"Incorrect value in config section '{section}', error(s): {e}"
-        )
-    except Exception as e:
-        return Exception(f"{e}")
+        raise ValueError(f"Failed to validate config section '{section}': {e}")
 
 
 class S3ConfigModel(BaseModel):
@@ -380,6 +365,7 @@ class S3ConfigModel(BaseModel):
     aws_secret_access_key: str
 
 
+# TODO remove
 def validate_s3_config() -> S3ConfigModel:
     """
     Return S3ConfigModel object after validating required environment variables.

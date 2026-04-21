@@ -81,12 +81,9 @@ def websnap(
     # validate_endpoint_url(endpoint_url, s3_uploader)
 
     # Validate configuration
-    try:
-        conf_parser = get_config_parser(config, section_config, timeout)
-        conf_log = validate_log_config(conf_parser)
-        min_size_kb = validate_min_size_kb(conf_parser)
-    except Exception as e:  # TODO refactor
-        raise e
+    conf_parser = get_config_parser(config, section_config, timeout)
+    conf_log = validate_log_config(conf_parser)
+    min_size_kb = validate_min_size_kb(conf_parser)
 
     # Validate custom log
     log = get_custom_logger(

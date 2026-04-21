@@ -62,12 +62,11 @@ def parse_arguments() -> argparse.Namespace | None:
     parser.add_argument(
         "--profile-name",
         help="Name of a profile to use for S3 shared credentials file. "
-         "If omitted then the default profile is used."
+        "If omitted then the default profile is used.",
     )
 
     parser.add_argument(
-        "--endpoint-url",
-        help="Complete URL to use for the constructed S3 client."
+        "--endpoint-url", help="Complete URL to use for the constructed S3 client."
     )
 
     parser.add_argument(
