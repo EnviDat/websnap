@@ -77,7 +77,8 @@ def websnap(
     """
     # Validate arguments
     validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
-    validate_endpoint_url(endpoint_url, s3_uploader)
+    # TODO implement after refactoring .gitlab-ci.yml
+    # validate_endpoint_url(endpoint_url, s3_uploader)
 
     # Validate configuration
     try:

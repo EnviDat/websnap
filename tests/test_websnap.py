@@ -26,6 +26,7 @@ def test_websnap(config_basic, config_min_size_kb, config_log, tmp_path):
             assert data["info"]["name"] == "websnap"
 
 
+# TODO refactor
 # This test only supports S3 configurations for buckets with public read access
 def test_websnap_s3(s3_config):
 
