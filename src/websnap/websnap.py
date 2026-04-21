@@ -9,7 +9,6 @@ from websnap.constants import TIMEOUT
 from websnap.validators import (
     get_config_parser,
     validate_log_config,
-    validate_s3_config,
     validate_min_size_kb,
     validate_positive_int_args,
     validate_endpoint_url,
@@ -19,6 +18,7 @@ from websnap.logic import (
     write_urls_locally,
     write_urls_to_s3,
     sleep_until_next_iteration,
+    create_s3_client,
 )
 
 __all__ = ["websnap"]
@@ -76,8 +76,7 @@ def websnap(
     """
     # Validate arguments
     validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
-    # TODO implement after refactoring .gitlab-ci.yml
-    # validate_endpoint_url(endpoint_url, s3_uploader)
+    validate_endpoint_url(endpoint_url, s3_uploader)
 
     # Validate configuration
     conf_parser = get_config_parser(config, section_config, timeout)
@@ -103,16 +102,11 @@ def websnap(
             f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
         )
 
-        # TODO refactor to use shared credentials file and common session
         if s3_uploader:
-            try:
-                conf_s3 = validate_s3_config()
-            # TODO refactor
-            except Exception as e:
-                raise e
+            s3_client = create_s3_client(endpoint_url, profile_name)
             write_urls_to_s3(
                 conf_parser,
-                conf_s3,
+                s3_client,
                 log,
                 min_size_kb,
                 backup_s3_count,

@@ -2,7 +2,6 @@
 
 import configparser
 import json
-import os
 import sys
 from pathlib import Path
 import requests
@@ -17,7 +16,6 @@ from pydantic import (
     TypeAdapter,
 )
 from typing import Optional, Any
-from dotenv import load_dotenv
 from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
 
@@ -335,7 +333,7 @@ def validate_config_section(
 ) -> ConfigSectionModel | Exception:
     """
     Return ConfigSectionModel object.
-    Returns Exception if parsing fails.
+    Raises ValidationError if parsing fails.
 
     Args:
         config_parser: ConfigParser object
@@ -355,38 +353,6 @@ def validate_config_section(
         raise ValueError(f"Failed to validate config section '{section}': {e}")
 
 
-class S3ConfigModel(BaseModel):
-    """
-    Class with required S3 config values and their types.
-    """
-
-    endpoint_url: AnyUrl
-    aws_access_key_id: str
-    aws_secret_access_key: str
-
-
-# TODO remove
-def validate_s3_config() -> S3ConfigModel:
-    """
-    Return S3ConfigModel object after validating required environment variables.
-    """
-    try:
-        load_dotenv()
-        s3_conf = {
-            "endpoint_url": os.getenv("ENDPOINT_URL"),
-            "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
-            "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-        }
-        return S3ConfigModel(**s3_conf)
-    except ValidationError as e:
-        raise Exception(
-            f"Failed to validate S3 config environment variables, error(s): {e}"
-        )
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
-
-
-# TODO remove
 class S3ConfigSectionModel(BaseModel):
     """
     Class with required config section values (for writing to S3 bucket).
@@ -417,7 +383,7 @@ def validate_s3_config_section(
 ) -> S3ConfigSectionModel | Exception:
     """
     Return S3ConfigSectionModel object.
-    Returns Exception if parsing fails.
+    Raises ValueError if parsing fails or config is invalid.
 
     Args:
         config_parser: ConfigParser object
@@ -430,11 +396,7 @@ def validate_s3_config_section(
             "key": config_parser.get(section, "key"),
         }
         return S3ConfigSectionModel(**conf_section)
-    except ValidationError as e:
-        # TODO refactor to raise error
-        return Exception(
-            f"Failed to validate config section '{section}', error(s): {e}"
-        )
-    # TODO remove
-    except Exception as e:
-        return Exception(f"{e}")
+    except (configparser.NoSectionError, configparser.NoOptionError) as e:
+        raise ValueError(f"Missing required key in S3 config section '{section}': {e}")
+    except (ValidationError, ValueError) as e:
+        raise ValueError(f"Failed to validate S3 config section '{section}': {e}")
