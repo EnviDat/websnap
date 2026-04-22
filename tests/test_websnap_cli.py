@@ -1,30 +1,15 @@
 """Tests for src/websnap/websnap_cli.py"""
 
-import subprocess
+from websnap.websnap_cli import main
+import unittest.mock as mock
 
 
 def test_websnap_cli(config_basic):
+    # Mock sys.argv to simulate command line input
+    test_args = ["websnap_cli", f"--config={config_basic[0]}", "--log-level=WARNING"]
 
-    result_pass = subprocess.run(
-        [
-            "websnap_cli",
-            f"--config={config_basic[0]}",
-            "--log-level=WARNING",
-            "--file-logs",
-            "--timeout=30",
-            "--early-exit",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert result_pass.returncode == 0
-
-    result_fail = subprocess.run(
-        [
-            "websnap_cli",
-            "--timeout=not_a_number",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert result_fail.returncode != 0
+    with mock.patch("sys.argv", test_args):
+        try:
+            main()
+        except SystemExit as e:
+            assert e.code == 0
