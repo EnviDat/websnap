@@ -297,7 +297,7 @@ def delete_s3_backup_object(
         key_split = conf.key.rpartition("/")
 
         if not key_split[0]:
-            response = client.list_objects_v2(  # pragma: no cover
+            response = client.list_objects_v2(
                 Bucket=conf.bucket,
             )
         else:
@@ -333,14 +333,14 @@ def delete_s3_backup_object(
                 log.info(
                     f"Config section '{section}': Deleted backup file '{delete_key}'"
                 )
-            else:  # pragma: no cover
+            else:
                 log.error(
                     f"Config section '{section}': Backup file delete "
                     f"attempt returned unexpected HTTP response {status_code}"
                 )
                 terminate_program(early_exit)
 
-        else:  # pragma: no cover
+        else:
             log.info(
                 f"Config section '{section}': Current number of backup "
                 f"files does not exceed backup S3 count {backup_s3_count}"
@@ -464,34 +464,36 @@ def write_urls_to_s3(
                 client, conf, log, section, backup_s3_count, early_exit
             )
 
-        response_s3 = None
         try:
             response_s3 = client.put_object(
                 Body=url_content, Bucket=conf.bucket, Key=conf.key
             )
+
+            if (
+                status_code := response_s3.get("ResponseMetadata", {}).get(
+                    "HTTPStatusCode"
+                )
+            ) == 200:
+                log.info(
+                    f"Config section '{section}': Successfully copied URL "
+                    f"content to S3 object '{conf.key}'"
+                )
+            else:
+                log.error(
+                    f"Config section '{section}': S3 client returned unexpected "
+                    f"HTTP response {status_code}"
+                )
+                terminate_program(early_exit)
+
         except ClientError as err:
             handle_s3_client_error(err, log, section, early_exit)
-
-        if (
-            status_code := response_s3.get("ResponseMetadata", {}).get("HTTPStatusCode")
-        ) == 200:
-            log.info(
-                f"Config section '{section}': Successfully copied URL "
-                f"content to S3 object '{conf.key}'"
-            )
-        else:
-            log.error(
-                f"Config section '{section}': S3 client returned unexpected "
-                f"HTTP response {status_code}"
-            )
-            terminate_program(early_exit)
 
     return
 
 
 def sleep_until_next_iteration(
     sleep_minutes: int, start_time: float, log: logging.getLogger
-) -> None:  # pragma: no cover
+) -> None:
     """
     Sleep (delay execution) <sleep_minutes> minutes until next websnap iteration.
 

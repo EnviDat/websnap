@@ -83,7 +83,6 @@ def websnap(
     conf_log = validate_log_config(conf_parser)
     min_size_kb = validate_min_size_kb(conf_parser)
 
-    # Validate custom log
     log = get_custom_logger(
         name=LOGGER_NAME,
         level=log_level,
