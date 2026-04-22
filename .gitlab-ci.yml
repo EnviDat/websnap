@@ -27,36 +27,36 @@ test:
   script:
     - pdm run pytest --cov=websnap --cov-report=term-missing --s3-config "$CI_PROJECT_DIR/tests/config_test.json"
 
-#
-#test-tox:
-#  stage: test
-#  image: python:${PYTHON_VERSION}-slim-bookworm
-#  before_script:
-#    - pip install pdm
-#    - pdm sync --dev
-#    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
-#    - echo "$TEST_CONFIG_JSON" > config_test.json
-#    - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
-#  script:
-#    - pdm run tox -e py${PYTHON_VERSION}  # Run tox for different versions
-#  parallel:
-#    matrix:
-#      - PYTHON_VERSION: [ "3.11", "3.12", "3.13", "3.14" ]
-#  when: manual
-#
-#
-#backup:
-#  stage: backup
-#  before_script:
-#    - pip install pdm
-#    - pdm sync
-#    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
-#    - echo "$CONFIG_INI" > config_ci.ini
-#    - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
-#  script:
-#     - pdm run websnap-cli --s3-uploader --endpoint-url "$ENDPOINT_URL" --backup-s3-count "$BACKUP_S3_COUNT" --early-exit
-#
-#
+
+test-tox:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim-bookworm
+  before_script:
+    - pip install pdm
+    - pdm sync --dev
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - echo "$TEST_CONFIG_JSON" > config_test.json
+    - scp config_test.json "$CI_PROJECT_DIR/tests/config_test.json"
+  script:
+    - pdm run tox -e py${PYTHON_VERSION}  # Run tox for different versions
+  parallel:
+    matrix:
+      - PYTHON_VERSION: [ "3.11", "3.12", "3.13", "3.14" ]
+  when: manual
+
+
+backup:
+  stage: backup
+  before_script:
+    - pip install pdm
+    - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - echo "$CONFIG_INI" > config_ci.ini
+    - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
+  script:
+     - pdm run websnap-cli --s3-uploader --endpoint-url "$ENDPOINT_URL" --backup-s3-count "$BACKUP_S3_COUNT" --early-exit
+
+
 #opendata-swiss:
 #  stage: opendata-swiss
 #  before_script:
