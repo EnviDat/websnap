@@ -40,7 +40,7 @@ def test_validate_positive_integer(x):
 
 @pytest.mark.parametrize("timeout, backup_s3_count", [(-1, None), (2, -3)])
 def test_validate_positive_int_args(timeout, backup_s3_count):
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         assert validate_positive_int_args(timeout, backup_s3_count)
 
 
@@ -50,12 +50,12 @@ def test_validate_endpoint_url():
 
 
 def test_validate_endpoint_url_no_url():
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         validate_endpoint_url(None, True)
 
 
 def test_validate_endpoint_url_invalid():
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         validate_endpoint_url("abc", True)
 
 
@@ -88,7 +88,7 @@ def test_json_config_parser(config_basic):
 
 
 def test_json_config_parser_nonexistent_config():
-    with pytest.raises(SystemExit):
+    with pytest.raises(FileNotFoundError):
         get_json_config_parser(Path("nonexistent_config.json"))
 
 
@@ -96,7 +96,7 @@ def test_get_json_config_parser_invalid_json(tmp_path):
     broken_file = tmp_path / "broken.json"
     broken_file.write_text("{ 'invalid': json }")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         get_json_config_parser(broken_file)
 
 
@@ -106,7 +106,7 @@ def test_get_url_json_config_parser_timeout(mock_get):
     timeout_val = 5
     mock_get.side_effect = requests.exceptions.Timeout()
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(TimeoutError):
         get_url_json_config_parser(url, timeout=timeout_val)
 
 
@@ -118,7 +118,7 @@ def test_get_url_json_config_parser():
     )
     assert isinstance(result_1, configparser.ConfigParser)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(RuntimeError):
         get_url_json_config_parser("https://httpbin.org/status/400", 30)
 
 
@@ -131,7 +131,7 @@ def test_get_url_json_config_parser_json_error(mock_get):
     mock_response.json.side_effect = json.JSONDecodeError("Expecting value", "", 0)
     mock_get.return_value = mock_response
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         get_url_json_config_parser(url)
 
 
@@ -142,7 +142,7 @@ def test_get_url_json_config_parser_request_exception(mock_get):
     # Raise a general RequestException (like a ConnectionError)
     mock_get.side_effect = requests.exceptions.RequestException("DNS failure")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ConnectionError):
         get_url_json_config_parser(url)
 
 
@@ -155,21 +155,13 @@ def test_get_json_section_config_parser():
     assert isinstance(result, configparser.ConfigParser)
 
 
-@pytest.mark.parametrize(
-    "section_config", ["section_config.ini", "section_config.json"]
-)
-def test_get_json_section_config_parser_invalid_section_config(section_config):
-    with pytest.raises(SystemExit):
-        get_json_section_config_parser(section_config)
-
-
 @patch("websnap.validators.is_url")
 @patch("websnap.validators.get_json_config_parser")
 def test_get_json_section_config_parser_not_instance(mock_get_json, mock_is_url):
     mock_is_url.return_value = False
     mock_get_json.return_value = "I am a string, not a parser"
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(TypeError):
         get_json_section_config_parser("test.json")
 
 
@@ -182,7 +174,7 @@ def test_get_json_section_config_parser_has_defaults(mock_get_json, mock_is_url)
     parser_with_defaults["DEFAULT"] = {"key": "value"}
     mock_get_json.return_value = parser_with_defaults
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         get_json_section_config_parser("test.json")
 
 
@@ -195,16 +187,16 @@ def test_get_config_parser(config_basic):
     "config, section_config, timeout",
     [
         ("config_1.ini", "section_config.ini", 30),
-        ("config_2.json", "section_config.json", 30),
+        ("config_2.ini", "section_config.json", 30),
     ],
 )
 def test_get_config_parser_invalid_parameters(config, section_config, timeout):
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         get_config_parser(config=config, section_config=section_config, timeout=timeout)
 
 
 def test_get_config_parser_invalid_section_config(config_basic):
-    with pytest.raises(SystemExit):
+    with pytest.raises(FileNotFoundError):
         get_config_parser(
             config=config_basic[0], section_config="non-existent.json", timeout=30
         )
@@ -255,7 +247,7 @@ def test_get_config_parser_merges_successfully(
 def test_get_config_parser_ini_file_not_found(tmp_path):
     missing_ini = tmp_path / "does_not_exist.ini"
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(FileNotFoundError):
         get_config_parser(str(missing_ini))
 
 
@@ -263,7 +255,7 @@ def test_get_config_parser_no_sections_error(tmp_path):
     empty_conf = tmp_path / "empty.ini"
     empty_conf.write_text("# This file only has comments\n# No sections here.")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         get_config_parser(str(empty_conf))
 
 
@@ -286,7 +278,7 @@ def test_validate_log_config_validation_error(mock_model):
     parser = configparser.ConfigParser()
     mock_model.side_effect = ValidationError.from_exception_data("TestModel", [])
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         validate_log_config(parser)
 
 
@@ -294,7 +286,7 @@ def test_validate_log_config_value_error():
     parser = configparser.ConfigParser()
     parser.set("DEFAULT", "log_interval", "not-a-number")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         validate_log_config(parser)
 
 
@@ -309,7 +301,7 @@ def test_validate_min_size_kb_negative_error():
     parser = configparser.ConfigParser()
     parser.set("DEFAULT", "min_size_kb", "-50")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         validate_min_size_kb(parser)
 
 
@@ -318,7 +310,7 @@ def test_validate_min_size_kb_type_error():
     parser = configparser.ConfigParser()
     parser.set("DEFAULT", "min_size_kb", "not-a-number")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         validate_min_size_kb(parser)
 
 

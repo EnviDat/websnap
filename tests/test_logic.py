@@ -455,13 +455,13 @@ def test_delete_s3_backup_object_client_error(mock_handler):
 )
 @patch("websnap.logic.boto3.Session")
 def test_create_s3_client_exceptions(mock_session_class, exception_to_raise):
-    """Test that BotoCore, NoCredentials, and Endpoint errors trigger SystemExit."""
+    """Test that BotoCore, NoCredentials, and Endpoint errors trigger ConnectionError."""
     mock_session_instance = MagicMock()
     mock_session_class.return_value = mock_session_instance
 
     mock_session_instance.client.side_effect = exception_to_raise
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ConnectionError):
         create_s3_client(endpoint_url="http://localhost:4566")
 
 
