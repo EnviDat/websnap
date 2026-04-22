@@ -5,10 +5,10 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.5.0"
-content_hash = "sha256:ded0d92e3c0bab1a060d08f1d215ce3d741755b3b6bb2d392a94f8818437ed89"
+content_hash = "sha256:740f683b55cd0efd8f8a064971f9886e6527098b60510057beed9d03f97a4267"
 
 [[metadata.targets]]
-requires_python = ">=3.11"
+requires_python = ">=3.12"
 
 [[package]]
 name = "annotated-types"
