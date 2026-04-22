@@ -38,7 +38,6 @@ target="_blank">Click here to view a websnap overview diagram.</a>
 </p>
 
 
-###
 #### Function
 
 ```python
@@ -51,7 +50,6 @@ websnap()
 websnap(file_logs=True, s3_uploader=True, endpoint_url="https://examplecloud.com", backup_s3_count=7, early_exit=True)
 ```
 
-###
 #### CLI
 
 To access CLI documentation in terminal execute: 
