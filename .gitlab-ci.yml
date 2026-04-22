@@ -40,21 +40,19 @@ test-tox:
       - PYTHON_VERSION: [ "3.11", "3.12", "3.13", "3.14" ]
   when: manual
 
+backup:
+  stage: backup
+  before_script:
+    - pip install pdm
+    - pdm sync
+    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
+    - echo "$CONFIG_INI" > config_ci.ini
+    - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
+  script:
+     - pdm run websnap-cli --s3-uploader --endpoint-url "$ENDPOINT_URL" --backup-s3-count "$BACKUP_S3_COUNT" --early-exit
+
 
 # TODO reimplement jobs
-#
-## TODO test --endpoint-url
-#backup:
-#  stage: backup
-#  before_script:
-#    - pip install pdm
-#    - pdm sync
-#    - apt-get update && apt-get install -y openssh-client && rm -rf /var/lib/apt/lists/*
-#    - echo "$CONFIG_INI" > config_ci.ini
-#    - scp config_ci.ini "$CI_PROJECT_DIR/config.ini"
-#  script:
-#     - pdm run websnap-cli --s3-uploader --endpoint-url "$ENDPOINT_URL" --backup-s3-count "$BACKUP_S3_COUNT" --early-exit
-#
 ## TODO add --endpoint-url to other jobs
 #
 #
