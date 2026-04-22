@@ -48,7 +48,7 @@ from websnap import websnap
 websnap()
 
 # Execute websnap passing arguments
-websnap(file_logs=True, s3_uploader=True, backup_s3_count=7, early_exit=True)
+websnap(file_logs=True, s3_uploader=True, endpoint_url="https://examplecloud.com", backup_s3_count=7, early_exit=True)
 ```
 
 ###
@@ -165,7 +165,7 @@ aws_secret_access_key=singer
 # The s3_uploader argument must be passed as True to copy files as objects to an S3 bucket
 # If s3_uploader is True then the endpoint_url argument must also be passed 
 
-# Copies objects to an S3 bucket using default argument values
+# Copies objects to an S3 bucket 
 websnap(s3_uploader=True, endpoint_url="https://examplecloud.com")
 
 # Copies objects to an S3 bucket, repeats every 1440 minutes (24 hours),
