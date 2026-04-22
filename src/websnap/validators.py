@@ -2,9 +2,7 @@
 
 import configparser
 import json
-import os
 from pathlib import Path
-
 import requests
 from pydantic import (
     BaseModel,
@@ -17,8 +15,6 @@ from pydantic import (
     TypeAdapter,
 )
 from typing import Optional, Any
-from dotenv import load_dotenv
-
 from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
 
@@ -34,8 +30,8 @@ def validate_positive_integer(x: Any) -> int:
     try:
         ta.validate_python(x)
         return x
-    except ValidationError:
-        raise Exception(f"{x} is not a a positive integer")
+    except (ValueError, ValidationError):
+        raise ValueError(f"Argument is not a a positive integer: {x}")
 
 
 def validate_positive_int_args(
@@ -63,17 +59,45 @@ def validate_positive_int_args(
         "repeat_minutes": repeat_minutes,
     }
 
-    param = None
     try:
         for param, arg in param_arg_dict.items():
             if param == "timeout":
                 validate_positive_integer(arg)
             elif arg is not None:
                 validate_positive_integer(arg)
-    except Exception as e:
-        raise Exception(f"Invalid argument passed for parameter {param}: {e}")
+    except ValueError as e:
+        raise ValueError(e)
 
     return
+
+
+def validate_endpoint_url(endpoint_url: str | None, s3_uploader: bool) -> str:
+    """
+    Validate and return endpoint_url, it must be truthy and an http or https URL.
+    If validation fails then raises Exception.
+    """
+    if s3_uploader and not endpoint_url:
+        raise ValueError(
+            "'--endpoint-url' option (endpoint_url function argument) "
+            "must be provided when the "
+            "'--s3-uploader' option (s3_uploader function argument) "
+            "is enabled (set to True)"
+        )
+
+    if endpoint_url:
+        try:
+            ta = TypeAdapter(AnyHttpUrl)
+            validated = ta.validate_python(endpoint_url)
+            return str(validated)
+
+        except ValidationError:
+            raise ValueError(
+                f"'--endpoint-url' value (endpoint_url function argument) "
+                f"'{endpoint_url}' "
+                f"is not a valid HTTP/HTTPS URL"
+            )
+
+    return endpoint_url
 
 
 def is_url(x: Any) -> bool:
@@ -100,7 +124,6 @@ def merge_config_parsers(
     the values from config_2 will overwrite those in config_1.
     """
     for section in config_2.sections():
-
         if not config_1.has_section(section):
             config_1.add_section(section)
 
@@ -127,9 +150,9 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser:
         return config_parser
 
     except FileNotFoundError:
-        raise Exception(f"File '{config_path}' not found")
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+        raise FileNotFoundError(f"File '{config_path}' not found")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"File '{config_path}' is not valid JSON: {e}")
 
 
 def get_url_json_config_parser(
@@ -145,11 +168,7 @@ def get_url_json_config_parser(
     try:
         response = requests.get(config_url, timeout=timeout)
 
-        if not response.ok:
-            raise Exception(
-                f"URL {config_url} returned unsuccessful "
-                f"status code {response.status_code}"
-            )
+        response.raise_for_status()
 
         data = response.json()
 
@@ -158,12 +177,16 @@ def get_url_json_config_parser(
 
         return config_parser
 
-    except requests.exceptions.Timeout:  # pragma: no cover
-        raise Exception(
-            f"URL {config_url} timed out while waiting {timeout} seconds for response"
+    except requests.exceptions.Timeout:
+        raise TimeoutError("URL {config_url} timed out after {timeout}s")
+    except requests.exceptions.HTTPError as e:
+        raise RuntimeError(
+            f"URL {config_url} failed with status: {e.response.status_code}"
         )
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+    except json.JSONDecodeError:
+        raise ValueError(f"URL {config_url} did not return valid JSON")
+    except requests.exceptions.RequestException as e:
+        raise ConnectionError(f"A network error occurred: {e}")
 
 
 def get_json_section_config_parser(
@@ -177,26 +200,21 @@ def get_json_section_config_parser(
         section_config: File or URL with additional configuration sections.
         timeout: Number of seconds to wait for response for each HTTP request.
     """
-    try:
-
-        if is_url(section_config):
-            section_parser = get_url_json_config_parser(section_config, timeout)
+    if is_url(section_config):
+        section_parser = get_url_json_config_parser(section_config, timeout)
+    else:
+        if (section_path := Path(section_config)).suffix == ".json":
+            section_parser = get_json_config_parser(section_path)
         else:
-            if (section_path := Path(section_config)).suffix == ".json":
-                section_parser = get_json_config_parser(section_path)
-            else:
-                raise Exception("Section config extension must be '.json'")
+            raise ValueError("Section config extension must be '.json'")
 
-        if not isinstance(section_parser, configparser.ConfigParser):
-            raise Exception(section_parser)
+    if not isinstance(section_parser, configparser.ConfigParser):
+        raise TypeError(f"Expected ConfigParser, got {type(section_parser).__name__}")
 
-        if section_parser.defaults():
-            raise Exception(f"Section config cannot have a 'DEFAULT' section")
+    if section_parser.defaults():
+        raise ValueError("Section config cannot have a 'DEFAULT' section")
 
-        return section_parser
-
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+    return section_parser
 
 
 def get_config_parser(
@@ -213,32 +231,28 @@ def get_config_parser(
                               Default value is None.
         timeout: Number of seconds to wait for response for each HTTP request.
     """
-    try:
-        conf_path = Path(config)
+    conf_path = Path(config)
 
-        if section_config and conf_path.suffix != ".json":
-            raise Exception(
-                f"Config '{config}' extension must be '.json' to also use "
-                f"optional section config '{section_config}'"
-            )
-        elif conf_path.suffix == ".json":
-            config_parser = get_json_config_parser(conf_path)
-            if section_config:
-                section_parser = get_json_section_config_parser(section_config, timeout)
-                config_parser = merge_config_parsers(config_parser, section_parser)
-        else:  # pragma: no cover
-            config_parser = configparser.ConfigParser()
-            conf = config_parser.read(conf_path)
-            if not conf:
-                raise Exception(f"File '{config}' not found")
+    if section_config and conf_path.suffix != ".json":
+        raise ValueError(
+            f"Config '{config}' extension must be '.json' to also use "
+            f"optional section config '{section_config}'"
+        )
+    elif conf_path.suffix == ".json":
+        config_parser = get_json_config_parser(conf_path)
+        if section_config:
+            section_parser = get_json_section_config_parser(section_config, timeout)
+            config_parser = merge_config_parsers(config_parser, section_parser)
+    else:
+        config_parser = configparser.ConfigParser()
+        conf = config_parser.read(conf_path)
+        if not conf:
+            raise FileNotFoundError(f"File '{config}' not found")
 
-        if len(config_parser.sections()) < 1:  # pragma: no cover
-            raise Exception(f"File '{config}' does not have any sections")
+    if len(config_parser.sections()) < 1:
+        raise ValueError(f"File '{config}' does not have any sections")
 
-        return config_parser
-
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+    return config_parser
 
 
 class LogConfigModel(BaseModel):
@@ -275,11 +289,9 @@ def validate_log_config(
         }
         return LogConfigModel(**log)
     except ValidationError as e:
-        raise Exception(f"Failed to validate config, error(s): {e}")
+        raise ValueError(f"Log configuration is invalid: {e}")
     except ValueError as e:
-        raise Exception(f"Incorrect log related value in config, error(s): {e}")
-    except Exception as e:
-        raise Exception(f"{e}")
+        raise ValueError(f"Incorrect log related value in config: {e}")
 
 
 def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
@@ -300,14 +312,9 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
                 "Value for config value 'min_size_kb' must be greater than or equal "
                 "to 0"
             )
-    except ValidationError as e:
-        raise Exception(f"Failed to validate config value 'min_size_kb, error(s): {e}")
-    except ValueError as e:  # pragma: no cover
-        raise Exception(
-            f"Incorrect value for config value 'min_size_kb', error(s): {e}"
-        )
-    except Exception as e:  # pragma: no cover
-        raise Exception(f"{e}")
+
+    except ValueError as e:
+        raise ValueError(f"Incorrect value for config value 'min_size_kb': {e}")
 
 
 class ConfigSectionModel(BaseModel):
@@ -325,7 +332,7 @@ def validate_config_section(
 ) -> ConfigSectionModel | Exception:
     """
     Return ConfigSectionModel object.
-    Returns Exception if parsing fails.
+    Raises ValidationError if parsing fails.
 
     Args:
         config_parser: ConfigParser object
@@ -339,46 +346,10 @@ def validate_config_section(
         if directory := config_parser.get(section, "directory", fallback=None):
             conf_section["directory"] = directory
         return ConfigSectionModel(**conf_section)
+    except (configparser.NoSectionError, configparser.NoOptionError) as e:
+        raise ValueError(f"Missing required key in section '{section}': {e}")
     except ValidationError as e:
-        return Exception(
-            f"Failed to validate config section '{section}', error(s): {e}"
-        )
-    except ValueError as e:
-        return Exception(
-            f"Incorrect value in config section '{section}', error(s): {e}"
-        )
-    except Exception as e:
-        return Exception(f"{e}")
-
-
-class S3ConfigModel(BaseModel):
-    """
-    Class with required S3 config values and their types.
-    """
-
-    endpoint_url: AnyUrl
-    aws_access_key_id: str
-    aws_secret_access_key: str
-
-
-def validate_s3_config() -> S3ConfigModel:
-    """
-    Return S3ConfigModel object after validating required environment variables.
-    """
-    try:
-        load_dotenv()
-        s3_conf = {
-            "endpoint_url": os.getenv("ENDPOINT_URL"),
-            "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
-            "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-        }
-        return S3ConfigModel(**s3_conf)
-    except ValidationError as e:
-        raise Exception(
-            f"Failed to validate S3 config environment variables, error(s): {e}"
-        )
-    except Exception as e:  # pragma: no cover
-        raise Exception(e)
+        raise ValueError(f"Failed to validate config section '{section}': {e}")
 
 
 class S3ConfigSectionModel(BaseModel):
@@ -411,7 +382,7 @@ def validate_s3_config_section(
 ) -> S3ConfigSectionModel | Exception:
     """
     Return S3ConfigSectionModel object.
-    Returns Exception if parsing fails.
+    Raises ValueError if parsing fails or config is invalid.
 
     Args:
         config_parser: ConfigParser object
@@ -424,9 +395,7 @@ def validate_s3_config_section(
             "key": config_parser.get(section, "key"),
         }
         return S3ConfigSectionModel(**conf_section)
-    except ValidationError as e:
-        return Exception(
-            f"Failed to validate config section '{section}', error(s): {e}"
-        )
-    except Exception as e:
-        return Exception(f"{e}")
+    except (configparser.NoSectionError, configparser.NoOptionError) as e:
+        raise ValueError(f"Missing required key in S3 config section '{section}': {e}")
+    except (ValidationError, ValueError) as e:
+        raise ValueError(f"Failed to validate S3 config section '{section}': {e}")

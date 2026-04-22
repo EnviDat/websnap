@@ -3,22 +3,22 @@ Function websnap() downloads files from URLs and uploads them to S3 bucket.
 Also supports writing downloaded files to local machine.
 """
 
-import logging
 import time
 
 from websnap.constants import TIMEOUT
 from websnap.validators import (
     get_config_parser,
     validate_log_config,
-    validate_s3_config,
     validate_min_size_kb,
     validate_positive_int_args,
+    validate_endpoint_url,
 )
 from websnap.logger import get_custom_logger
 from websnap.logic import (
     write_urls_locally,
     write_urls_to_s3,
     sleep_until_next_iteration,
+    create_s3_client,
 )
 
 __all__ = ["websnap"]
@@ -31,6 +31,8 @@ def websnap(
     log_level: str = "INFO",
     file_logs: bool = False,
     s3_uploader: bool = False,
+    profile_name: str | None = None,
+    endpoint_url: str | None = None,
     backup_s3_count: int | None = None,
     timeout: int = TIMEOUT,
     early_exit: bool = False,
@@ -46,6 +48,9 @@ def websnap(
         log_level: Level to use for logging.
         file_logs: If True then implements rotating file logs.
         s3_uploader: If True then uploads files to S3 bucket.
+        profile_name: Name of a profile to use for S3 shared credentials file.
+                      If omitted then the default profile is used.
+        endpoint_url: Complete URL to use for the constructed S3 client.
         backup_s3_count: Copy and backup S3 objects in each config section
             <backup_s3_count> times,
             remove object with the oldest last modified timestamp.
@@ -69,53 +74,38 @@ def websnap(
                 Duplicate sections will overwrite values with the same section
                 passed in the `config` argument.
     """
-    # Validate integer arguments
-    try:
-        validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
-    except Exception as e:
-        raise e
+    # Validate arguments
+    validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
+    validate_endpoint_url(endpoint_url, s3_uploader)
 
     # Validate configuration
-    try:
-        conf_parser = get_config_parser(config, section_config, timeout)
-        conf_log = validate_log_config(conf_parser)
-        min_size_kb = validate_min_size_kb(conf_parser)
-    except Exception as e:
-        raise e
+    conf_parser = get_config_parser(config, section_config, timeout)
+    conf_log = validate_log_config(conf_parser)
+    min_size_kb = validate_min_size_kb(conf_parser)
 
-    # Validate custom log
     log = get_custom_logger(
         name=LOGGER_NAME,
         level=log_level,
         file_logs=file_logs,
         config=conf_log,
     )
-    if not isinstance(log, logging.Logger):
-        raise Exception(log)
 
     # Copy URL files and write to S3 bucket or local machine
     is_repeat = True
     while is_repeat:
-
-        # Do not repeat iteration if repeat_minutes is None
         is_repeat = repeat_minutes is not None
-
         start_time = time.time()
 
         log.info("******* START WEBSNAP ITERATION *******")
         log.info(
-            f"Read config file: '{config}', it has sections: "
-            f"{conf_parser.sections()}"
+            f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
         )
 
         if s3_uploader:
-            try:
-                conf_s3 = validate_s3_config()
-            except Exception as e:
-                raise e
+            s3_client = create_s3_client(endpoint_url, profile_name)
             write_urls_to_s3(
                 conf_parser,
-                conf_s3,
+                s3_client,
                 log,
                 min_size_kb,
                 backup_s3_count,
@@ -127,7 +117,7 @@ def websnap(
 
         log.info("Finished websnap iteration")
 
-        if is_repeat:  # pragma: no cover
+        if is_repeat:
             sleep_until_next_iteration(repeat_minutes, start_time, log)
 
     return

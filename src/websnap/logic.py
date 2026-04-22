@@ -11,14 +11,18 @@ from math import ceil
 
 import requests
 import boto3
-from botocore.exceptions import ClientError
+from botocore.config import Config
+from botocore.exceptions import (
+    ClientError,
+    BotoCoreError,
+    NoCredentialsError,
+    EndpointConnectionError,
+)
 import sys
 
 from websnap.validators import (
     validate_config_section,
-    S3ConfigModel,
     validate_s3_config_section,
-    ConfigSectionModel,
     S3ConfigSectionModel,
 )
 
@@ -52,7 +56,6 @@ def get_url_content(
             If False then only logs error and continues execution.
     """
     try:
-
         response = requests.get(url, timeout=timeout)
 
         if not response.ok:
@@ -66,7 +69,7 @@ def get_url_content(
 
         return response.content
 
-    except requests.exceptions.Timeout:  # pragma: no cover
+    except requests.exceptions.Timeout:
         log.error(
             f"Config section '{section}': "
             f"URL timed out while waiting {timeout} seconds for response"
@@ -131,56 +134,47 @@ def write_urls_locally(
             If False then only logs error and continues execution.
     """
     for section in conf_parser.sections():
-
         try:
             conf = validate_config_section(conf_parser, section)
-            if not isinstance(conf, ConfigSectionModel):
-                log.error(f"Config section '{section}': {conf}")
-                terminate_program(early_exit)
-                continue
-
-            if conf.directory and not os.path.isdir(conf.directory):  # pragma: no cover
-                log.error(
-                    f"Config section '{section}': directory '{conf.directory}' "
-                    f"does not exist"
-                )
-                terminate_program(early_exit)
-                continue
-
-            url_content = get_url_content(
-                str(conf.url), section, log, timeout, early_exit
-            )
-            if not url_content:  # pragma: no cover
-                continue
-
-            is_min_size = is_min_size_kb(
-                url_content, min_size_kb, section, log, early_exit
-            )
-            if not is_min_size:  # pragma: no cover
-                continue
-
-            if conf.directory:
-                file_path = f"{conf.directory}/{conf.file_name}"
-            else:  # pragma: no cover
-                file_path = f"{conf.file_name}"
-
-            with open(file_path, "wb") as f:
-                f.write(url_content)
-                log.info(
-                    f"Successfully downloaded URL content and wrote file locally in "
-                    f"config section: {section}"
-                )
-
-        except Exception as e:  # pragma: no cover
-            log.error(f"Config section '{section}', error(s): {e}")
+        except ValueError as e:
+            log.error(e)
             terminate_program(early_exit)
+            continue
+
+        if conf.directory and not os.path.isdir(conf.directory):
+            log.error(
+                f"Config section '{section}': directory '{conf.directory}' "
+                f"does not exist"
+            )
+            terminate_program(early_exit)
+            continue
+
+        url_content = get_url_content(str(conf.url), section, log, timeout, early_exit)
+        if not url_content:
+            continue
+
+        is_min_size = is_min_size_kb(url_content, min_size_kb, section, log, early_exit)
+        if not is_min_size:
+            continue
+
+        if conf.directory:
+            file_path = f"{conf.directory}/{conf.file_name}"
+        else:
+            file_path = f"{conf.file_name}"
+
+        with open(file_path, "wb") as f:
+            f.write(url_content)
+            log.info(
+                f"Successfully downloaded URL content and wrote file locally in "
+                f"config section: {section}"
+            )
 
     return
 
 
 def handle_s3_client_error(
     err: ClientError, log: logging.getLogger, section: str, early_exit: bool
-) -> None:  # pragma: no cover
+) -> None:
     """
     Handles and logs botocore.exceptions.ClientError returned by failed S3 client
     method call.
@@ -254,9 +248,9 @@ def copy_s3_object(
 
         if status_code == 200:
             log.info(
-                f"Config section '{section}': " f"Created new backup file '{key_copy}'"
+                f"Config section '{section}': Created new backup file '{key_copy}'"
             )
-        else:  # pragma: no cover
+        else:
             log.error(
                 f"Config section '{section}': "
                 f"Object backup attempt returned "
@@ -303,7 +297,7 @@ def delete_s3_backup_object(
         key_split = conf.key.rpartition("/")
 
         if not key_split[0]:
-            response = client.list_objects_v2(  # pragma: no cover
+            response = client.list_objects_v2(
                 Bucket=conf.bucket,
             )
         else:
@@ -328,7 +322,6 @@ def delete_s3_backup_object(
         sorted_objs = sorted(match_objs, key=lambda x: x["LastModified"])
 
         if len(sorted_objs) > backup_s3_count:
-
             obj_oldest = sorted_objs[0]
             delete_key = obj_oldest.get("Key")
 
@@ -338,17 +331,16 @@ def delete_s3_backup_object(
 
             if status_code == 204:
                 log.info(
-                    f"Config section '{section}': "
-                    f"Deleted backup file '{delete_key}'"
+                    f"Config section '{section}': Deleted backup file '{delete_key}'"
                 )
-            else:  # pragma: no cover
+            else:
                 log.error(
                     f"Config section '{section}': Backup file delete "
                     f"attempt returned unexpected HTTP response {status_code}"
                 )
                 terminate_program(early_exit)
 
-        else:  # pragma: no cover
+        else:
             log.info(
                 f"Config section '{section}': Current number of backup "
                 f"files does not exceed backup S3 count {backup_s3_count}"
@@ -360,9 +352,71 @@ def delete_s3_backup_object(
     return
 
 
+def create_s3_client(
+    endpoint_url: str, profile_name: str = None
+) -> boto3.Session.client:
+    """
+    Returns a validated Boto3 S3 client created using a shared AWS credentials file.
+
+    To learn more see
+    https://docs.aws.amazon.com/boto3/latest/guide/credentials.html#shared-credentials-file
+
+    Args:
+        endpoint_url: The complete URL to use for the constructed S3 client.
+        profile_name: The name of a profile to use for S3 credentials file.
+                      If not given, then the default profile is used.
+
+    Raises:
+        SystemExit: If the client could not be created.
+
+    Returns:
+        boto3.Session.client: Configured S3 client
+    """
+    try:
+        session = (
+            boto3.Session(profile_name=profile_name)
+            if profile_name
+            else boto3.Session()
+        )
+
+        client = session.client(
+            service_name="s3",
+            endpoint_url=endpoint_url,
+            config=Config(
+                request_checksum_calculation="when_required",
+                response_checksum_validation="when_required",
+                connect_timeout=5,
+                read_timeout=32,
+                retries={"max_attempts": 3},
+            ),
+        )
+
+    except (BotoCoreError, NoCredentialsError, EndpointConnectionError) as e:
+        raise ConnectionError(f"Failed to create S3 client: {e}")
+
+    return client
+
+
+def validate_bucket_access(client: boto3.Session.client, bucket: str) -> None:
+    """
+    Raises ClientError if bucket does not exist or S3 client credentials are invalid.
+
+    Args:
+        client: Configured S3 client
+        bucket: Name of S3 bucket that object will be written in.
+    """
+    try:
+        # Validate credentials, endpoint and access to an existing bucket
+        client.head_bucket(Bucket=bucket)
+    except ClientError as e:
+        raise ValueError(f"S3 credentials, endpoint and/or bucket are invalid: {e}")
+
+    return
+
+
 def write_urls_to_s3(
     conf_parser: configparser.ConfigParser,
-    conf_s3: S3ConfigModel,
+    client: boto3.Session.client,
     log: logging.getLogger,
     min_size_kb: int,
     backup_s3_count: int | None = None,
@@ -374,7 +428,7 @@ def write_urls_to_s3(
 
     Args:
         conf_parser: ConfigParser object created from parsing configuration file.
-        conf_s3: S3ConfigModel object created from validated configuration file.
+        client: boto3.Session.client
         log: Logger object created with customized configuration file.
         min_size_kb: Minimum threshold in kilobytes that URL response content must be to
             upload file to S3 bucket.
@@ -387,51 +441,44 @@ def write_urls_to_s3(
             Default value is False.
             If False then only logs error and continues execution.
     """
-    session = boto3.Session(
-        aws_access_key_id=conf_s3.aws_access_key_id,
-        aws_secret_access_key=conf_s3.aws_secret_access_key,
-    )
-
-    client = session.client(service_name="s3", endpoint_url=str(conf_s3.endpoint_url))
-
     for section in conf_parser.sections():
-
         try:
             conf = validate_s3_config_section(conf_parser, section)
-            if not isinstance(conf, S3ConfigSectionModel):  # pragma: no cover
-                log.error(f"Config section '{section}': {conf}")
-                terminate_program(early_exit)
-                continue
+            validate_bucket_access(client, conf.bucket)
+        except ValueError as e:
+            log.error(f"Validation failed for config section '{section}': {e}")
+            terminate_program(early_exit)
+            continue
 
-            url_content = get_url_content(
-                str(conf.url), section, log, timeout, early_exit
+        url_content = get_url_content(str(conf.url), section, log, timeout, early_exit)
+        if not url_content:
+            continue
+
+        is_min_size = is_min_size_kb(url_content, min_size_kb, section, log, early_exit)
+        if not is_min_size:
+            continue
+
+        if backup_s3_count:
+            copy_s3_object(client, conf, log, section, early_exit)
+            delete_s3_backup_object(
+                client, conf, log, section, backup_s3_count, early_exit
             )
-            if not url_content:  # pragma: no cover
-                continue
 
-            is_min_size = is_min_size_kb(
-                url_content, min_size_kb, section, log, early_exit
-            )
-            if not is_min_size:  # pragma: no cover
-                continue
-
-            if backup_s3_count:
-                copy_s3_object(client, conf, log, section, early_exit)
-                delete_s3_backup_object(
-                    client, conf, log, section, backup_s3_count, early_exit
-                )
-
+        try:
             response_s3 = client.put_object(
                 Body=url_content, Bucket=conf.bucket, Key=conf.key
             )
-            status_code = response_s3.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
-            if status_code == 200:
+            if (
+                status_code := response_s3.get("ResponseMetadata", {}).get(
+                    "HTTPStatusCode"
+                )
+            ) == 200:
                 log.info(
                     f"Config section '{section}': Successfully copied URL "
                     f"content to S3 object '{conf.key}'"
                 )
-            else:  # pragma: no cover
+            else:
                 log.error(
                     f"Config section '{section}': S3 client returned unexpected "
                     f"HTTP response {status_code}"
@@ -441,16 +488,12 @@ def write_urls_to_s3(
         except ClientError as err:
             handle_s3_client_error(err, log, section, early_exit)
 
-        except Exception as e:  # pragma: no cover
-            log.error(f"Config section '{section}', error(s): {e}")
-            terminate_program(early_exit)
-
     return
 
 
 def sleep_until_next_iteration(
     sleep_minutes: int, start_time: float, log: logging.getLogger
-) -> None:  # pragma: no cover
+) -> None:
     """
     Sleep (delay execution) <sleep_minutes> minutes until next websnap iteration.
 

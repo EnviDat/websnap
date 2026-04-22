@@ -6,11 +6,11 @@ Example pdm command without flags (uses default argument values):
     pdm run websnap-cli
 
 Example pdm command, writes files locally and repeats every 60 minutes (1 hour):
-pdm run websnap-cli --file_logs --repeat_minutes 60
+pdm run websnap-cli --file-logs --repeat-minutes 60
 
 Example pdm command, uploads files to a S3 bucket and
 repeats every 1440 minutes (24 hours):
-pdm run websnap-cli --file_logs --s3_uploader --backup_s3_count 3 --repeat_minutes 1440
+pdm run websnap-cli --file-logs --s3-uploader --backup-s3-count 3 --repeat-minutes 1440
 
 Example command to run command directly with python
 from project root directory without flags:
@@ -18,6 +18,8 @@ from project root directory without flags:
 """
 
 import argparse
+import sys
+
 import websnap
 from websnap.constants import TIMEOUT
 
@@ -34,43 +36,48 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-c",
         "--config",
         default="config.ini",
-        help="Path to configuration file." "Default value is 'config.ini'.",
+        help="Path to configuration file.Default value is 'config.ini'.",
     )
 
     parser.add_argument(
-        "-l",
-        "--log_level",
+        "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
         help="Level to use for logging. Default value is 'INFO'.",
     )
 
     parser.add_argument(
-        "-f", "--file_logs", action="store_true", help="Enable rotating file logs."
+        "--file-logs", action="store_true", help="Enable rotating file logs."
     )
 
     parser.add_argument(
-        "-s",
-        "--s3_uploader",
+        "--s3-uploader",
         action="store_true",
         help="Enable uploading of files to S3 bucket. ",
     )
 
     parser.add_argument(
-        "-b",
-        "--backup_s3_count",
+        "--profile-name",
+        help="Name of a profile to use for S3 shared credentials file. "
+        "If omitted then the default profile is used.",
+    )
+
+    parser.add_argument(
+        "--endpoint-url", help="Complete URL to use for the constructed S3 client."
+    )
+
+    parser.add_argument(
+        "--backup-s3-count",
         type=int,
         help="Copy and backup S3 objects in each config section"
-        "<backup_s3_count> times, "
+        "<backup-s3-count> times, "
         "remove object with the oldest last modified timestamp. "
         "If omitted then objects are not copied or removed.",
     )
 
     parser.add_argument(
-        "-t",
         "--timeout",
         type=int,
         default=TIMEOUT,
@@ -78,8 +85,7 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-e",
-        "--early_exit",
+        "--early-exit",
         action="store_true",
         help="Enable early program termination after error occurs. "
         "If omitted then logs URL processing errors "
@@ -87,16 +93,14 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-r",
-        "--repeat_minutes",
+        "--repeat-minutes",
         type=int,
-        help="Run websnap continuously every <repeat_minutes>. "
+        help="Run websnap continuously every <repeat-minutes>. "
         "If omitted then websnap does not repeat.",
     )
 
     parser.add_argument(
-        "-n",
-        "--section_config",
+        "--section-config",
         help="File or URL to obtain additional configuration sections. "
         "Cannot be used to assign DEFAULT section in config. "
         "Only currently supports JSON config.",
@@ -111,14 +115,27 @@ def main():
     """
     kwargs = vars(parse_arguments())
 
-    websnap.websnap(
-        config=kwargs["config"],
-        log_level=kwargs["log_level"],
-        file_logs=kwargs["file_logs"],
-        s3_uploader=kwargs["s3_uploader"],
-        backup_s3_count=kwargs["backup_s3_count"],
-        timeout=kwargs["timeout"],
-        early_exit=kwargs["early_exit"],
-        repeat_minutes=kwargs["repeat_minutes"],
-        section_config=kwargs["section_config"],
-    )
+    try:
+        websnap.websnap(
+            config=kwargs["config"],
+            log_level=kwargs["log_level"],
+            file_logs=kwargs["file_logs"],
+            s3_uploader=kwargs["s3_uploader"],
+            profile_name=kwargs["profile_name"],
+            endpoint_url=kwargs["endpoint_url"],
+            backup_s3_count=kwargs["backup_s3_count"],
+            timeout=kwargs["timeout"],
+            early_exit=kwargs["early_exit"],
+            repeat_minutes=kwargs["repeat_minutes"],
+            section_config=kwargs["section_config"],
+        )
+
+    except (
+        ValueError,
+        FileNotFoundError,
+        TypeError,
+        ConnectionError,
+        RuntimeError,
+        TimeoutError,
+    ) as e:
+        sys.exit(f"ERROR: {e}")
