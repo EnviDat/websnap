@@ -155,6 +155,17 @@ def test_get_json_section_config_parser():
     assert isinstance(result, configparser.ConfigParser)
 
 
+def test_get_json_section_config_parser_invalid_extension():
+    """
+    Test that ValueError is raised when the section_config
+    file does not end in '.json'.
+    """
+    invalid_file = "config.txt"
+
+    with pytest.raises(ValueError):
+        get_json_section_config_parser(invalid_file)
+
+
 @patch("websnap.validators.is_url")
 @patch("websnap.validators.get_json_config_parser")
 def test_get_json_section_config_parser_not_instance(mock_get_json, mock_is_url):
