@@ -2,6 +2,7 @@
 
 import configparser
 from datetime import datetime
+from math import ceil
 from unittest.mock import patch, mock_open, MagicMock
 
 import pytest
@@ -25,6 +26,7 @@ from websnap.logic import (
     create_s3_client,
     validate_bucket_access,
     write_urls_to_s3,
+    sleep_until_next_iteration,
 )
 
 
@@ -374,6 +376,49 @@ def test_delete_s3_backup_object_no_prefix():
     assert "Prefix" not in kwargs
 
 
+@patch("websnap.logic.terminate_program")
+def test_delete_s3_backup_object_unexpected_status(mock_terminate):
+    """Test the else branch when delete_object returns a non-204 status."""
+    client = MagicMock()
+    log = MagicMock()
+    section = "S3_Delete_Section"
+
+    mock_conf = MagicMock()
+    mock_conf.bucket = "my-bucket"
+    mock_conf.key = "folder/data.txt"
+
+    # Mock list_objects_v2 to return 2 matching files
+    # (Setting backup_s3_count=1 to trigger deletion)
+    client.list_objects_v2.return_value = {
+        "Contents": [
+            {
+                "Key": "folder/data_2023-01-01_10-00-00.txt",
+                "LastModified": datetime(2023, 1, 1),
+            },
+            {
+                "Key": "folder/data_2023-01-02_10-00-00.txt",
+                "LastModified": datetime(2023, 1, 2),
+            },
+        ]
+    }
+
+    # Trigger: Mock delete_object to return an unexpected 500 status
+    client.delete_object.return_value = {"ResponseMetadata": {"HTTPStatusCode": 500}}
+
+    delete_s3_backup_object(
+        client, mock_conf, log, section, backup_s3_count=1, early_exit=True
+    )
+
+    # Verify the error log for unexpected response was called
+    log.error.assert_called_once_with(
+        f"Config section '{section}': Backup file delete "
+        f"attempt returned unexpected HTTP response 500"
+    )
+
+    # Verify the program termination was triggered
+    mock_terminate.assert_called_once_with(True)
+
+
 @patch("websnap.logic.handle_s3_client_error")
 def test_delete_s3_backup_object_client_error(mock_handler):
     """Test the 'except ClientError' block when an S3 call fails."""
@@ -594,3 +639,81 @@ def test_write_urls_to_s3_skips_after_put_error(
         "Config section 'SectionSuccess': Successfully copied URL "
         "content to S3 object 'data.bin'"
     )
+
+
+@patch("websnap.logic.validate_s3_config_section")
+@patch("websnap.logic.validate_bucket_access")
+@patch("websnap.logic.get_url_content")
+@patch("websnap.logic.is_min_size_kb")
+@patch("websnap.logic.terminate_program")
+def test_write_urls_to_s3_unexpected_status(
+    mock_terminate, mock_is_min_size, mock_get_url, mock_bucket_access, mock_validate_s3
+):
+    """Test the else branch when put_object returns a non-200 status code."""
+    parser = configparser.ConfigParser()
+    parser.add_section("ErrorSection")
+
+    # Stup mocks to succeed
+    mock_conf = MagicMock(bucket="my-bucket", key="data.txt", url="http://test.com")
+    mock_validate_s3.return_value = mock_conf
+    mock_bucket_access.return_value = None
+    mock_get_url.return_value = b"some data"
+    mock_is_min_size.return_value = True
+
+    # Setup S3 Client Mock
+    client = MagicMock()
+    # Trigger: Return 500 instead of 200
+    client.put_object.return_value = {"ResponseMetadata": {"HTTPStatusCode": 500}}
+
+    log = MagicMock()
+
+    write_urls_to_s3(parser, client, log, min_size_kb=1, early_exit=True)
+
+    # Verify the error was logged with the unexpected code
+    log.error.assert_called_once_with(
+        "Config section 'ErrorSection': S3 client returned unexpected HTTP response 500"
+    )
+
+    # Verify termination was triggered
+    mock_terminate.assert_called_once_with(True)
+
+
+@patch("websnap.logic.time.time")
+@patch("websnap.logic.time.sleep")
+def test_sleep_until_next_iteration_waits(mock_sleep, mock_time):
+    """Test that program sleeps for the remaining time when execution is fast."""
+    log = MagicMock()
+    sleep_minutes = 5  # 300 seconds total
+    start_time = 1000.0
+
+    # Mock current time to be 10 seconds after start_time
+    # Execution took 10s, should sleep for 290s
+    mock_time.return_value = 1010.0
+
+    sleep_until_next_iteration(sleep_minutes, start_time, log)
+
+    # Verify sleep call
+    mock_sleep.assert_called_once_with(290)
+
+    # Verify log message exists and contains the correct math
+    log.info.assert_called_once()
+    assert "Sleeping 290 seconds" in log.info.call_args[0][0]
+    assert f"about {ceil(290 / 60)} minutes" in log.info.call_args[0][0]
+
+
+@patch("websnap.logic.time.time")
+@patch("websnap.logic.time.sleep")
+def test_sleep_until_next_iteration_skips(mock_sleep, mock_time):
+    """Test that programs skips sleep if execution took longer than sleep_minutes."""
+    log = MagicMock()
+    sleep_minutes = 1  # 60 seconds total
+    start_time = 1000.0
+
+    # Mock current time to be 70 seconds after start_time
+    mock_time.return_value = 1070.0
+
+    sleep_until_next_iteration(sleep_minutes, start_time, log)
+
+    # Verify sleep was never called and nothing was logged
+    mock_sleep.assert_not_called()
+    log.info.assert_not_called()
