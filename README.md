@@ -56,7 +56,7 @@ websnap(file_logs=True, s3_uploader=True, backup_s3_count=7, early_exit=True)
 
 To access CLI documentation in terminal execute: 
    ```bash
-  websnap_cli --help
+  websnap-cli --help
    ```
 
 
@@ -74,6 +74,8 @@ To access CLI documentation in terminal execute:
 | `log_level`       | `str`         | `"INFO"`       |
 | `file_logs`       | `bool`        | `False`        |
 | `s3_uploader`     | `bool`        | `False`        |
+| `profile_name`    | `str \| None` | `None`         |
+| `endpoint_url`    | `str \| None` | `None`         |
 | `backup_s3_count` | `int \| None` | `None`         |
 | `timeout`         | `int`         | `32`           |
 | `early_exit`      | `bool`        | `False`        |
@@ -81,17 +83,19 @@ To access CLI documentation in terminal execute:
 | `section_config`  | `str \| None` | `None`         |
 
 ### CLI Options
-| Option              | Shortcut | Default      |
-|---------------------|----------|--------------|
-| `--config`          | `-c`     | `config.ini` |
-| `--log_level`       | `-l`     | `INFO`       |
-| `--file_logs`       | `-f`     | `False`      |
-| `--s3_uploader`     | `-s`     | `False`      |
-| `--backup_s3_count` | `-b`     | `None`       |
-| `--timeout`         | `-t`     | `32`         |
-| `--early_exit`      | `-e`     | `False`      |
-| `--repeat_minutes`  | `-r`     | `None`       |
-| `--section_config`  | `-n`     | `None`       |
+| Option              | Default      |
+|---------------------|--------------|
+| `--config`          | `config.ini` |
+| `--log_level`       | `INFO`       |
+| `--file_logs`       | `False`      |
+| `--s3_uploader`     | `False`      |
+| `--profile-name`    | `None`       |
+| `--endpoint-url`    | `None`       |
+| `--backup_s3_count` | `None`       |
+| `--timeout`         | `32`         |
+| `--early_exit`      | `False`      |
+| `--repeat_minutes`  | `None`       |
+| `--section_config`  | `None`       |
 
 ### Description
 
@@ -101,6 +105,8 @@ To access CLI documentation in terminal execute:
 | `log_level` _(str)_                  | <ul><li>Level to use for logging</li><li>Default value is `INFO`</li><li>Valid logging levels are `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`</li><li><a href="https://docs.python.org/3/library/logging.html#levels" target="_blank">Click here to learn more about logging levels</a></li></ul>                                                                                                                                                      |
 | `file_logs` _(bool)_                 | <ul><li>Enable rotating file logs</li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `s3_uploader` _(bool)_               | <ul><li>Enable uploading of files as objects to an S3 bucket</li><ul>                                                                                                                                                                                                                                                                                                                                                                                         |
+| `profile_name` _(str \| None)_       | <ul><li>Name of a profile to use for S3 shared credentials file</li><li>If omitted then the default profile is used</li></ul>                                                                                                                                                                                                                                                                                                                                 |
+| `endpoint_url`  _(str \| None)_      | <ul><li>Complete URL to use for the constructed S3 client</li></ul>                                                                                                                                                                                                                                                                                                                                                                                           |
 | `backup_s3_count` _(int \| None)_    | <ul><li>Copy and backup object in each config section to the configured S3 bucket a maximum of `backup_s3_count` times</li><li>Remove object with the oldest last modified timestamp</li><li>If omitted then objects are not copied or removed</li><li>If enabled then backup objects are copied and assigned the original object's key name with the last modified timestamp appended</li></ul>                                                              |
 | `timeout` _(int)_                    | <ul><li>Number of seconds to wait for response for each HTTP request before timing out</li><li>Default value is `32` seconds</li></ul>                                                                                                                                                                                                                                                                                                                        |
 | `early_exit` _(bool)_                | <ul><li>Enable early program termination after error occurs</li><li>If omitted logs errors but continues program execution</li></ul>                                                                                                                                                                                                                                                                                                                          |
