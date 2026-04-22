@@ -1,7 +1,7 @@
 # websnap
 
 <div>
-  <img alt="Supported Python Versions" src="https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13|%203.14-blue">
+  <img alt="Supported Python Versions" src="https://img.shields.io/badge/python-3.12%20|%203.13|%203.14-blue">
   <a href="https://pypi.org/project/websnap" target="_blank">
     <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/websnap">
   </a>
@@ -86,16 +86,16 @@ To access CLI documentation in terminal execute:
 | Option              | Default      |
 |---------------------|--------------|
 | `--config`          | `config.ini` |
-| `--log_level`       | `INFO`       |
-| `--file_logs`       | `False`      |
-| `--s3_uploader`     | `False`      |
+| `--log-level`       | `INFO`       |
+| `--file-logs`       | `False`      |
+| `--s3-uploader`     | `False`      |
 | `--profile-name`    | `None`       |
 | `--endpoint-url`    | `None`       |
-| `--backup_s3_count` | `None`       |
+| `--backup-s3-count` | `None`       |
 | `--timeout`         | `32`         |
-| `--early_exit`      | `False`      |
-| `--repeat_minutes`  | `None`       |
-| `--section_config`  | `None`       |
+| `--early-exit`      | `False`      |
+| `--repeat-minutes`  | `None`       |
+| `--section-config`  | `None`       |
 
 ### Description
 
@@ -128,39 +128,77 @@ To access CLI documentation in terminal execute:
 
 Utilizes the AWS SDK for Python (Boto3) to add and backup API files as objects in an S3 bucket. 
 
-### Examples
 
-#### Function
+### Credentials
+Use a shared credentials file to export records to an S3 bucket.
+
+<a href="https://docs.aws.amazon.com/boto3/latest/guide/credentials.html#shared-credentials-file" target="_blank">Click here</a>
+ to learn about Boto3 shared credentials file, expected default location of file (`~/.aws/credentials`), supported configuration variables, and profiles.
+
+**__Note:__** Be aware that environment variables will take precedence over a shared credentials file! 
+<a href="https://docs.aws.amazon.com/boto3/latest/guide/credentials.html#configuring-credentialse" target="_blank">Click here</a>
+ to learn more about the order that Boto3 searches for credentials.
+
+The CLI will use the `[default]` settings in the shared credentials file unless the option `--profile-name` is used.
+
+Example `~/.aws/credentials` file:
+```
+[default]
+aws_access_key_id=food
+aws_secret_access_key=bard
+```
+
+If using the CLI option `--profile-name` option then a specific configuration profile can be used in the `~/.aws/credentials` file:
+```
+[default]
+aws_access_key_id=food
+aws_secret_access_key=bard
+
+[dev]
+aws_access_key_id=snack
+aws_secret_access_key=singer
+```
+
+
+### Function Examples
 ```python
 # The s3_uploader argument must be passed as True to copy files as objects to an S3 bucket
+# If s3_uploader is True then the endpoint_url argument must also be passed 
+
 # Copies objects to an S3 bucket using default argument values
-websnap(s3_uploader=True)
+websnap(s3_uploader=True, endpoint_url="https://examplecloud.com")
 
 # Copies objects to an S3 bucket, repeats every 1440 minutes (24 hours),
 #   and at maximum 4 backup objects are allowed for each config section
-websnap(s3_uploader=True, repeat_minutes=1440, backup_s3_count=4)
-
+websnap(s3_uploader=True, endpoint_url="https://examplecloud.com", repeat_minutes=1440, backup_s3_count=4)
 
 ```
 
-#### CLI
-- The following CLI option **must** be used to enable websnap to upload files as objects in an S3 bucket: `--s3_uploader`
+### CLI Examples
 
-- Copies objects to an S3 bucket using default argument values:
-     ```bash
-      websnap_cli --s3_uploader 
-     ```
+#### Required Options
+- The following CLI options **must** be used to enable websnap to upload files as objects in an S3 bucket:
+  - `--s3-uploader`
+  - `--endpoint-url` must be assigned to the complete URL to use for the constructed S3 client
 
-- Copies objects to an S3 bucket, repeats every 1440 minutes (24 hours),
-   and at maximum 4 backup objects are allowed for each config section:
-     ```bash
-      websnap_cli --s3_uploader --repeat_minutes 1440 --backup_s3_count 4 
-     ```
+#### Basic Usage
+- Copies objects to an S3 bucket using default argument values
+ ```bash
+  websnap-cli --s3-uploader --endpoint-url "https://examplecloud.com"
+ ```
+
+#### Advanced Usage
+- Copies objects to an S3 bucket
+- Specify `dev` as the profile to use in the `~/.aws/credentials` file
+- Repeat every 1440 minutes (24 hours)
+- At maximum 4 backup objects are allowed for each config section
+- Enable logging to a file
+ ```bash
+  websnap-cli --s3-uploader --profile-name dev --endpoint-url "https://examplecloud.com" --repeat-minutes 1440 --backup-s3-count 4 --file-logs
+ ```
 
 ### Configuration
 
-- The following environment variables are **required**: `ENDPOINT_URL`, 
-  `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
 - A valid `.ini` or `.json `configuration file is **required**.
 - Websnap expects the config to be `config.ini` in the same directory as websnap 
   package is being executed from.
@@ -175,27 +213,9 @@ websnap(s3_uploader=True, repeat_minutes=1440, backup_s3_count=4)
 | `.json` | <a href="https://github.com/EnviDat/websnap/blob/main/src/websnap/config_templates/s3_config_template.json" target="_blank">src/websnap/config_templates/s3_config_template.json</a> |
 
 
-#### Environment Variables
+#### S3 Configuration Sections (one per API URL endpoint)
 
-Supports setting environment variables in a `.env` file.
-
-Example `.env` file:
-
-```
-ENDPOINT_URL=https://dreamycloud.com
-AWS_ACCESS_KEY_ID=1234567abcdefg
-AWS_SECRET_ACCESS_KEY=hijklmn1234567
-```
-
-| Environment Variable    | Description                              |
-|-------------------------|------------------------------------------|
-| `ENDPOINT_URL`          | URL to use for the constructed S3 client |
-| `AWS_ACCESS_KEY_ID`     | AWS access key ID                        |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret access key                    |
-
-#### Sections (one per API URL endpoint)
-
-- _Each file retrieved from an API requires its **own config section!**_
+- _Each file retrieved from an API requires its **own configuration section!**_
 - The section name be anything, it is suggested to have a name that relates to the 
   copied file.
 
@@ -252,13 +272,13 @@ websnap(file_logs=True, repeat_minutes=60)
 
 - Write copied files to local machine using default argument values:
      ```bash
-      websnap_cli 
+      websnap-cli 
      ```
 
 - Write copied files locally and repeats every 60 minutes (1 hour), file logs 
   are enabled:
      ```bash
-      websnap_cli --file_logs --repeat_minutes 60
+      websnap-cli --file-logs --repeat-minutes 60
      ```
 
 ### Configuration
@@ -310,9 +330,10 @@ directory=projectdata
 
 Websnap supports optional rotating file logs.
 
-- The following CLI option **must** be used to enable websnap to support rotating file logs: `--file_logs`
+- The following CLI option **must** be used to enable websnap to support rotating file logs: `--file-logs`
   - In function usage the following argument must be passed to support rotating file 
     logs: `file_logs=True`
+- Log is called by default `websnap.log`
 - If log keys are not specified in the configuration `[DEFAULT]` section then default values in the table below will be used. 
 - `log_when` expects a value used by logging module TimedRotatingFileHandler.
 - <a href="https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler" target="_blank">Click here for more information about how to use TimedRotatingFileHandler.</a>
@@ -355,7 +376,7 @@ file must be to copy it from the configured API URL endpoint.
 - Configured minimum download size must be a non-negative integer.
 - If the content from the API URL endpoint is less than the configured size:
   - An error will be logged and the program continues to the next config section.
-  - If the CLI option `--early_exit` (or function argument `early_exit=True`) is 
+  - If the CLI option `--early-exit` (or function argument `early_exit=True`) is 
     enabled 
     then the program will terminate early.
 
@@ -379,7 +400,7 @@ min_size_kb=1
 
 ## Author
 
-Rebecca Buchholz, EnviDat Software Engineer
+Rebecca Buchholz
 
 
 ## Purpose
