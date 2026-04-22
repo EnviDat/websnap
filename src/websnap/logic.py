@@ -392,7 +392,7 @@ def create_s3_client(
         )
 
     except (BotoCoreError, NoCredentialsError, EndpointConnectionError) as e:
-        raise SystemExit(f"ERROR: Failed to create S3 client: {e}")
+        raise ConnectionError(f"Failed to create S3 client: {e}")
 
     return client
 

@@ -2,7 +2,6 @@
 
 import configparser
 import json
-import sys
 from pathlib import Path
 import requests
 from pydantic import (
@@ -67,7 +66,7 @@ def validate_positive_int_args(
             elif arg is not None:
                 validate_positive_integer(arg)
     except ValueError as e:
-        sys.exit(f"ERROR: {e}")
+        raise ValueError(e)
 
     return
 
@@ -78,8 +77,8 @@ def validate_endpoint_url(endpoint_url: str | None, s3_uploader: bool) -> str:
     If validation fails then raises Exception.
     """
     if s3_uploader and not endpoint_url:
-        sys.exit(
-            "ERROR: '--endpoint-url' option (endpoint_url function argument) "
+        raise ValueError(
+            "'--endpoint-url' option (endpoint_url function argument) "
             "must be provided when the "
             "'--s3-uploader' option (s3_uploader function argument) "
             "is enabled (set to True)"
@@ -92,8 +91,8 @@ def validate_endpoint_url(endpoint_url: str | None, s3_uploader: bool) -> str:
             return str(validated)
 
         except ValidationError:
-            sys.exit(
-                f"ERROR: '--endpoint-url' value (endpoint_url function argument) "
+            raise ValueError(
+                f"'--endpoint-url' value (endpoint_url function argument) "
                 f"'{endpoint_url}' "
                 f"is not a valid HTTP/HTTPS URL"
             )
@@ -151,9 +150,9 @@ def get_json_config_parser(config_path: Path) -> configparser.ConfigParser:
         return config_parser
 
     except FileNotFoundError:
-        sys.exit(f"ERROR: File '{config_path}' not found")
+        raise FileNotFoundError(f"File '{config_path}' not found")
     except json.JSONDecodeError as e:
-        sys.exit(f"ERROR: File '{config_path}' is not valid JSON: {e}")
+        raise ValueError(f"File '{config_path}' is not valid JSON: {e}")
 
 
 def get_url_json_config_parser(
@@ -179,15 +178,15 @@ def get_url_json_config_parser(
         return config_parser
 
     except requests.exceptions.Timeout:
-        sys.exit(f"ERROR: URL {config_url} timed out after {timeout}s")
+        raise TimeoutError("URL {config_url} timed out after {timeout}s")
     except requests.exceptions.HTTPError as e:
-        sys.exit(
-            f"ERROR: URL {config_url} failed with status: {e.response.status_code}"
+        raise RuntimeError(
+            f"URL {config_url} failed with status: {e.response.status_code}"
         )
     except json.JSONDecodeError:
-        sys.exit(f"ERROR: URL {config_url} did not return valid JSON")
+        raise ValueError(f"URL {config_url} did not return valid JSON")
     except requests.exceptions.RequestException as e:
-        sys.exit(f"ERROR: A network error occurred: {e}")
+        raise ConnectionError(f"A network error occurred: {e}")
 
 
 def get_json_section_config_parser(
@@ -207,13 +206,13 @@ def get_json_section_config_parser(
         if (section_path := Path(section_config)).suffix == ".json":
             section_parser = get_json_config_parser(section_path)
         else:
-            sys.exit("ERROR: Section config extension must be '.json'")
+            raise ValueError("Section config extension must be '.json'")
 
     if not isinstance(section_parser, configparser.ConfigParser):
-        sys.exit(f"ERROR: Expected ConfigParser, got {type(section_parser).__name__}")
+        raise TypeError(f"Expected ConfigParser, got {type(section_parser).__name__}")
 
     if section_parser.defaults():
-        sys.exit("ERROR: Section config cannot have a 'DEFAULT' section")
+        raise ValueError("Section config cannot have a 'DEFAULT' section")
 
     return section_parser
 
@@ -235,8 +234,8 @@ def get_config_parser(
     conf_path = Path(config)
 
     if section_config and conf_path.suffix != ".json":
-        sys.exit(
-            f"ERROR: Config '{config}' extension must be '.json' to also use "
+        raise ValueError(
+            f"Config '{config}' extension must be '.json' to also use "
             f"optional section config '{section_config}'"
         )
     elif conf_path.suffix == ".json":
@@ -248,10 +247,10 @@ def get_config_parser(
         config_parser = configparser.ConfigParser()
         conf = config_parser.read(conf_path)
         if not conf:
-            sys.exit(f"ERROR: File '{config}' not found")
+            raise FileNotFoundError(f"File '{config}' not found")
 
     if len(config_parser.sections()) < 1:
-        sys.exit(f"ERROR: File '{config}' does not have any sections")
+        raise ValueError(f"File '{config}' does not have any sections")
 
     return config_parser
 
@@ -290,9 +289,9 @@ def validate_log_config(
         }
         return LogConfigModel(**log)
     except ValidationError as e:
-        sys.exit(f"ERROR: Log configuration is invalid: {e}")
+        raise ValueError(f"Log configuration is invalid: {e}")
     except ValueError as e:
-        sys.exit(f"ERROR: Incorrect log related value in config: {e}")
+        raise ValueError(f"Incorrect log related value in config: {e}")
 
 
 def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
@@ -315,7 +314,7 @@ def validate_min_size_kb(config_parser: configparser.ConfigParser) -> int:
             )
 
     except ValueError as e:
-        sys.exit(f"ERROR: Incorrect value for config value 'min_size_kb': {e}")
+        raise ValueError(f"Incorrect value for config value 'min_size_kb': {e}")
 
 
 class ConfigSectionModel(BaseModel):

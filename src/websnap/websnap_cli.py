@@ -18,6 +18,8 @@ from project root directory without flags:
 """
 
 import argparse
+import sys
+
 import websnap
 from websnap.constants import TIMEOUT
 
@@ -113,16 +115,27 @@ def main():
     """
     kwargs = vars(parse_arguments())
 
-    websnap.websnap(
-        config=kwargs["config"],
-        log_level=kwargs["log_level"],
-        file_logs=kwargs["file_logs"],
-        s3_uploader=kwargs["s3_uploader"],
-        profile_name=kwargs["profile_name"],
-        endpoint_url=kwargs["endpoint_url"],
-        backup_s3_count=kwargs["backup_s3_count"],
-        timeout=kwargs["timeout"],
-        early_exit=kwargs["early_exit"],
-        repeat_minutes=kwargs["repeat_minutes"],
-        section_config=kwargs["section_config"],
-    )
+    try:
+        websnap.websnap(
+            config=kwargs["config"],
+            log_level=kwargs["log_level"],
+            file_logs=kwargs["file_logs"],
+            s3_uploader=kwargs["s3_uploader"],
+            profile_name=kwargs["profile_name"],
+            endpoint_url=kwargs["endpoint_url"],
+            backup_s3_count=kwargs["backup_s3_count"],
+            timeout=kwargs["timeout"],
+            early_exit=kwargs["early_exit"],
+            repeat_minutes=kwargs["repeat_minutes"],
+            section_config=kwargs["section_config"],
+        )
+
+    except (
+        ValueError,
+        FileNotFoundError,
+        TypeError,
+        ConnectionError,
+        RuntimeError,
+        TimeoutError,
+    ) as e:
+        sys.exit(f"ERROR: {e}")

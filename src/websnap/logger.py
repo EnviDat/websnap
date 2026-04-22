@@ -101,6 +101,4 @@ def get_custom_logger(
         return logger
 
     except AttributeError:
-        sys.exit(f"ERROR: Logging level must be a string, got {type(level).__name__}")
-    except ValueError as e:
-        sys.exit(f"ERROR: '{level}' is not a valid logging level: {e}")
+        raise TypeError(f"Logging level must be a string, got {type(level).__name__}")
