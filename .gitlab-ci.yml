@@ -41,7 +41,7 @@ test-tox:
     - pdm run tox -e py${PYTHON_VERSION}  # Run tox for different versions
   parallel:
     matrix:
-      - PYTHON_VERSION: [ "3.11", "3.12", "3.13", "3.14" ]
+      - PYTHON_VERSION: [ "3.12", "3.13", "3.14" ]
   when: manual
 
 
