@@ -34,14 +34,12 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-c",
         "--config",
         default="config.ini",
         help="Path to configuration file.Default value is 'config.ini'.",
     )
 
     parser.add_argument(
-        "-l",
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
@@ -49,11 +47,10 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-f", "--file-logs", action="store_true", help="Enable rotating file logs."
+        "--file-logs", action="store_true", help="Enable rotating file logs."
     )
 
     parser.add_argument(
-        "-s",
         "--s3-uploader",
         action="store_true",
         help="Enable uploading of files to S3 bucket. ",
@@ -70,7 +67,6 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-b",
         "--backup-s3-count",
         type=int,
         help="Copy and backup S3 objects in each config section"
@@ -80,7 +76,6 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-t",
         "--timeout",
         type=int,
         default=TIMEOUT,
@@ -88,7 +83,6 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-e",
         "--early-exit",
         action="store_true",
         help="Enable early program termination after error occurs. "
@@ -97,7 +91,6 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-r",
         "--repeat-minutes",
         type=int,
         help="Run websnap continuously every <repeat-minutes>. "
@@ -105,7 +98,6 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "-n",
         "--section-config",
         help="File or URL to obtain additional configuration sections. "
         "Cannot be used to assign DEFAULT section in config. "
