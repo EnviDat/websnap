@@ -1,6 +1,6 @@
 [project]
 name = "websnap"
-version = "3.0.0"
+version = "4.0.0"
 description = "Copies files retrieved from an API to an S3 bucket or a local machine."
 authors = [
     {name = "Rebecca Buchholz"},

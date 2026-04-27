@@ -1,5 +1,17 @@
 # CHANGELOG
 
+
+## 4.0.0 (2026-04-27)
+### Refactor
+- remove CLI option `--repeat-minutes`
+- separate local and S3 logic
+- improve validation
+### Docs
+- remove `--repeat-minutes` references
+### Tests
+- update tests to cover refactored logic and validators
+
+
 ## 3.0.0 (2026-04-22)
 ### Refactor
 - connect to S3 service using shared credentials file
