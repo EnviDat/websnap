@@ -4,6 +4,7 @@ import configparser
 import json
 from pathlib import Path
 import requests
+from websnap.session import make_session
 from pydantic import (
     BaseModel,
     ValidationError,
@@ -18,57 +19,39 @@ from typing import Optional, Any
 from websnap.constants import LogRotation, MIN_SIZE_KB, TIMEOUT
 
 
-def validate_positive_integer(x: Any) -> int:
+_ta = TypeAdapter(PositiveInt)
+
+
+def validate_timeout(timeout: int) -> None:
     """
-    Return x if it is a positive integer.
-
-    Args:
-        x: The input value.
-    """
-    ta = TypeAdapter(PositiveInt)
-
-    try:
-        ta.validate_python(x)
-        return x
-    except (ValueError, ValidationError):
-        raise ValueError(f"Argument is not a a positive integer: {x}")
-
-
-def validate_positive_int_args(
-    timeout: int, backup_s3_count: int | None = None, repeat_minutes: int | None = None
-) -> None:
-    """
-    Return None if validation passes (arguments are positive integers).
-    If validation fails then raises Exception.
-    None values are allowed for arguments backup_s3_count and repeat_minutes
-    (validation still passes).
+    Validate that timeout is a positive integer.
+    Raises ValueError if validation fails.
 
     Args:
         timeout: Number of seconds to wait for response for each HTTP request.
-            If integer passed then it must be a positive integer.
-        backup_s3_count: Copy and backup S3 objects in each config section
-            <backup_s3_count> times,
-            remove object with the oldest last modified timestamp.
-            If integer passed then it must be a positive integer.
-        repeat_minutes: Run websnap continuously every <repeat> minutes
-               If integer passed then it must be a positive integer.
     """
-    param_arg_dict = {
-        "timeout": timeout,
-        "backup_s3_count": backup_s3_count,
-        "repeat_minutes": repeat_minutes,
-    }
-
     try:
-        for param, arg in param_arg_dict.items():
-            if param == "timeout":
-                validate_positive_integer(arg)
-            elif arg is not None:
-                validate_positive_integer(arg)
-    except ValueError as e:
-        raise ValueError(e)
+        _ta.validate_python(timeout)
+    except (ValueError, ValidationError):
+        raise ValueError(f"'timeout' is not a positive integer: {timeout}")
 
-    return
+
+def validate_backup_s3_count(backup_s3_count: int | None) -> None:
+    """
+    Validate that backup_s3_count is a positive integer if provided.
+    None values are allowed (validation passes).
+    Raises ValueError if validation fails.
+
+    Args:
+        backup_s3_count: Number of times to copy and backup S3 objects.
+    """
+    if backup_s3_count is not None:
+        try:
+            _ta.validate_python(backup_s3_count)
+        except (ValueError, ValidationError):
+            raise ValueError(
+                f"'backup_s3_count' is not a positive integer: {backup_s3_count}"
+            )
 
 
 def validate_endpoint_url(endpoint_url: str | None, s3_uploader: bool) -> str:
@@ -166,7 +149,7 @@ def get_url_json_config_parser(
         timeout: Number of seconds to wait for response for each HTTP request.
     """
     try:
-        response = requests.get(config_url, timeout=timeout)
+        response = make_session().get(config_url, timeout=timeout)
 
         response.raise_for_status()
 
@@ -178,7 +161,7 @@ def get_url_json_config_parser(
         return config_parser
 
     except requests.exceptions.Timeout:
-        raise TimeoutError("URL {config_url} timed out after {timeout}s")
+        raise TimeoutError(f"URL {config_url} timed out after {timeout}s")
     except requests.exceptions.HTTPError as e:
         raise RuntimeError(
             f"URL {config_url} failed with status: {e.response.status_code}"

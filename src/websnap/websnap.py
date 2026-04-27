@@ -3,23 +3,18 @@ Function websnap() downloads files from URLs and uploads them to S3 bucket.
 Also supports writing downloaded files to local machine.
 """
 
-import time
-
 from websnap.constants import TIMEOUT
 from websnap.validators import (
     get_config_parser,
     validate_log_config,
     validate_min_size_kb,
-    validate_positive_int_args,
     validate_endpoint_url,
+    validate_timeout,
+    validate_backup_s3_count,
 )
 from websnap.logger import get_custom_logger
-from websnap.logic import (
-    write_urls_locally,
-    write_urls_to_s3,
-    sleep_until_next_iteration,
-    create_s3_client,
-)
+from websnap.logic import write_urls_locally
+from websnap.logic_s3 import create_s3_client, write_urls_to_s3
 
 __all__ = ["websnap"]
 
@@ -36,7 +31,6 @@ def websnap(
     backup_s3_count: int | None = None,
     timeout: int = TIMEOUT,
     early_exit: bool = False,
-    repeat_minutes: int | None = None,
     section_config: str | None = None,
 ) -> None:
     """
@@ -61,9 +55,6 @@ def websnap(
         early_exit: If True then terminates program immediately after error occurs.
             Default value is False.
             If False then only logs error and continues execution.
-        repeat_minutes: Run websnap continuously every <repeat> minutes
-               If integer passed then it must be a positive integer.
-               If omitted then default value is None and websnap will not repeat.
         section_config: File or URL to obtain additional configuration sections.
                 If omitted then default value is None and only config specified in
                 'config' argument is used.
@@ -75,7 +66,8 @@ def websnap(
                 passed in the `config` argument.
     """
     # Validate arguments
-    validate_positive_int_args(timeout, backup_s3_count, repeat_minutes)
+    validate_timeout(timeout)
+    validate_backup_s3_count(backup_s3_count)
     validate_endpoint_url(endpoint_url, s3_uploader)
 
     # Validate configuration
@@ -90,34 +82,21 @@ def websnap(
         config=conf_log,
     )
 
-    # Copy URL files and write to S3 bucket or local machine
-    is_repeat = True
-    while is_repeat:
-        is_repeat = repeat_minutes is not None
-        start_time = time.time()
+    log.info("******* START WEBSNAP *******")
+    log.info(f"Read config file: '{config}', it has sections: {conf_parser.sections()}")
 
-        log.info("******* START WEBSNAP ITERATION *******")
-        log.info(
-            f"Read config file: '{config}', it has sections: {conf_parser.sections()}"
+    if s3_uploader:
+        s3_client = create_s3_client(endpoint_url, profile_name)
+        write_urls_to_s3(
+            conf_parser,
+            s3_client,
+            log,
+            min_size_kb,
+            backup_s3_count,
+            timeout,
+            early_exit,
         )
+    else:
+        write_urls_locally(conf_parser, log, min_size_kb, timeout, early_exit)
 
-        if s3_uploader:
-            s3_client = create_s3_client(endpoint_url, profile_name)
-            write_urls_to_s3(
-                conf_parser,
-                s3_client,
-                log,
-                min_size_kb,
-                backup_s3_count,
-                timeout,
-                early_exit,
-            )
-        else:
-            write_urls_locally(conf_parser, log, min_size_kb, timeout, early_exit)
-
-        log.info("Finished websnap iteration")
-
-        if is_repeat:
-            sleep_until_next_iteration(repeat_minutes, start_time, log)
-
-    return
+    log.info("Finished websnap")
