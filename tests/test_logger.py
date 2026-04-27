@@ -1,7 +1,6 @@
 """Tests for src/websnap/logger.py"""
 
 import logging
-from unittest.mock import patch
 
 import pytest
 
