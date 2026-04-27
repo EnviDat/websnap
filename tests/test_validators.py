@@ -17,31 +17,41 @@ from websnap.validators import (
     get_url_json_config_parser,
     get_json_section_config_parser,
     get_config_parser,
-    validate_positive_integer,
+    validate_timeout,
+    validate_backup_s3_count,
     validate_s3_config_section,
     S3ConfigSectionModel,
     validate_endpoint_url,
-    validate_positive_int_args,
     validate_log_config,
     validate_min_size_kb,
     validate_config_section,
 )
 
 
-@pytest.mark.parametrize("x", [1, 0, 1.23, "abc"])
-def test_validate_positive_integer(x):
-    try:
-        result = validate_positive_integer(x)
-        assert result == x
-    except ValueError as e:
-        if e == f"Argument is not a a positive integer: {x}":
-            assert True
+@pytest.mark.parametrize("timeout", [1, 10, 100])
+def test_validate_timeout_valid(timeout):
+    validate_timeout(timeout)
 
 
-@pytest.mark.parametrize("timeout, backup_s3_count", [(-1, None), (2, -3)])
-def test_validate_positive_int_args(timeout, backup_s3_count):
+@pytest.mark.parametrize("timeout", [0, -1, -100])
+def test_validate_timeout_invalid(timeout):
     with pytest.raises(ValueError):
-        assert validate_positive_int_args(timeout, backup_s3_count)
+        validate_timeout(timeout)
+
+
+@pytest.mark.parametrize("backup_s3_count", [1, 5, 100])
+def test_validate_backup_s3_count_valid(backup_s3_count):
+    validate_backup_s3_count(backup_s3_count)
+
+
+def test_validate_backup_s3_count_none():
+    validate_backup_s3_count(None)
+
+
+@pytest.mark.parametrize("backup_s3_count", [0, -1, -100])
+def test_validate_backup_s3_count_invalid(backup_s3_count):
+    with pytest.raises(ValueError):
+        validate_backup_s3_count(backup_s3_count)
 
 
 def test_validate_endpoint_url():
@@ -100,58 +110,73 @@ def test_get_json_config_parser_invalid_json(tmp_path):
         get_json_config_parser(broken_file)
 
 
-@patch("websnap.validators.requests.get")
-def test_get_url_json_config_parser_timeout(mock_get):
+@patch("websnap.validators.make_session")
+def test_get_url_json_config_parser_timeout(mock_make_session):
     url = "https://example.com"
     timeout_val = 5
-    mock_get.side_effect = requests.exceptions.Timeout()
+    mock_make_session.return_value.get.side_effect = requests.exceptions.Timeout()
 
     with pytest.raises(TimeoutError):
         get_url_json_config_parser(url, timeout=timeout_val)
 
 
-def test_get_url_json_config_parser():
-    result_1 = get_url_json_config_parser(
-        "https://www.envidat.ch/converters-api/internal-dataset/websnap-config-all/"
-        "bibtex?bucket=random&is-recent=true&is-json=true",
-        30,
+@patch("websnap.validators.make_session")
+def test_get_url_json_config_parser(mock_make_session):
+    mock_response = MagicMock()
+    mock_response.raise_for_status.return_value = None
+    mock_response.json.return_value = {
+        "Section1": {"url": "https://example.com", "file_name": "test.json"}
+    }
+    mock_make_session.return_value.get.return_value = mock_response
+
+    result = get_url_json_config_parser("https://example.com", 30)
+    assert isinstance(result, configparser.ConfigParser)
+
+
+@patch("websnap.validators.make_session")
+def test_get_url_json_config_parser_http_error(mock_make_session):
+    mock_response = MagicMock()
+    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+        response=MagicMock(status_code=400)
     )
-    assert isinstance(result_1, configparser.ConfigParser)
+    mock_make_session.return_value.get.return_value = mock_response
 
     with pytest.raises(RuntimeError):
-        get_url_json_config_parser("https://httpbin.org/status/400", 30)
+        get_url_json_config_parser("https://example.com", 30)
 
 
-@patch("websnap.validators.requests.get")
-def test_get_url_json_config_parser_json_error(mock_get):
+@patch("websnap.validators.make_session")
+def test_get_url_json_config_parser_json_error(mock_make_session):
     url = "https://example.com"
 
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     mock_response.json.side_effect = json.JSONDecodeError("Expecting value", "", 0)
-    mock_get.return_value = mock_response
+    mock_make_session.return_value.get.return_value = mock_response
 
     with pytest.raises(ValueError):
         get_url_json_config_parser(url)
 
 
-@patch("websnap.validators.requests.get")
-def test_get_url_json_config_parser_request_exception(mock_get):
+@patch("websnap.validators.make_session")
+def test_get_url_json_config_parser_request_exception(mock_make_session):
     url = "https://invalid-domain.xyz"
 
-    # Raise a general RequestException (like a ConnectionError)
-    mock_get.side_effect = requests.exceptions.RequestException("DNS failure")
+    mock_make_session.return_value.get.side_effect = (
+        requests.exceptions.RequestException("DNS failure")
+    )
 
     with pytest.raises(ConnectionError):
         get_url_json_config_parser(url)
 
 
-def test_get_json_section_config_parser():
-    result = get_json_section_config_parser(
-        "https://www.envidat.ch/converters-api/internal-dataset/websnap-config-all/"
-        "bibtex?bucket=random&is-recent=true&is-json=true",
-        30,
-    )
+@patch("websnap.validators.get_url_json_config_parser")
+def test_get_json_section_config_parser(mock_get_url):
+    parser = configparser.ConfigParser()
+    parser.add_section("Section1")
+    mock_get_url.return_value = parser
+
+    result = get_json_section_config_parser("https://example.com", 30)
     assert isinstance(result, configparser.ConfigParser)
 
 

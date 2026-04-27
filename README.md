@@ -77,7 +77,6 @@ To access CLI documentation in terminal execute:
 | `backup_s3_count` | `int \| None` | `None`         |
 | `timeout`         | `int`         | `32`           |
 | `early_exit`      | `bool`        | `False`        |
-| `repeat_minutes`  | `int \| None` | `None`         |
 | `section_config`  | `str \| None` | `None`         |
 
 ### CLI Options
@@ -92,7 +91,6 @@ To access CLI documentation in terminal execute:
 | `--backup-s3-count` | `None`       |
 | `--timeout`         | `32`         |
 | `--early-exit`      | `False`      |
-| `--repeat-minutes`  | `None`       |
 | `--section-config`  | `None`       |
 
 ### Description
@@ -107,8 +105,7 @@ To access CLI documentation in terminal execute:
 | `endpoint_url`  _(str \| None)_      | <ul><li>Complete URL to use for the constructed S3 client</li></ul>                                                                                                                                                                                                                                                                                                                                                                                           |
 | `backup_s3_count` _(int \| None)_    | <ul><li>Copy and backup object in each config section to the configured S3 bucket a maximum of `backup_s3_count` times</li><li>Remove object with the oldest last modified timestamp</li><li>If omitted then objects are not copied or removed</li><li>If enabled then backup objects are copied and assigned the original object's key name with the last modified timestamp appended</li></ul>                                                              |
 | `timeout` _(int)_                    | <ul><li>Number of seconds to wait for response for each HTTP request before timing out</li><li>Default value is `32` seconds</li></ul>                                                                                                                                                                                                                                                                                                                        |
-| `early_exit` _(bool)_                | <ul><li>Enable early program termination after error occurs</li><li>If omitted logs errors but continues program execution</li></ul>                                                                                                                                                                                                                                                                                                                          |
-| `repeat_minutes` _(int \| None)_     | <ul><li>Run websnap continuously every `repeat_minutes` minutes</li><li>If omitted then websnap does not repeat</li></ul>                                                                                                                                                                                                                                                                                                                                     |
+| `early_exit` _(bool)_                | <ul><li>Enable early program termination after error occurs</li><li>If omitted logs errors but continues program execution</li></ul>                                                                                                                                                                                                                                                                                                                          | |
 | `section_config` _(str \| None)_     | <ul><li>File or URL to obtain additional configuration sections</li><li>If omitted then default value is `None` and only config specified in `config` argument is used</li><li>Cannot be used to assign "DEFAULT" values in config</li><li>Currently only supports JSON config and can only be used if `config` argument is also a JSON file</li><li>Duplicate sections will overwrite values with the same section passed in the `config` argument</li></ul> |                                                                                                                                                                                                                                                                                                                                                                      |
 
 
@@ -166,9 +163,9 @@ aws_secret_access_key=singer
 # Copies objects to an S3 bucket 
 websnap(s3_uploader=True, endpoint_url="https://examplecloud.com")
 
-# Copies objects to an S3 bucket, repeats every 1440 minutes (24 hours),
-#   and at maximum 4 backup objects are allowed for each config section
-websnap(s3_uploader=True, endpoint_url="https://examplecloud.com", repeat_minutes=1440, backup_s3_count=4)
+# Copies objects to an S3 bucket and at maximum 4 backup objects are allowed for each 
+# config section
+websnap(s3_uploader=True, endpoint_url="https://examplecloud.com", backup_s3_count=4)
 
 ```
 
@@ -188,11 +185,10 @@ websnap(s3_uploader=True, endpoint_url="https://examplecloud.com", repeat_minute
 #### Advanced Usage
 - Copies objects to an S3 bucket
 - Specify `dev` as the profile to use in the `~/.aws/credentials` file
-- Repeat every 1440 minutes (24 hours)
 - At maximum 4 backup objects are allowed for each config section
 - Enable logging to a file
  ```bash
-  websnap-cli --s3-uploader --profile-name dev --endpoint-url "https://examplecloud.com" --repeat-minutes 1440 --backup-s3-count 4 --file-logs
+  websnap-cli --s3-uploader --profile-name dev --endpoint-url "https://examplecloud.com" --backup-s3-count 4 --file-logs
  ```
 
 ### Configuration
@@ -261,9 +257,8 @@ key=project.json
 # Write files retrieved from an API to local machine using default argument values
 websnap()
 
-# Write files retrieved from an API locally and repeats every 60 minutes (1 hour), 
-# file logs are enabled
-websnap(file_logs=True, repeat_minutes=60)
+# Write files retrieved from an API locally and file logs are enabled
+websnap(file_logs=True)
 ```
 
 #### CLI 
@@ -273,10 +268,9 @@ websnap(file_logs=True, repeat_minutes=60)
       websnap-cli 
      ```
 
-- Write copied files locally and repeats every 60 minutes (1 hour), file logs 
-  are enabled:
+- Write copied files locally and file logs are enabled:
      ```bash
-      websnap-cli --file-logs --repeat-minutes 60
+      websnap-cli --file-logs
      ```
 
 ### Configuration
@@ -398,7 +392,7 @@ min_size_kb=1
 
 ## Author
 
-Rebecca Buchholz
+<a href="http://www.linkedin.com/in/rebeccabuchholz" target="_blank">Rebecca Buchholz</a> 
 
 
 ## Purpose

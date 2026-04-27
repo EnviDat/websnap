@@ -1,4 +1,5 @@
 """Tests for src/websnap/websnap_cli.py"""
+
 import pytest
 
 from websnap.websnap_cli import main
@@ -25,8 +26,10 @@ def test_main_handles_value_error_cleanly():
 
     # Patch sys.argv to simulate CLI call
     # and Patch websnap to trigger the error
-    with mock.patch("sys.argv", test_args), \
-            mock.patch("websnap.websnap") as mock_websnap:
+    with (
+        mock.patch("sys.argv", test_args),
+        mock.patch("websnap.websnap") as mock_websnap,
+    ):
         # Simulate a validation failure inside the core logic
         mock_websnap.side_effect = ValueError("Timeout must be positive")
 
@@ -42,8 +45,10 @@ def test_main_handles_connection_error_cleanly():
     """
     test_args = ["websnap_cli", "--s3-uploader"]
 
-    with mock.patch("sys.argv", test_args), \
-            mock.patch("websnap.websnap") as mock_websnap:
+    with (
+        mock.patch("sys.argv", test_args),
+        mock.patch("websnap.websnap") as mock_websnap,
+    ):
         mock_websnap.side_effect = ConnectionError("Could not reach S3")
 
         with pytest.raises(SystemExit) as excinfo:

@@ -5,12 +5,11 @@ them to S3 bucket or local machine.
 Example pdm command without flags (uses default argument values):
     pdm run websnap-cli
 
-Example pdm command, writes files locally and repeats every 60 minutes (1 hour):
-pdm run websnap-cli --file-logs --repeat-minutes 60
+Example pdm command, writes files locally:
+pdm run websnap-cli --file-logs
 
-Example pdm command, uploads files to a S3 bucket and
-repeats every 1440 minutes (24 hours):
-pdm run websnap-cli --file-logs --s3-uploader --backup-s3-count 3 --repeat-minutes 1440
+Example pdm command, uploads files to a S3 bucket:
+pdm run websnap-cli --file-logs --s3-uploader --backup-s3-count 3
 
 Example command to run command directly with python
 from project root directory without flags:
@@ -24,7 +23,7 @@ import websnap
 from websnap.constants import TIMEOUT
 
 
-def parse_arguments() -> argparse.Namespace | None:
+def parse_arguments() -> argparse.Namespace:
     """
     Parses command line arguments and return arguments as argparse.Namespace object.
     If parsing fails then return None.
@@ -93,13 +92,6 @@ def parse_arguments() -> argparse.Namespace | None:
     )
 
     parser.add_argument(
-        "--repeat-minutes",
-        type=int,
-        help="Run websnap continuously every <repeat-minutes>. "
-        "If omitted then websnap does not repeat.",
-    )
-
-    parser.add_argument(
         "--section-config",
         help="File or URL to obtain additional configuration sections. "
         "Cannot be used to assign DEFAULT section in config. "
@@ -126,7 +118,6 @@ def main():
             backup_s3_count=kwargs["backup_s3_count"],
             timeout=kwargs["timeout"],
             early_exit=kwargs["early_exit"],
-            repeat_minutes=kwargs["repeat_minutes"],
             section_config=kwargs["section_config"],
         )
 
